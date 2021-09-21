@@ -1,5 +1,7 @@
-
 import { _decorator, Component, Node } from 'cc';
+import { GridItem } from './grid/GridItem';
+import GridProperty from './grid/GridProperty';
+import { resHelper } from './helper/ResHelper';
 const { ccclass, property } = _decorator;
 
 /**
@@ -13,23 +15,39 @@ const { ccclass, property } = _decorator;
  * ManualUrl = https://docs.cocos.com/creator/3.3/manual/zh/
  *
  */
- 
+
 @ccclass('Main')
 export class Main extends Component {
-    // [1]
-    // dummy = '';
+	// [1]
+	// dummy = '';
 
-    // [2]
-    // @property
-    // serializableDummy = 0;
+	// [2]
+	@property(Node)
+	gridLayer: Node;
 
-    start () {
-        // [3]
-    }
+	private _gridProp: GridProperty;
 
-    // update (deltaTime: number) {
-    //     // [4]
-    // }
+	start() {
+		this._gridProp = new GridProperty();
+		this.loadGrid();
+	}
+
+	async loadGrid() {
+		try {
+			const ndGrid = await resHelper.loadPrefab('prefabs/GridItem');
+			this.gridLayer.addChild(ndGrid);
+			ndGrid.getComponent(GridItem).data = {
+				verticeSize: this._gridProp.verticeSize,
+				name: 'corn',
+			};
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	// update (deltaTime: number) {
+	//     // [4]
+	// }
 }
 
 /**
