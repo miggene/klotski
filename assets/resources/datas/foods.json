@@ -1,111 +1,89 @@
 [{
   "_id": {
-    "$oid": "615fbf192a552104f868ef89"
+    "$oid": "6175147804b30ed004da023d"
   },
   "id": 1,
   "name": "beef",
-  "h": 1,
-  "v": 2,
-  "isLR": false,
-  "group": 1
+  "range": "1x2",
+  "direction": 1
 },{
   "_id": {
-    "$oid": "615fbf192a552104f868ef8a"
+    "$oid": "6175147804b30ed004da023e"
   },
   "id": 2,
   "name": "icecream",
-  "h": 1,
-  "v": 2,
-  "isLR": false,
-  "group": 1
+  "range": "1x2",
+  "direction": 1
 },{
   "_id": {
-    "$oid": "615fbf192a552104f868ef8b"
+    "$oid": "6175147804b30ed004da023f"
   },
   "id": 3,
   "name": "pudding",
-  "h": 1,
-  "v": 2,
-  "isLR": false,
-  "group": 1
+  "range": "1x2",
+  "direction": 1
 },{
   "_id": {
-    "$oid": "615fbf192a552104f868ef8c"
+    "$oid": "6175147804b30ed004da0240"
   },
   "id": 4,
   "name": "corn",
-  "h": 1,
-  "v": 3,
-  "isLR": false,
-  "group": 2
+  "range": "1x3",
+  "direction": 1
 },{
   "_id": {
-    "$oid": "615fbf192a552104f868ef8d"
+    "$oid": "6175147804b30ed004da0241"
   },
   "id": 5,
   "name": "fishBall",
-  "h": 1,
-  "v": 3,
-  "isLR": false,
-  "group": 2
+  "range": "1x3",
+  "direction": 1
 },{
   "_id": {
-    "$oid": "615fbf192a552104f868ef8e"
+    "$oid": "6175147804b30ed004da0242"
   },
   "id": 6,
   "name": "bun",
-  "h": 2,
-  "v": 1,
-  "isLR": true,
-  "group": 3
+  "range": "2x1",
+  "direction": 2
 },{
   "_id": {
-    "$oid": "615fbf192a552104f868ef8f"
+    "$oid": "6175147804b30ed004da0243"
   },
   "id": 7,
   "name": "sushi",
-  "h": 2,
-  "v": 1,
-  "isLR": true,
-  "group": 3
+  "range": "2x1",
+  "direction": 2
 },{
   "_id": {
-    "$oid": "615fbf192a552104f868ef90"
+    "$oid": "6175147804b30ed004da0244"
   },
   "id": 8,
   "name": "fries",
-  "h": 2,
-  "v": 2,
-  "isLR": true,
-  "group": 4
+  "range": "2x1",
+  "direction": 2
 },{
   "_id": {
-    "$oid": "615fbf192a552104f868ef91"
+    "$oid": "6175147804b30ed004da0245"
   },
   "id": 9,
   "name": "zongzi",
-  "h": 2,
-  "v": 2,
-  "isLR": true,
-  "group": 4
+  "range": "2x2",
+  "direction": 3
 },{
   "_id": {
-    "$oid": "615fbf192a552104f868ef92"
+    "$oid": "6175147804b30ed004da0246"
   },
   "id": 10,
   "name": "sausage",
-  "h": 3,
-  "v": 1,
-  "isLR": true,
-  "group": 5
+  "range": "3x1",
+  "direction": 2
 },{
   "_id": {
-    "$oid": "615fbf192a552104f868ef93"
+    "$oid": "6175147804b30ed004da0247"
   },
   "id": 11,
   "name": "eggRoll",
-  "h": 3,
-  "v": 1,
-  "isLR": true,
-  "group": 5
+  "range": "3x1",
+  "direction": 2
 }]

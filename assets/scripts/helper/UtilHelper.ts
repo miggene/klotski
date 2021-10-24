@@ -1,12 +1,12 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-09-22 13:59:44
- * @LastEditTime: 2021-09-22 14:11:02
+ * @LastEditTime: 2021-10-24 11:55:13
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/helper/UtilHelper.ts
  */
-import { Node } from 'cc';
+import { JsonAsset, Node, resources } from 'cc';
 
 export interface ITouchListener {
 	start?: () => void;
@@ -38,6 +38,26 @@ class UtilHelper {
 				nd.off(key, func, target);
 			}
 		}
+	}
+
+	// 动态加载json文件
+	public async loadJson(path: string): Promise<object> {
+		return new Promise((resolve, reject) => {
+			resources.load(path, JsonAsset, (err, data: JsonAsset) => {
+				if (err) return reject(err);
+				return resolve(data.json);
+			});
+		});
+	}
+
+	// 动态加载json文件数组
+	public async loadJsons(paths: string[]): Promise<object[]> {
+		return new Promise((resolve, reject) => {
+			resources.load(paths, JsonAsset, (err, data: JsonAsset[]) => {
+				if (err) return reject(err);
+				return resolve(data.map((v) => v.json));
+			});
+		});
 	}
 }
 
