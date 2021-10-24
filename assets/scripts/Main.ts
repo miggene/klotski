@@ -1,35 +1,34 @@
-
-import { _decorator, Component, Node } from 'cc';
-const { ccclass, property } = _decorator;
-
-/**
- * Predefined variables
- * Name = Main
- * DateTime = Tue Sep 21 2021 13:58:26 GMT+0800 (中国标准时间)
- * Author = dailycode365
- * FileBasename = Main.ts
- * FileBasenameNoExtension = Main
- * URL = db://assets/scripts/Main.ts
- * ManualUrl = https://docs.cocos.com/creator/3.3/manual/zh/
- *
+/*
+ * @Author: zhupengfei
+ * @Date: 2021-09-21 13:58:26
+ * @LastEditTime: 2021-10-24 11:30:49
+ * @LastEditors: zhupengfei
+ * @Description:
+ * @FilePath: /klotski/assets/scripts/Main.ts
  */
- 
+import { _decorator, Component, Node } from 'cc';
+
+const { ccclass, property } = _decorator;
 @ccclass('Main')
 export class Main extends Component {
-    // [1]
-    // dummy = '';
+	@property(Node)
+	gridLayer: Node;
 
-    // [2]
-    // @property
-    // serializableDummy = 0;
+	onLoad() {
 
-    start () {
-        // [3]
-    }
+	}
 
-    // update (deltaTime: number) {
-    //     // [4]
-    // }
+	start() {
+
+	}
+
+
+
+
+
+	// update (deltaTime: number) {
+	//     // [4]
+	// }
 }
 
 /**

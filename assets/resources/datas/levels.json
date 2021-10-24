@@ -1,0 +1,12 @@
+[{
+  "_id": {
+    "$oid": "615fbf542a552104f868ef96"
+  },
+  "id": 15,
+  "group_1": 5,
+  "group_2": 0,
+  "group_3": 2,
+  "group_4": 0,
+  "group_5": 3,
+  "targetId": 1
+}]
