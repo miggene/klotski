@@ -1,0 +1,111 @@
+[{
+  "_id": {
+    "$oid": "615fbf192a552104f868ef89"
+  },
+  "id": 1,
+  "name": "beef",
+  "h": 1,
+  "v": 2,
+  "isLR": false,
+  "group": 1
+},{
+  "_id": {
+    "$oid": "615fbf192a552104f868ef8a"
+  },
+  "id": 2,
+  "name": "icecream",
+  "h": 1,
+  "v": 2,
+  "isLR": false,
+  "group": 1
+},{
+  "_id": {
+    "$oid": "615fbf192a552104f868ef8b"
+  },
+  "id": 3,
+  "name": "pudding",
+  "h": 1,
+  "v": 2,
+  "isLR": false,
+  "group": 1
+},{
+  "_id": {
+    "$oid": "615fbf192a552104f868ef8c"
+  },
+  "id": 4,
+  "name": "corn",
+  "h": 1,
+  "v": 3,
+  "isLR": false,
+  "group": 2
+},{
+  "_id": {
+    "$oid": "615fbf192a552104f868ef8d"
+  },
+  "id": 5,
+  "name": "fishBall",
+  "h": 1,
+  "v": 3,
+  "isLR": false,
+  "group": 2
+},{
+  "_id": {
+    "$oid": "615fbf192a552104f868ef8e"
+  },
+  "id": 6,
+  "name": "bun",
+  "h": 2,
+  "v": 1,
+  "isLR": true,
+  "group": 3
+},{
+  "_id": {
+    "$oid": "615fbf192a552104f868ef8f"
+  },
+  "id": 7,
+  "name": "sushi",
+  "h": 2,
+  "v": 1,
+  "isLR": true,
+  "group": 3
+},{
+  "_id": {
+    "$oid": "615fbf192a552104f868ef90"
+  },
+  "id": 8,
+  "name": "fries",
+  "h": 2,
+  "v": 2,
+  "isLR": true,
+  "group": 4
+},{
+  "_id": {
+    "$oid": "615fbf192a552104f868ef91"
+  },
+  "id": 9,
+  "name": "zongzi",
+  "h": 2,
+  "v": 2,
+  "isLR": true,
+  "group": 4
+},{
+  "_id": {
+    "$oid": "615fbf192a552104f868ef92"
+  },
+  "id": 10,
+  "name": "sausage",
+  "h": 3,
+  "v": 1,
+  "isLR": true,
+  "group": 5
+},{
+  "_id": {
+    "$oid": "615fbf192a552104f868ef93"
+  },
+  "id": 11,
+  "name": "eggRoll",
+  "h": 3,
+  "v": 1,
+  "isLR": true,
+  "group": 5
+}]
