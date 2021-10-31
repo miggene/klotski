@@ -1,12 +1,12 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-09-21 13:58:26
- * @LastEditTime: 2021-10-24 18:19:37
+ * @LastEditTime: 2021-10-31 15:03:30
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/Main.ts
  */
-import { _decorator, Component, Node } from 'cc';
+import { _decorator, Component, Node, UITransform } from 'cc';
 import { Food } from './client/Food';
 import { arrange } from './client/logic/Arrange';
 import { resHelper } from './helper/ResHelper';
@@ -31,7 +31,13 @@ export class Main extends Component {
 					const foodPrefab = await resHelper.loadPrefab('prefabs/FoodPrefab');
 					const data = await server.reqFood(v);
 					data.idx = idx;
+					let [x, y] = arrange.getPosByIdx(idx);
+					[x, y] = arrange.flipY([x, y]);
+					[x, y] = arrange.moveRel2Center([x, y]);
+					const [r, c] = data.range.split('x').map((v) => parseInt(v, 10));
+					[x, y] = arrange.moveRel2Self([x, y], arrange.getWH([r, c]));
 					foodPrefab.getComponent(Food).initView(data);
+					foodPrefab.setPosition(x, y);
 					this.gridLayer.addChild(foodPrefab);
 				}
 			});

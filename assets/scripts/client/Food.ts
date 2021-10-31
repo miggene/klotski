@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-10-24 17:56:39
- * @LastEditTime: 2021-10-24 18:33:29
+ * @LastEditTime: 2021-10-30 17:47:52
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/client/Food.ts
@@ -43,8 +43,8 @@ export class Food extends Component {
 
 	public async initView(data: IFoodModel) {
 		const { name, idx } = data;
-		const [x, y] = arrange.getPosByIdx(idx);
-		this.node.setPosition(x, y);
+		// const [x, y] = arrange.getPosByIdx(idx);
+		// this.node.setPosition(x, y);
 		this.node.getComponent(Sprite).spriteFrame = await resHelper.loadSprite(
 			`foods/${name}`
 		);
