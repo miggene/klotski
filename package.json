@@ -1,9 +1,9 @@
 {
+  "creator": {
+    "version": "3.3.2"
+  },
   "name": "klotski",
   "type": "3d",
   "uuid": "e26dbcc9-c35c-4c4d-9791-1d458bc975ba",
-  "version": "3.3.0",
-  "creator": {
-    "version": "3.3.0"
-  }
+  "version": "3.3.2"
 }

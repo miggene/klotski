@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-09-22 13:59:44
- * @LastEditTime: 2021-10-24 11:55:13
+ * @LastEditTime: 2021-10-31 18:18:05
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/helper/UtilHelper.ts
@@ -9,10 +9,10 @@
 import { JsonAsset, Node, resources } from 'cc';
 
 export interface ITouchListener {
-	start?: () => void;
-	move?: () => void;
-	end?: () => void;
-	cancel: () => void;
+	'touch-start'?: (e) => void;
+	'touch-move'?: (e) => void;
+	'touch-end'?: (e) => void;
+	'touch-cancel': (e) => void;
 }
 
 class UtilHelper {
@@ -26,7 +26,7 @@ class UtilHelper {
 		for (const key in tch) {
 			if (Object.prototype.hasOwnProperty.call(tch, key)) {
 				const func = tch[key];
-				nd.on(key, func, target);
+				nd.on(`${key}`, func, target);
 			}
 		}
 	}

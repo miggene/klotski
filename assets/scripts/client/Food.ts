@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-10-24 17:56:39
- * @LastEditTime: 2021-10-30 17:47:52
+ * @LastEditTime: 2021-10-31 15:37:22
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/client/Food.ts
@@ -26,12 +26,8 @@ const { ccclass, property } = _decorator;
 
 @ccclass('Food')
 export class Food extends Component {
-	// [1]
-	// dummy = '';
-
-	// [2]
-	// @property
-	// serializableDummy = 0;
+	@property(Sprite)
+	spFood: Sprite = null;
 
 	start() {
 		// [3]
@@ -45,9 +41,7 @@ export class Food extends Component {
 		const { name, idx } = data;
 		// const [x, y] = arrange.getPosByIdx(idx);
 		// this.node.setPosition(x, y);
-		this.node.getComponent(Sprite).spriteFrame = await resHelper.loadSprite(
-			`foods/${name}`
-		);
+		this.spFood.spriteFrame = await resHelper.loadSprite(`foods/${name}`);
 	}
 }
 

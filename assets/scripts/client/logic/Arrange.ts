@@ -1,13 +1,13 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-10-24 18:09:53
- * @LastEditTime: 2021-10-31 15:03:12
+ * @LastEditTime: 2021-10-31 15:56:51
  * @LastEditors: zhupengfei
  * @Description:排列布局逻辑
  * @FilePath: /klotski/assets/scripts/client/logic/Arrange.ts
  */
 const BOARD_SIZE = [6, 6]; //[行，列];
-const BORDER_SIZE = [3, 3];
+const BORDER_SIZE = [4, 4];
 const BOARD_VERTISIZE = 120; //中心广场120，左边距3，右边距3
 const [WIDTH, HEIGHT] = BOARD_SIZE.map(
 	(v, index) => v * (BOARD_VERTISIZE + BORDER_SIZE[index] * 2)
@@ -30,8 +30,11 @@ class Arrange {
 		return [r, c];
 	}
 	public getPosByIdx(idx: number): number[] {
-		const v = this.getVec2(idx);
-		return v.map((value) => value * BOARD_VERTISIZE);
+		const [r, c] = this.getVec2(idx);
+
+		return [c, r].map(
+			(value, index) => value * (BOARD_VERTISIZE + BORDER_SIZE[index] * 2)
+		);
 	}
 	public flipY(vecArr: number[]): number[] {
 		const [x, y] = vecArr;
