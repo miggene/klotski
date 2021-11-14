@@ -4,7 +4,7 @@ import { IFoodModel, ILevelModel } from './database/IDataModel';
 /*
  * @Author: zhupengfei
  * @Date: 2021-10-24 11:39:07
- * @LastEditTime: 2021-10-24 18:07:06
+ * @LastEditTime: 2021-11-07 15:04:29
  * @LastEditors: zhupengfei
  * @Description: 服务端启动脚本
  * @FilePath: /klotski/assets/scripts/server/Server.ts
@@ -25,22 +25,26 @@ class Server {
 		}
 	}
 
-	public async reqLvlDt(level: number): Promise<ILevelModel> {
-		try {
-			const lvlDt = await db.queryLvlDt(level);
-			return lvlDt;
-		} catch (error) {
-			console.error(error);
-		}
+	public reqLvlDt(level: number): ILevelModel {
+		return db.queryLvlDt(level);
 	}
 
-	public async reqFood(id: number | string): Promise<IFoodModel> {
-		try {
-			const data = await db.queryFood(id);
-			return data;
-		} catch (error) {
-			console.error(error);
-		}
+	// public async reqFood(id: number | string): Promise<IFoodModel> {
+	// 	try {
+	// 		const data = await db.queryFood(id);
+	// 		return data;
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 	}
+	// }
+	public reqFood(id: number | string): IFoodModel {
+		return db.queryFood(id);
+		// try {
+		// 	const data = await db.queryFood(id);
+		// 	return data;
+		// } catch (error) {
+		// 	console.error(error);
+		// }
 	}
 }
 

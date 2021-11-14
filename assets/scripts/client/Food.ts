@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-10-24 17:56:39
- * @LastEditTime: 2021-10-31 15:37:22
+ * @LastEditTime: 2021-11-07 21:50:08
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/client/Food.ts
@@ -29,6 +29,11 @@ export class Food extends Component {
 	@property(Sprite)
 	spFood: Sprite = null;
 
+	private _data: IFoodModel = null;
+	public get data(): IFoodModel {
+		return this._data;
+	}
+
 	start() {
 		// [3]
 	}
@@ -38,10 +43,16 @@ export class Food extends Component {
 	// }
 
 	public async initView(data: IFoodModel) {
+		this._data = data;
+		console.log('this._data :>> ', this._data);
 		const { name, idx } = data;
 		// const [x, y] = arrange.getPosByIdx(idx);
 		// this.node.setPosition(x, y);
 		this.spFood.spriteFrame = await resHelper.loadSprite(`foods/${name}`);
+	}
+
+	updateIdx(idx: number) {
+		this._data.idx = idx;
 	}
 }
 
