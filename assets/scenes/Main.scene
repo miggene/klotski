@@ -2530,7 +2530,7 @@
     "fileId": "e8a+bU/8dPDbbJguUzLdoF"
   },
   {
-    "__type__": "97574WRTH5FsYQ6h7/vM9lf",
+    "__type__": "409fe4j56tJircAT9Vj0D5+",
     "_name": "",
     "_objFlags": 0,
     "node": {
@@ -2538,10 +2538,7 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "gridLayer": {
-      "__id__": 57
-    },
-    "_id": "1aQbzTpb9OpY8Tog+6Rd5q"
+    "_id": "c15BsU+dhFoJ3N2vaBw0PE"
   },
   {
     "__type__": "cc.SceneGlobals",
