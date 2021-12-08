@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-04 10:27:19
- * @LastEditTime: 2021-12-05 21:17:47
+ * @LastEditTime: 2021-12-08 21:22:03
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/Main.ts
@@ -27,15 +27,12 @@ import Klotski, {
 	Block,
 	BOARD_CELL_BOARDER,
 	BOARD_CELL_EMPTY,
-	Game,
 	HRD_BOARD_HEIGHT,
 	HRD_BOARD_WIDTH,
 	HRD_GAME_COL,
 	HRD_GAME_ROW,
 	Move,
-	Options,
 	Shape,
-	Step,
 } from './libs/Klotski';
 const { ccclass, property } = _decorator;
 const GRID_WIDTH = 126;
@@ -57,9 +54,9 @@ interface IFood {
 }
 @ccclass('Main')
 export class Main extends Component {
-	public klotski: Klotski;
-	private foods: IFood[];
-	private moves: Move[];
+	public klotski: Klotski = null;
+	private foods: IFood[] = null;
+	private moves: Move[] = null;
 	private foodCache: Map<number, Node> = new Map();
 	private _movedFood: Node = null;
 	private _moveRange: {
@@ -103,9 +100,9 @@ export class Main extends Component {
 		this.moves = this.klotski.solve({ blocks });
 		console.log('this.klotski.game :>> ', this.klotski.game);
 	}
-
 	public async refreshLevel(level: number) {
-		const lvlData = await this.getLvlData(level);
+		let lvlData = await this.getLvlData(level);
+		console.log('lvlData :>> ', lvlData);
 		this.foods = await this.getFoods();
 		this.foodCache.clear();
 		this.createFood(lvlData as Block[]);
@@ -174,6 +171,22 @@ export class Main extends Component {
 		}
 	}
 
+	private _canMove(shape: Shape, row: number, col: number, blockIdx: number) {
+		const [r, c] = shape;
+		for (let i = 1; i <= r; ++i) {
+			for (let j = 1; j <= c; ++j) {
+				if (
+					row !== undefined &&
+					col !== undefined &&
+					this._board[row + i][col + j] !== blockIdx + 1 &&
+					this._board[row + i][col + j] !== BOARD_CELL_EMPTY
+				)
+					return false;
+			}
+		}
+		return true;
+	}
+
 	private _updateBlocks(blockIdx: number, row: number, col: number) {
 		this._blocks[blockIdx].position = [row, col];
 	}
@@ -188,7 +201,8 @@ export class Main extends Component {
 				if (err) {
 					return reject(err);
 				}
-				return resolve(data.json[level].blocks as Block[]);
+				const copyData = JSON.parse(JSON.stringify(data));
+				return resolve(copyData.json[level].blocks as Block[]);
 			});
 		});
 	}
@@ -256,13 +270,9 @@ export class Main extends Component {
 			if (bx.contains(v2(lp.x, lp.y))) {
 				this._movedFood = ndFood;
 				const { x, y, z } = ndFood.getPosition();
-				const { blockIdx } = ndFood.getComponent(Food);
+				const { blockIdx, position, shape } = ndFood.getComponent(Food);
 				this._tsp = v3(x, y, z);
-				this._moveRange = this.getFoodPosLimit(
-					blockIdx,
-					ndFood.getComponent(Food).position,
-					this._movedFood
-				);
+				this._moveRange = this.getFoodPosLimit(blockIdx, position, shape);
 				break;
 			}
 		}
@@ -390,35 +400,35 @@ export class Main extends Component {
 
 	getMovedRange(
 		blockIdx: number,
-		position: [number, number]
+		position: [number, number],
+		shape: Shape
 	): [number, number, number, number] {
-		const [r, c] = position.map((v) => v + 1);
-		const board = this._board;
+		const [r, c] = position;
 		let base: [number, number, number, number] = [0, 0, 0, 0]; //[下，右，上，左]
 		for (let i = 0; i < base.length; ++i) {
 			const { x, y } = this.klotski.getDirection(i);
 			if ((i & 1) === 1) {
+				//左右
 				while (
 					c + (base[i] + 1) * x >= 0 &&
-					c + (base[i] + 1) * x < HRD_BOARD_WIDTH
+					c + (base[i] + 1) * x < HRD_GAME_COL
 				) {
-					if (
-						board[r][c + (base[i] + 1) * x] === BOARD_CELL_EMPTY ||
-						board[r][c + (base[i] + 1) * x] === blockIdx + 1
-					)
-						base[i]++;
+					const tmpR = r;
+					const tmpC = c + (base[i] + 1) * x;
+					const b = this._canMove(shape, tmpR, tmpC, blockIdx);
+					if (b) base[i]++;
 					else break;
 				}
 			} else {
+				//上下
 				while (
 					r + (base[i] + 1) * y >= 0 &&
-					r + (base[i] + 1) * y < HRD_BOARD_HEIGHT
+					r + (base[i] + 1) * y < HRD_GAME_ROW
 				) {
-					if (
-						board[r + (base[i] + 1) * y][c] === BOARD_CELL_EMPTY ||
-						board[r + (base[i] + 1) * y][c] === blockIdx + 1
-					)
-						base[i]++;
+					const tmpR = r + (base[i] + 1) * y;
+					const tmpC = c;
+					const b = this._canMove(shape, tmpR, tmpC, blockIdx);
+					if (b) base[i]++;
 					else break;
 				}
 			}
@@ -427,8 +437,8 @@ export class Main extends Component {
 		return base;
 	}
 
-	getFoodPosLimit(blockIdx: number, position: [number, number], food: Node) {
-		const range = this.getMovedRange(blockIdx, position).map(
+	getFoodPosLimit(blockIdx: number, position: [number, number], shape: Shape) {
+		const range = this.getMovedRange(blockIdx, position, shape).map(
 			(v) => v * GRID_WIDTH
 		);
 		const limit = [-1, 1, 1, -1].map((v, index) => v * range[index]);
@@ -440,8 +450,38 @@ export class Main extends Component {
 		return { minX, maxX, minY, maxY };
 	}
 
+	reset() {
+		// private moves: Move[] = null;
+		// private foodCache: Map<number, Node> = new Map();
+		// private _movedFood: Node = null;
+		// private _moveRange: {
+		// 	minX: number;
+		// 	maxX: number;
+		// 	minY: number;
+		// 	maxY: number;
+		// } = null;
+		// private _tsp: Vec3 = null;
+		// private _blocks: Block[] = [];
+		// private _board: number[][] = [];
+
+		this.foods = null;
+		this.moves = null;
+		this.foodCache.clear();
+		this._movedFood = null;
+		this._moveRange = null;
+		this._tsp = null;
+		this._blocks = [];
+		this._board = [];
+	}
+
 	onBtnClickToTip(e: EventTouch) {
 		this.makeMoveTip();
+	}
+
+	onBtnClickToRetry() {
+		this.gridLayer.destroyAllChildren();
+		this.reset();
+		this.refreshLevel(0);
 	}
 }
 
