@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-04 10:27:19
- * @LastEditTime: 2021-12-08 21:22:03
+ * @LastEditTime: 2021-12-09 20:20:26
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/Main.ts
@@ -65,6 +65,7 @@ export class Main extends Component {
 		minY: number;
 		maxY: number;
 	} = null;
+	private _moveDir: number = null; //移动方向
 	private _tsp: Vec3 = null;
 	private _blocks: Block[] = [];
 	private _board: number[][] = [];
@@ -285,33 +286,36 @@ export class Main extends Component {
 			let lp = this.gridLayer
 				.getComponent(UITransformComponent)
 				.convertToNodeSpaceAR(v3(wp.x, wp.y, 0));
-			const { minX, minY, maxX, maxY } = this._moveRange;
 			let { x, y } = lp;
-			const offX = x - this._tsp.x;
-			const offY = y - this._tsp.y;
-			// 左右移动
-			if (Math.abs(offX) > Math.abs(offY)) {
-				if (x < minX) x = minX;
-				if (x > maxX) x = maxX;
-				y = this._tsp.y;
-				this._movedFood.setPosition(x, y);
+
+			if (this._moveDir !== null) {
+				this._updateFoodPosition(x, y);
 				return;
 			}
-
-			if (y < minY) y = minY;
-			if (y > maxY) y = maxY;
-			x = this._tsp.x;
-			this._movedFood.setPosition(x, y);
+			const offX = x - this._tsp.x;
+			const offY = y - this._tsp.y;
+			const bDistance = Math.abs(offX) + Math.abs(offY) > 40;
+			if (bDistance && this._moveDir === null) {
+				// 左右移动
+				if (Math.abs(offX) > Math.abs(offY)) {
+					this._moveDir = offX > 0 ? 1 : 3;
+					this._updateFoodPosition(x, y);
+					return;
+				}
+				//上下移动
+				this._moveDir = offY > 0 ? 2 : 0;
+				this._updateFoodPosition(x, y);
+			}
 		}
 	}
 	_tchE(e: EventTouch) {
 		if (this._movedFood) {
-			const wp = e.getUILocation();
-			let lp = this.gridLayer
-				.getComponent(UITransformComponent)
-				.convertToNodeSpaceAR(v3(wp.x, wp.y, 0));
+			// const wp = e.getUILocation();
+			// let lp = this.gridLayer
+			// 	.getComponent(UITransformComponent)
+			// 	.convertToNodeSpaceAR(v3(wp.x, wp.y, 0));
 			const { minX, minY, maxX, maxY } = this._moveRange;
-			let { x, y } = lp;
+			let { x, y } = this._movedFood.getPosition();
 			if (x < minX) x = minX;
 			if (x > maxX) x = maxX;
 			if (y < minY) y = minY;
@@ -340,15 +344,16 @@ export class Main extends Component {
 		this._movedFood = null;
 		this._moveRange = null;
 		this.moves = null;
+		this._moveDir = null;
 	}
 	_tchC(e: EventTouch) {
 		if (this._movedFood) {
-			const wp = e.getUILocation();
-			let lp = this.gridLayer
-				.getComponent(UITransformComponent)
-				.convertToNodeSpaceAR(v3(wp.x, wp.y, 0));
+			// const wp = e.getUILocation();
+			// let lp = this.gridLayer
+			// 	.getComponent(UITransformComponent)
+			// 	.convertToNodeSpaceAR(v3(wp.x, wp.y, 0));
 			const { minX, minY, maxX, maxY } = this._moveRange;
-			let { x, y } = lp;
+			let { x, y } = this._movedFood.getPosition();
 			if (x < minX) x = minX;
 			if (x > maxX) x = maxX;
 			if (y < minY) y = minY;
@@ -370,11 +375,33 @@ export class Main extends Component {
 			this._takePosition(blockIdx, shape, row - yn, col + xn);
 			this._updateBlocks(blockIdx, row - yn, col + xn);
 			this._movedFood.getComponent(Food).position = [row - yn, col + xn];
+			console.log('this._blocks1 :>> ', this._blocks);
+			console.log('this._board1 :>> ', this._board);
 		}
 		this._tsp = null;
 		this._movedFood = null;
 		this._moveRange = null;
 		this.moves = null;
+		this._moveDir = null;
+	}
+
+	private _updateFoodPosition(x: number, y: number) {
+		const { minX, minY, maxX, maxY } = this._moveRange;
+		if (this._moveDir === 0 || this._moveDir === 2) {
+			x = this._tsp.x;
+			y = Math.max(y, minY);
+			y = Math.min(y, maxY);
+			this._movedFood.setPosition(x, y);
+			return;
+		}
+
+		if (this._moveDir === 1 || this._moveDir === 3) {
+			y = this._tsp.y;
+			x = Math.max(x, minX);
+			x = Math.min(x, maxX);
+			this._movedFood.setPosition(x, y);
+			return;
+		}
 	}
 
 	makeMoveTip() {
@@ -469,6 +496,7 @@ export class Main extends Component {
 		this.foodCache.clear();
 		this._movedFood = null;
 		this._moveRange = null;
+		this._moveDir = null;
 		this._tsp = null;
 		this._blocks = [];
 		this._board = [];
