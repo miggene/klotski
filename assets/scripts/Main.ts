@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-04 10:27:19
- * @LastEditTime: 2021-12-10 16:09:25
+ * @LastEditTime: 2021-12-10 16:26:28
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/Main.ts
@@ -496,6 +496,16 @@ export class Main extends Component {
 		let move = this.moves.shift();
 		if (!move) {
 			console.log('game win');
+			// this.unschedule(this._updateUsedTime);
+			// tween(this.lblWin.node)
+			// 	.show()
+			// 	.to(1, { position: v3(0, 0) })
+			// 	.start();
+			// this._tsp = null;
+			// this._movedFood = null;
+			// this._moveRange = null;
+			// this.moves = null;
+			// this._moveDir = null;
 			return;
 		}
 		const { blockIdx, dirIdx } = move;
@@ -506,16 +516,20 @@ export class Main extends Component {
 		const offY = -y * GRID_WIDTH;
 		const pos = ndFood.getPosition().add(v3(x + offX, y + offY, 0));
 		ndFood.setPosition(pos);
+		const [row, col] = position;
+		const [tarRow, tarCol] = [row + y, col + x];
 
-		this._clearPosition(shape, position[0], position[1]);
-		this._takePosition(blockIdx, shape, position[0] + y, position[1] + x);
-		ndFood.getComponent(Food).position = [position[0] + y, position[1] + x];
-		this._blocks[blockIdx].position = [position[0] + y, position[1] + x];
+		this._clearPosition(shape, row, col);
+		this._takePosition(blockIdx, shape, tarRow, tarCol);
+		ndFood.getComponent(Food).position = [tarRow, tarCol];
+		this._blocks[blockIdx].position = [tarRow, tarCol];
+		if (tarRow !== row || tarCol !== col) this.moveStep++;
+
 		if (this._isInExit()) {
 			console.log('game win');
 			this.unschedule(this._updateUsedTime);
+			this.lblWin.node.active = true;
 			tween(this.lblWin.node)
-				.show()
 				.to(1, { position: v3(0, 0) })
 				.start();
 			this._tsp = null;
@@ -589,13 +603,15 @@ export class Main extends Component {
 		this._tsp = null;
 		this._blocks = [];
 		this._board = [];
+		this.moveStep = 0;
+		this.usedTime = 0;
 	}
 
 	private _isInExit() {
 		return (
 			Array.isArray(this._blocks) &&
-			this._blocks[0].row === ESCAPE_ROW &&
-			this._blocks[0].col === ESCAPE_COL
+			this._blocks[0].position[0] === ESCAPE_ROW &&
+			this._blocks[0].position[1] === ESCAPE_COL
 		);
 	}
 
@@ -611,6 +627,8 @@ export class Main extends Component {
 		this.gridLayer.destroyAllChildren();
 		this.reset();
 		this.refreshLevel();
+		this.unschedule(this._updateUsedTime);
+		this.schedule(this._updateUsedTime, 1);
 	}
 
 	onBtnClickToNextLevel() {
