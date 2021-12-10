@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-11-24 16:58:32
- * @LastEditTime: 2021-12-05 15:19:16
+ * @LastEditTime: 2021-12-10 15:17:01
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/libs/Klotski.ts
@@ -14,8 +14,8 @@ export let HRD_GAME_COL = 4;
 export let HRD_BOARD_WIDTH = HRD_GAME_COL + 2;
 export let HRD_BOARD_HEIGHT = HRD_GAME_ROW + 2;
 
-let ESCAPE_ROW = 3;
-let ESCAPE_COL = 1;
+export let ESCAPE_ROW = 3;
+export let ESCAPE_COL = 1;
 export const BOARD_CELL_EMPTY = 0;
 export const BOARD_CELL_BOARDER = -1;
 
