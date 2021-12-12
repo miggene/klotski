@@ -1,10 +1,10 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-10 15:35:41
- * @LastEditTime: 2021-12-10 15:43:05
+ * @LastEditTime: 2021-12-12 17:19:33
  * @LastEditors: zhupengfei
  * @Description:
- * @FilePath: /klotski/assets/scripts/utils/Helper.ts
+ * @FilePath: /klotski/assets/scripts/common/utils/Helper.ts
  */
 
 export function formatTime(time: number, format: string = 'HH:MM:SS'): string {
@@ -31,4 +31,8 @@ export function formatTime(time: number, format: string = 'HH:MM:SS'): string {
 		h = h.length > 1 ? h : `0${h}`;
 		return len > 2 ? `${h}:${ms}` : `${ms}`;
 	}
+}
+
+export function deepClone(obj: Object) {
+	return JSON.parse(JSON.stringify(obj));
 }

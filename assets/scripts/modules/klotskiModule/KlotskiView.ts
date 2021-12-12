@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 11:13:58
- * @LastEditTime: 2021-12-12 15:02:02
+ * @LastEditTime: 2021-12-12 17:40:56
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/klotskiModule/KlotskiView.ts
@@ -22,7 +22,7 @@ import {
 	Prefab,
 } from 'cc';
 import { resMgr } from '../../common/mgrs/ResMgr';
-import { formatTime } from '../../common/utils/Helper';
+import { deepClone, formatTime } from '../../common/utils/Helper';
 import { Food } from '../../components/Food';
 import Klotski, {
 	Block,
@@ -56,6 +56,17 @@ const { ccclass, property } = _decorator;
 @ccclass('KlotskiView')
 export class KlotskiView extends Component {
 	public klotski: Klotski = null;
+
+	private _blocks: Block[];
+	public get blocks(): Block[] {
+		return this._blocks;
+	}
+	public set blocks(v: Block[]) {
+		this._blocks = v;
+	}
+
+	private _oldBlocks: Block[];
+
 	private foods: IFood[] = null;
 	private moves: Move[] = null;
 	private foodCache: Map<number, Node> = new Map();
@@ -68,7 +79,6 @@ export class KlotskiView extends Component {
 	} = null;
 	private _moveDir: number = null; //移动方向
 	private _tsp: Vec3 = null;
-	private _blocks: Block[] = [];
 	private _board: number[][] = [];
 	// private _levelIndex: number = 0;
 
@@ -137,6 +147,21 @@ export class KlotskiView extends Component {
 		this.schedule(this._updateUsedTime, 1);
 	}
 
+	/**
+	 * initProps
+	 */
+
+	public initView(props: Block[]) {
+		this.initProps(props);
+		this.refreshLevel();
+		this.schedule(this._updateUsedTime, 1);
+	}
+
+	public initProps(blocks: Block[]) {
+		this.blocks = deepClone(blocks);
+		this._oldBlocks = deepClone(blocks);
+	}
+
 	onDisable() {
 		this.gridLayer.off(Node.EventType.TOUCH_START, this._tchS, this);
 		this.gridLayer.off(Node.EventType.TOUCH_MOVE, this._tchM, this);
@@ -185,12 +210,10 @@ export class KlotskiView extends Component {
 		this.moves = this.klotski.solve({ blocks });
 		console.log('this.klotski.game :>> ', this.klotski.game);
 	}
-	public async refreshLevel(level: number = this.levelIndex) {
-		let lvlData = await this.getLvlData(level);
+	public async refreshLevel() {
 		this.foods = await this.getFoods();
 		this.foodCache.clear();
-		this.createFood(lvlData as Block[]);
-		this._blocks = lvlData;
+		this.createFood(this.blocks);
 		for (let i = 0; i < HRD_BOARD_HEIGHT; ++i) {
 			this._board[i] = [];
 			for (let j = 0; j < HRD_BOARD_WIDTH; ++j) {
@@ -203,13 +226,13 @@ export class KlotskiView extends Component {
 						: BOARD_CELL_BOARDER;
 			}
 		}
-		for (let i = 0; i < this._blocks.length; ++i) {
+		for (let i = 0; i < this.blocks.length; ++i) {
 			const {
 				shape,
 				position,
 				row = position[0],
 				col = position[1],
-			} = this._blocks[i];
+			} = this.blocks[i];
 			if (this._isPositionAvailable(shape, row, col)) {
 				this._takePosition(i, shape, row, col);
 			}
@@ -270,21 +293,21 @@ export class KlotskiView extends Component {
 	}
 
 	private _updateBlocks(blockIdx: number, row: number, col: number) {
-		this._blocks[blockIdx].position = [row, col];
+		this.blocks[blockIdx].position = [row, col];
 	}
 
 	// update (deltaTime: number) {
 	//     // [4]
 	// }
 
-	public async getLvlData(level: number) {
-		try {
-			const data = await resMgr.loadJson('datas/hrd');
-			return data[level].blocks as Block[];
-		} catch (error) {
-			console.error(error);
-		}
-	}
+	// public async getLvlData(level: number) {
+	// 	try {
+	// 		const data = await resMgr.loadJson('datas/hrd');
+	// 		return data[level].blocks as Block[];
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 	}
+	// }
 
 	public async getFoods(): Promise<IFood[]> {
 		try {
@@ -483,27 +506,8 @@ export class KlotskiView extends Component {
 		}
 	}
 
-	private _updateFoodPosition(x: number, y: number) {
-		const { minX, minY, maxX, maxY } = this._moveRange;
-		if (this._moveDir === 0 || this._moveDir === 2) {
-			x = this._tsp.x;
-			y = Math.max(y, minY);
-			y = Math.min(y, maxY);
-			this._movedFood.setPosition(x, y);
-			return;
-		}
-
-		if (this._moveDir === 1 || this._moveDir === 3) {
-			y = this._tsp.y;
-			x = Math.max(x, minX);
-			x = Math.min(x, maxX);
-			this._movedFood.setPosition(x, y);
-			return;
-		}
-	}
-
 	makeMoveTip() {
-		this.moves = this.moves || this.klotski.solve({ blocks: this._blocks });
+		this.moves = this.moves || this.klotski.solve({ blocks: this.blocks });
 		let move = this.moves.shift();
 		if (!move) {
 			console.log('game win');
@@ -533,7 +537,7 @@ export class KlotskiView extends Component {
 		this._clearPosition(shape, row, col);
 		this._takePosition(blockIdx, shape, tarRow, tarCol);
 		ndFood.getComponent(Food).position = [tarRow, tarCol];
-		this._blocks[blockIdx].position = [tarRow, tarCol];
+		this.blocks[blockIdx].position = [tarRow, tarCol];
 		if (tarRow !== row || tarCol !== col) this.moveStep++;
 
 		if (this._isInExit()) {
@@ -612,7 +616,7 @@ export class KlotskiView extends Component {
 		this._moveRange = null;
 		this._moveDir = null;
 		this._tsp = null;
-		this._blocks = [];
+		this.blocks = [];
 		this._board = [];
 		this.moveStep = 0;
 		this.usedTime = 0;
@@ -620,9 +624,9 @@ export class KlotskiView extends Component {
 
 	private _isInExit() {
 		return (
-			Array.isArray(this._blocks) &&
-			this._blocks[0].position[0] === ESCAPE_ROW &&
-			this._blocks[0].position[1] === ESCAPE_COL
+			Array.isArray(this.blocks) &&
+			this.blocks[0].position[0] === ESCAPE_ROW &&
+			this.blocks[0].position[1] === ESCAPE_COL
 		);
 	}
 
@@ -637,6 +641,7 @@ export class KlotskiView extends Component {
 	onBtnClickToRetry() {
 		this.gridLayer.destroyAllChildren();
 		this.reset();
+		this.blocks = this._oldBlocks;
 		this.refreshLevel();
 		this.unschedule(this._updateUsedTime);
 		this.schedule(this._updateUsedTime, 1);

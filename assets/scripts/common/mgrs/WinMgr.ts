@@ -1,4 +1,12 @@
-import { director, earcut, instantiate, Layers, Node, Widget } from 'cc';
+/*
+ * @Author: zhupengfei
+ * @Date: 2021-12-12 11:50:28
+ * @LastEditTime: 2021-12-12 17:24:24
+ * @LastEditors: zhupengfei
+ * @Description:
+ * @FilePath: /klotski/assets/scripts/common/mgrs/WinMgr.ts
+ */
+import { director, instantiate, Layers, Node, Prefab, Widget } from 'cc';
 import { WinCache } from './IMgrs';
 import { resMgr } from './ResMgr';
 import { getWinInfo, WIN_ID, WIN_ZINDEX } from './WinConfig';
@@ -6,7 +14,7 @@ import { getWinInfo, WIN_ID, WIN_ZINDEX } from './WinConfig';
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-11 11:24:02
- * @LastEditTime: 2021-12-12 11:08:56
+ * @LastEditTime: 2021-12-12 17:23:13
  * @LastEditors: zhupengfei
  * @Description: 视窗管理类
  * @FilePath: /klotski/assets/scripts/common/mgrs/WinMgr.ts
@@ -33,11 +41,18 @@ class WinMgr {
 		canvas.addChild(this._winLayer);
 	}
 	public async openWin(winId: WIN_ID) {
+		return new Promise((resolve, reject) => {
+			const { path } = getWinInfo(winId);
+			resMgr
+				.loadPrefab(path)
+				.then((prefab: Prefab) => {
+					const ndWin = instantiate(prefab);
+					this._winLayer.addChild(ndWin);
+					resolve(ndWin);
+				})
+				.catch((err) => reject(err));
+		});
 		try {
-			const { path, zIndex } = getWinInfo(winId);
-			const prefab = await resMgr.loadPrefab(path);
-			const ndWin = instantiate(prefab) as Node;
-			this._winLayer.addChild(ndWin);
 		} catch (error) {
 			console.error(error);
 		}
