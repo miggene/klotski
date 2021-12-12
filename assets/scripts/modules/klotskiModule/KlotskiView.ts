@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 11:13:58
- * @LastEditTime: 2021-12-12 11:45:20
+ * @LastEditTime: 2021-12-12 15:02:02
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/klotskiModule/KlotskiView.ts
@@ -344,7 +344,6 @@ export class KlotskiView extends Component {
 		const lp = this.gridLayer
 			.getComponent(UITransformComponent)
 			.convertToNodeSpaceAR(v3(wp.x, wp.y, 0));
-		// this._tsp = lp;
 		for (const ndFood of this.foodCache.values()) {
 			const bx = ndFood.getComponent(UITransformComponent).getBoundingBox();
 			if (bx.contains(v2(lp.x, lp.y))) {
@@ -356,132 +355,132 @@ export class KlotskiView extends Component {
 				break;
 			}
 		}
-
 		return;
 	}
-	_tchM(e: EventTouch) {
-		if (this._movedFood) {
-			const wp = e.getUILocation();
-			let lp = this.gridLayer
-				.getComponent(UITransformComponent)
-				.convertToNodeSpaceAR(v3(wp.x, wp.y, 0));
-			let { x, y } = lp;
-
-			if (this._moveDir !== null) {
-				this._updateFoodPosition(x, y);
-				return;
-			}
-			const offX = x - this._tsp.x;
-			const offY = y - this._tsp.y;
-			const bDistance = Math.abs(offX) + Math.abs(offY) > 40;
-			if (bDistance && this._moveDir === null) {
-				// 左右移动
-				if (Math.abs(offX) > Math.abs(offY)) {
-					this._moveDir = offX > 0 ? 1 : 3;
-					this._updateFoodPosition(x, y);
-					return;
-				}
-				//上下移动
-				this._moveDir = offY > 0 ? 2 : 0;
-				this._updateFoodPosition(x, y);
-			}
-		}
-	}
+	_tchM(e: EventTouch) {}
 	_tchE(e: EventTouch) {
 		if (this._movedFood) {
+			const wp = e.getUILocation();
+			const lp = this.gridLayer
+				.getComponent(UITransformComponent)
+				.convertToNodeSpaceAR(v3(wp.x, wp.y, 0));
+			const { blockIdx, position, shape } = this._movedFood.getComponent(Food);
+			const [srcRow, srcCol] = position;
+			const range = this.getMovedRange(blockIdx, position, shape);
 			const { minX, minY, maxX, maxY } = this._moveRange;
-			let { x, y } = this._movedFood.getPosition();
-			if (x < minX) x = minX;
-			if (x > maxX) x = maxX;
-			if (y < minY) y = minY;
-			if (y > maxY) y = maxY;
-			const srcX = this._tsp.x;
-			const srcY = this._tsp.y;
-			const offX = x - srcX;
-			const offY = y - srcY;
-			const xn = Math.floor(offX / GRID_WIDTH);
-			const yn = Math.floor(offY / GRID_WIDTH);
-			const finalX = xn * GRID_WIDTH + srcX;
-			const finalY = yn * GRID_WIDTH + srcY;
-			this._movedFood.setPosition(finalX, finalY);
-
-			const { blockIdx, shape, position } = this._movedFood.getComponent(Food);
-			const [row, col] = position;
-			const [tarRow, tarCol] = [row - yn, col + xn];
-			this._clearPosition(shape, row, col);
-
+			const maxRow = position[0] + range[0];
+			const minRow = position[0] - range[2];
+			const maxCol = position[1] + range[1];
+			const minCol = position[1] - range[3];
+			const offX = lp.x - this._tsp.x;
+			const offY = lp.y - this._tsp.y;
+			const { x, y } = this._movedFood.getPosition();
+			this._clearPosition(shape, position[0], position[1]);
+			let tarRow = position[0];
+			let tarCol = position[1];
+			let tarPositionX = x;
+			let tarPositionY = y;
+			if (Math.abs(offX) > Math.abs(offY) && offX < 0) {
+				//向左
+				tarPositionX = minX;
+				tarCol = minCol;
+			}
+			if (Math.abs(offX) > Math.abs(offY) && offX >= 0) {
+				//向右
+				tarPositionX = maxX;
+				tarCol = maxCol;
+			}
+			if (Math.abs(offX) <= Math.abs(offY) && offY < 0) {
+				// 向下
+				tarPositionY = minY;
+				tarRow = maxRow;
+			}
+			if (Math.abs(offX) <= Math.abs(offY) && offY >= 0) {
+				// 向上
+				tarPositionY = maxY;
+				tarRow = minRow;
+			}
+			this._movedFood.setPosition(tarPositionX, tarPositionY);
+			this._movedFood.getComponent(Food).position = [tarRow, tarCol];
 			this._takePosition(blockIdx, shape, tarRow, tarCol);
 			this._updateBlocks(blockIdx, tarRow, tarCol);
-			this._movedFood.getComponent(Food).position = [tarRow, tarCol];
-			if (tarRow !== row || tarCol !== col) this.moveStep++;
-		}
-		if (this._isInExit()) {
-			console.log('game win');
-			this.unschedule(this._updateUsedTime);
-			tween(this.lblWin.node)
-				.show()
-				.to(1, { position: v3(0, 0) })
-				.start();
+			if (tarRow !== srcRow || tarCol !== srcCol) this.moveStep++;
+			if (this._isInExit()) {
+				console.log('game win');
+				this.unschedule(this._updateUsedTime);
+				tween(this.lblWin.node)
+					.show()
+					.to(1, { position: v3(0, 0) })
+					.start();
+			}
 			this._tsp = null;
 			this._movedFood = null;
 			this._moveRange = null;
 			this.moves = null;
 			this._moveDir = null;
-			return;
 		}
-		this._tsp = null;
-		this._movedFood = null;
-		this._moveRange = null;
-		this.moves = null;
-		this._moveDir = null;
 	}
 	_tchC(e: EventTouch) {
 		if (this._movedFood) {
+			const wp = e.getUILocation();
+			const lp = this.gridLayer
+				.getComponent(UITransformComponent)
+				.convertToNodeSpaceAR(v3(wp.x, wp.y, 0));
+			const { blockIdx, position, shape } = this._movedFood.getComponent(Food);
+			const [srcRow, srcCol] = position;
+			const range = this.getMovedRange(blockIdx, position, shape);
 			const { minX, minY, maxX, maxY } = this._moveRange;
-			let { x, y } = this._movedFood.getPosition();
-			if (x < minX) x = minX;
-			if (x > maxX) x = maxX;
-			if (y < minY) y = minY;
-			if (y > maxY) y = maxY;
-			const srcX = this._tsp.x;
-			const srcY = this._tsp.y;
-			const offX = x - srcX;
-			const offY = y - srcY;
-			const xn = Math.floor(offX / GRID_WIDTH);
-			const yn = Math.floor(offY / GRID_WIDTH);
-			const finalX = xn * GRID_WIDTH + srcX;
-			const finalY = yn * GRID_WIDTH + srcY;
-			this._movedFood.setPosition(finalX, finalY);
-
-			const { blockIdx, shape, position } = this._movedFood.getComponent(Food);
-			const [row, col] = position;
-			const [tarRow, tarCol] = [row - yn, col + xn];
-			this._clearPosition(shape, row, col);
-
+			const maxRow = position[0] + range[0];
+			const minRow = position[0] - range[2];
+			const maxCol = position[1] + range[1];
+			const minCol = position[1] - range[3];
+			const offX = lp.x - this._tsp.x;
+			const offY = lp.y - this._tsp.y;
+			const { x, y } = this._movedFood.getPosition();
+			this._clearPosition(shape, position[0], position[1]);
+			let tarRow = position[0];
+			let tarCol = position[1];
+			let tarPositionX = x;
+			let tarPositionY = y;
+			if (Math.abs(offX) > Math.abs(offY) && offX < 0) {
+				//向左
+				tarPositionX = minX;
+				tarCol = minCol;
+			}
+			if (Math.abs(offX) > Math.abs(offY) && offX >= 0) {
+				//向右
+				tarPositionX = maxX;
+				tarCol = maxCol;
+			}
+			if (Math.abs(offX) <= Math.abs(offY) && offY < 0) {
+				// 向下
+				tarPositionY = minY;
+				tarRow = maxRow;
+			}
+			if (Math.abs(offX) <= Math.abs(offY) && offY >= 0) {
+				// 向上
+				tarPositionY = maxY;
+				tarRow = minRow;
+			}
+			this._movedFood.setPosition(tarPositionX, tarPositionY);
+			this._movedFood.getComponent(Food).position = [tarRow, tarCol];
 			this._takePosition(blockIdx, shape, tarRow, tarCol);
 			this._updateBlocks(blockIdx, tarRow, tarCol);
-			this._movedFood.getComponent(Food).position = [tarRow, tarCol];
-			if (tarRow !== row || tarCol !== col) this.moveStep++;
-		}
-		if (this._isInExit()) {
-			console.log('game win');
-			this.unschedule(this._updateUsedTime);
-			tween(this.lblWin.node)
-				.show()
-				.to(1, { position: v3(0, 0) })
-				.start();
+			if (tarRow !== srcRow || tarCol !== srcCol) this.moveStep++;
+			if (this._isInExit()) {
+				console.log('game win');
+				this.unschedule(this._updateUsedTime);
+				tween(this.lblWin.node)
+					.show()
+					.to(1, { position: v3(0, 0) })
+					.start();
+			}
 			this._tsp = null;
 			this._movedFood = null;
 			this._moveRange = null;
 			this.moves = null;
 			this._moveDir = null;
-			return;
 		}
-		this._tsp = null;
-		this._movedFood = null;
-		this._moveRange = null;
-		this.moves = null;
-		this._moveDir = null;
 	}
 
 	private _updateFoodPosition(x: number, y: number) {
