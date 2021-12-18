@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 17:05:58
- * @LastEditTime: 2021-12-12 17:55:19
+ * @LastEditTime: 2021-12-18 17:43:19
  * @LastEditors: zhupengfei
  * @Description:关卡组件
  * @FilePath: /klotski/assets/scripts/components/LevelItem.ts
@@ -11,6 +11,7 @@ import { WIN_ID } from '../common/mgrs/WinConfig';
 import { winMgr } from '../common/mgrs/WinMgr';
 import { Block } from '../libs/Klotski';
 import { KlotskiView } from '../modules/klotskiModule/KlotskiView';
+import { ILevelData } from '../modules/levelsModule/ILevelsModule';
 const { ccclass, property } = _decorator;
 
 /**
@@ -27,21 +28,29 @@ const { ccclass, property } = _decorator;
 
 @ccclass('LevelItem')
 export class LevelItem extends Component {
-	private _levelIndex: number;
-	public get levelIndex(): number {
-		return this._levelIndex;
+	private _level: number;
+	public get level(): number {
+		return this._level;
 	}
-	public set levelIndex(v: number) {
-		this._levelIndex = v;
-		this.lblLevelIndex.string = `${v + 1}`;
+	public set level(v: number) {
+		this._level = v;
+		this.lblLevelIndex.string = `${v}`;
 	}
 
-	private _blocks: Block[];
-	public get blocks(): Block[] {
-		return this._blocks;
+	private _boardString: string;
+	public get boardString(): string {
+		return this._boardString;
 	}
-	public set blocks(v: Block[]) {
-		this._blocks = v;
+	public set boardString(v: string) {
+		this._boardString = v;
+	}
+
+	private _levelData: ILevelData;
+	public get levelData(): ILevelData {
+		return this._levelData;
+	}
+	public set levelData(v: ILevelData) {
+		this._levelData = v;
 	}
 
 	@property(Label)
@@ -55,18 +64,20 @@ export class LevelItem extends Component {
 	//     // [4]
 	// }
 
-	initProps(props: { name: string; blocks: Block[]; index: number }) {
-		const { blocks, index } = props;
-		this.levelIndex = index;
-		this.blocks = blocks;
+	public initProps(props: ILevelData) {
+		this.levelData = props;
+		const { level, board } = props;
+		this.level = level;
+		this.boardString = board;
+		// this.blocks = blocks;
 	}
 
 	onBtnClickToLevel() {
-		console.log(`go to level: ${this.levelIndex}`);
+		console.log(`go to level: ${this.level}`);
 		winMgr
 			.openWin(WIN_ID.KLOTSKI)
 			.then((nd: Node) => {
-				nd.getComponent(KlotskiView).initProps(this.blocks);
+				nd.getComponent(KlotskiView).initProps(this.levelData);
 				this.node.parent.parent.parent.parent.parent.destroy();
 			})
 			.catch((err) => console.error(err));

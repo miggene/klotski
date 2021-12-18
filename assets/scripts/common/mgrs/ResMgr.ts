@@ -1,13 +1,13 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-11 16:14:50
- * @LastEditTime: 2021-12-12 11:36:45
+ * @LastEditTime: 2021-12-18 17:30:35
  * @LastEditors: zhupengfei
  * @Description: 资源加载管理类
  * @FilePath: /klotski/assets/scripts/common/mgrs/ResMgr.ts
  */
 
-import { JsonAsset, Prefab, resources } from 'cc';
+import { JsonAsset, Prefab, resources, Sprite, SpriteFrame } from 'cc';
 
 class ResMgr {
 	private static _instance: ResMgr;
@@ -31,6 +31,19 @@ class ResMgr {
 				if (err) reject(err);
 				else resolve(JSON.parse(JSON.stringify(data.json)));
 			});
+		});
+	}
+
+	public async loadSprite(path: string) {
+		return new Promise((resolve, reject) => {
+			resources.load(
+				path + '/spriteFrame',
+				SpriteFrame,
+				(err, asset: SpriteFrame) => {
+					if (err) reject(err);
+					else resolve(asset);
+				}
+			);
 		});
 	}
 }

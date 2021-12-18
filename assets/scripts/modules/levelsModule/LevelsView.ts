@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 16:53:46
- * @LastEditTime: 2021-12-12 17:12:49
+ * @LastEditTime: 2021-12-18 11:20:19
  * @LastEditors: zhupengfei
  * @Description: 关卡选择窗口
  * @FilePath: /klotski/assets/scripts/modules/levelsModule/LevelsView.ts
@@ -17,6 +17,8 @@ import {
 import { resMgr } from '../../common/mgrs/ResMgr';
 import { LevelItem } from '../../components/LevelItem';
 import { Block } from '../../libs/Klotski';
+import { ILevelData } from './ILevelsModule';
+import { Levels_Data_Path } from './ILevelsModuleCfg';
 const { ccclass, property } = _decorator;
 
 /**
@@ -38,8 +40,8 @@ export class LevelsView extends Component {
 
 	start() {
 		resMgr
-			.loadJson('datas/hrd')
-			.then((data: { name: string; blocks: Block[] }[]) => {
+			.loadJson(Levels_Data_Path)
+			.then((data: ILevelData[]) => {
 				console.log('data :>> ', data);
 				this._loadLevels(data);
 			})
@@ -50,13 +52,13 @@ export class LevelsView extends Component {
 	//     // [4]
 	// }
 
-	private _loadLevels(list: { name: string; blocks: Block[] }[]) {
-		for (let i = 0, len = list.length; i < len; ++i) {
+	private _loadLevels(list: ILevelData[]) {
+		for (const iter of list) {
 			resMgr.loadPrefab('prefabs/LevelItemPrefab').then((prefab: Prefab) => {
 				const ndItem = instantiate(prefab);
 				this.scrollView.content.addChild(ndItem);
-				ndItem.setSiblingIndex(i);
-				ndItem.getComponent(LevelItem).initProps({ ...list[i], index: i });
+				ndItem.setSiblingIndex(iter.level);
+				ndItem.getComponent(LevelItem).initProps(iter);
 			});
 		}
 	}

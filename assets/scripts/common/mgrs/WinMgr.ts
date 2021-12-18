@@ -1,12 +1,20 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 11:50:28
- * @LastEditTime: 2021-12-12 17:24:24
+ * @LastEditTime: 2021-12-18 14:40:33
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/common/mgrs/WinMgr.ts
  */
-import { director, instantiate, Layers, Node, Prefab, Widget } from 'cc';
+import {
+	director,
+	instantiate,
+	Layers,
+	Node,
+	Prefab,
+	UITransform,
+	Widget,
+} from 'cc';
 import { WinCache } from './IMgrs';
 import { resMgr } from './ResMgr';
 import { getWinInfo, WIN_ID, WIN_ZINDEX } from './WinConfig';
@@ -32,13 +40,12 @@ class WinMgr {
 		this._winLayer = new Node('winLayer');
 		this._winLayer.layer = Layers.Enum.UI_2D;
 		this._winLayer.setSiblingIndex(WIN_ZINDEX.WINDOW);
-		const widget = this._winLayer.addComponent(Widget);
-		widget.enabled = true;
-		widget.left = 0;
-		widget.right = 0;
-		widget.top = 0;
-		widget.bottom = 0;
+		this._winLayer.addComponent(UITransform);
 		canvas.addChild(this._winLayer);
+		console.log('this._winLayer :>> ', this._winLayer);
+		this._winLayer
+			.getComponent(UITransform)
+			.setContentSize(canvas.getComponent(UITransform).contentSize);
 	}
 	public async openWin(winId: WIN_ID) {
 		return new Promise((resolve, reject) => {
@@ -48,6 +55,8 @@ class WinMgr {
 				.then((prefab: Prefab) => {
 					const ndWin = instantiate(prefab);
 					this._winLayer.addChild(ndWin);
+					const size = this._winLayer.getComponent(UITransform).contentSize;
+					console.log('size :>> ', size);
 					resolve(ndWin);
 				})
 				.catch((err) => reject(err));
