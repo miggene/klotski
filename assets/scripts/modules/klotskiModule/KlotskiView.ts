@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 11:13:58
- * @LastEditTime: 2021-12-18 18:18:56
+ * @LastEditTime: 2021-12-20 10:42:04
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/klotskiModule/KlotskiView.ts
@@ -38,6 +38,7 @@ import Klotski, {
 	Move,
 	Shape,
 } from '../../libs/Klotski';
+import KlotskiSolver from '../../libs/klotskiLibs/KlotskiSolver';
 import { ILevelData } from '../levelsModule/ILevelsModule';
 import { KlotskiBlock } from './components/KlotskiBlock';
 import { IBlock } from './IKlotskiModule';
@@ -51,7 +52,17 @@ import {
 	TOTAL_H,
 	TOTAL_W,
 } from './KlotskiModuleCfg';
-import { getBlockPositionByStyle, getBlockSizeByStyle } from './KlotskiService';
+import {
+	getBlockPositionByStyle,
+	getBlockSizeByStyle,
+	getMoveInfo,
+	getStepAction,
+	key2Board,
+	moveBlock,
+	setBoardState,
+	setStepInfo,
+	stepInfo2PosInfo,
+} from './KlotskiService';
 import {
 	gBlockBelongTo,
 	gBlockStyle,
@@ -113,13 +124,18 @@ export class KlotskiView extends Component {
 	// private _boardState: number[][];
 
 	private _boardState: number[][] = [];
-	private _blockObj: { [key: string]: any } = {};
-	// public get boardState(): number[][] {
-	// 	return this._boardState;
-	// }
-	// public set boardState(v: number[][]) {
-	// 	this._boardState = v;
-	// }
+	private _blockObj: { [key: string]: Node } = {};
+
+	private _stepInfo: number[] = [];
+
+	private _curBoardStep: number = 0;
+	public get curBoardStep(): number {
+		return this._curBoardStep;
+	}
+	public set curBoardStep(v: number) {
+		this._curBoardStep = v;
+	}
+	private manualMoveCount: number = 0;
 
 	@property(Node)
 	gridLayer: Node;
@@ -174,6 +190,7 @@ export class KlotskiView extends Component {
 	public initProps(props: ILevelData) {
 		const { level, board } = props;
 		this.level = level;
+		this.board = board;
 		this._createBoard(board);
 	}
 
@@ -202,8 +219,7 @@ export class KlotskiView extends Component {
 					];
 
 				//don't create block for empty
-				if (style)
-					this._blockObj[blockId] = this._createBlock(blockId, col, row, style);
+				if (style) this._createBlock(blockId, col, row, style);
 				// this._blockObj[blockId] = createBlock(
 				// 	blockId,
 				// 	x,
@@ -231,7 +247,6 @@ export class KlotskiView extends Component {
 		style: number
 	) {
 		const data = await resMgr.loadJson(HRD_FOODS_JSON_PATH);
-
 		const tarData = (data as IBlock[]).find((v) => v.style === style);
 		resMgr
 			.loadPrefab(FOOD_PATH)
@@ -241,20 +256,12 @@ export class KlotskiView extends Component {
 				ndBlock
 					.getComponent(KlotskiBlock)
 					.initProps({ ...tarData, blockId, row, col });
-
-				console.log(
-					'name,blockId, row, col :>> ',
-					tarData.blockName,
-					blockId,
-					row,
-					col
-				);
 				const [x, y] = getBlockPositionByStyle(row, col, style);
-
 				ndBlock.setPosition(x, y);
 				// const x = col * CELL_W + CELL_W / 2;
 				// const y = -row * CELL_H - CELL_H / 2;
 				// ndBlock.setPosition(x, y);
+				this._blockObj[blockId] = ndBlock;
 			})
 			.catch((err) => console.error(err));
 	}
@@ -727,10 +734,103 @@ export class KlotskiView extends Component {
 	// 	this.usedTime++;
 	// }
 
-	// onBtnClickToTip(e: EventTouch) {
-	// 	this.makeMoveTip();
-	// }
+	onBtnClickToTip(e: EventTouch) {
+		// this.makeMoveTip();
+		const klotskiSolver = new KlotskiSolver(this.board);
+		const answers: {
+			exploreCount: number;
+			elapsedTime: number;
+			boardList: number[];
+		} = klotskiSolver.find();
+		console.log('answers :>> ', answers);
+		const { boardList } = answers;
+		const maxMove = boardList.length - 1;
+		if (maxMove <= 0) return;
+		let tmpBoardState: number[][] = [];
+		for (let x = 0; x < G_BOARD_X; ++x) {
+			tmpBoardState[x] = this._boardState[x].slice();
+		}
+		for (let i = 1; i <= maxMove; ++i) {
+			const moveInfo = getMoveInfo(
+				key2Board(answers.boardList[i - 1]),
+				key2Board(answers.boardList[i])
+			);
+			const blockId = tmpBoardState[moveInfo.startX][moveInfo.startY];
+			setStepInfo(
+				this._stepInfo,
+				this.curBoardStep,
+				blockId,
+				moveInfo.startX,
+				moveInfo.startY,
+				moveInfo.endX,
+				moveInfo.endY,
+				true,
+				i !== 1
+			);
+		}
+		console.log('this._stepInfo :>> ', this._stepInfo);
+		this._moveNext();
+		// this._moveLast(this._stepInfo.slice());
+	}
 
+	private _moveNext() {
+		const maxStep = this._stepInfo.length;
+		if (this.curBoardStep >= maxStep) return;
+		this.curBoardStep++;
+		const posInfo = stepInfo2PosInfo(this._stepInfo, this.curBoardStep);
+		const curBlock = this._blockObj[posInfo.id];
+
+		const style = curBlock.getComponent(KlotskiBlock).style;
+		const actions = getStepAction(
+			this._boardState,
+			posInfo,
+			style,
+			false,
+			false
+		);
+		setBoardState(this._boardState, posInfo.startX, posInfo.startY, style, 0);
+		setBoardState(
+			this._boardState,
+			posInfo.endX,
+			posInfo.endY,
+			style,
+			posInfo.id
+		);
+		curBlock.getComponent(KlotskiBlock).updatePos(posInfo.endY, posInfo.endX);
+		// const [x, y] = getBlockPositionByStyle(posInfo.endY, posInfo.endX, style);
+		// curBlock.setPosition(x, y);
+		moveBlock(
+			curBlock,
+			actions,
+			0,
+			this._moveNext.bind(this),
+			this._boardState,
+			this._blockObj
+		);
+	}
+
+	_moveLast(stepInfo: number[]) {
+		const maxStep = stepInfo.length;
+		// if (this.curBoardStep >= maxStep) return;
+		while (this.curBoardStep < maxStep) {
+			this.curBoardStep++;
+			const posInfo = stepInfo2PosInfo(this._stepInfo, this.curBoardStep);
+			const curBlock = this._blockObj[posInfo.id];
+			const style = curBlock.getComponent(KlotskiBlock).style;
+			setBoardState(this._boardState, posInfo.startX, posInfo.startY, style, 0);
+			setBoardState(
+				this._boardState,
+				posInfo.endX,
+				posInfo.endY,
+				style,
+				posInfo.id
+			);
+			curBlock.getComponent(KlotskiBlock).row = posInfo.endY;
+			curBlock.getComponent(KlotskiBlock).col = posInfo.endX;
+			const [x, y] = getBlockPositionByStyle(posInfo.endY, posInfo.endX, style);
+			curBlock.setPosition(x, y);
+		}
+	}
 	// onBtnClickToRetry() {
 	// 	this.gridLayer.destroyAllChildren();
 	// 	this.reset();

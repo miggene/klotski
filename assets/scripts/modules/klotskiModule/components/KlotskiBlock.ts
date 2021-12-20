@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-18 16:18:37
- * @LastEditTime: 2021-12-18 17:51:17
+ * @LastEditTime: 2021-12-19 17:48:39
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/klotskiModule/components/KlotskiBlock.ts
@@ -17,10 +17,7 @@ import {
 import { resMgr } from '../../../common/mgrs/ResMgr';
 import { IBlock } from '../IKlotskiModule';
 import { BLOCK_SPRITE_FRAME_PATH } from '../KlotskiModuleCfg';
-import {
-	getBlockContentSizeByStyle,
-	getBlockSizeByStyle,
-} from '../KlotskiService';
+import { getBlockContentSizeByStyle } from '../KlotskiService';
 const { ccclass, property } = _decorator;
 
 @ccclass('KlotskiBlock')
@@ -112,9 +109,12 @@ export class KlotskiBlock extends Component {
 	// }
 
 	/**
-	 * refreshBlockImg
+	 *  updatePos
 	 */
-	public refreshBlockImg() {}
+	public updatePos(row: number, col: number) {
+		this.row = row;
+		this.col = col;
+	}
 }
 
 /**
