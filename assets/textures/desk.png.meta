@@ -2,7 +2,7 @@
   "ver": "1.0.21",
   "importer": "image",
   "imported": true,
-  "uuid": "c06495b6-3019-400d-af17-66255aa61158",
+  "uuid": "5c967d5e-c190-4359-822e-e86a74fe7970",
   "files": [
     ".png",
     ".json"
@@ -10,14 +10,14 @@
   "subMetas": {
     "6c48a": {
       "importer": "texture",
-      "uuid": "c06495b6-3019-400d-af17-66255aa61158@6c48a",
+      "uuid": "5c967d5e-c190-4359-822e-e86a74fe7970@6c48a",
       "displayName": "desk",
       "id": "6c48a",
       "name": "texture",
       "userData": {
         "wrapModeS": "clamp-to-edge",
         "wrapModeT": "clamp-to-edge",
-        "imageUuidOrDatabaseUri": "c06495b6-3019-400d-af17-66255aa61158",
+        "imageUuidOrDatabaseUri": "5c967d5e-c190-4359-822e-e86a74fe7970",
         "minfilter": "linear",
         "magfilter": "linear",
         "mipfilter": "none",
@@ -33,7 +33,7 @@
     },
     "f9941": {
       "importer": "sprite-frame",
-      "uuid": "c06495b6-3019-400d-af17-66255aa61158@f9941",
+      "uuid": "5c967d5e-c190-4359-822e-e86a74fe7970@f9941",
       "displayName": "desk",
       "id": "f9941",
       "name": "spriteFrame",
@@ -45,17 +45,17 @@
         "offsetY": 0,
         "trimX": 0,
         "trimY": 0,
-        "width": 915,
-        "height": 529,
-        "rawWidth": 915,
-        "rawHeight": 529,
+        "width": 1015,
+        "height": 393,
+        "rawWidth": 1015,
+        "rawHeight": 393,
         "borderTop": 0,
         "borderBottom": 0,
         "borderLeft": 0,
         "borderRight": 0,
         "packable": true,
         "isUuid": true,
-        "imageUuidOrDatabaseUri": "c06495b6-3019-400d-af17-66255aa61158@6c48a",
+        "imageUuidOrDatabaseUri": "5c967d5e-c190-4359-822e-e86a74fe7970@6c48a",
         "atlasUuid": ""
       },
       "ver": "1.0.9",
@@ -69,6 +69,6 @@
   "userData": {
     "type": "sprite-frame",
     "hasAlpha": true,
-    "redirect": "c06495b6-3019-400d-af17-66255aa61158@f9941"
+    "redirect": "5c967d5e-c190-4359-822e-e86a74fe7970@f9941"
   }
 }

@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-11 17:59:27
- * @LastEditTime: 2021-12-12 16:52:45
+ * @LastEditTime: 2021-12-21 14:49:40
  * @LastEditors: zhupengfei
  * @Description:开始界面窗口
  * @FilePath: /klotski/assets/scripts/modules/menuModule/MenuView.ts
@@ -10,18 +10,6 @@ import { _decorator, Component, Node } from 'cc';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
 const { ccclass, property } = _decorator;
-
-/**
- * Predefined variables
- * Name = MenuView
- * DateTime = Sat Dec 11 2021 17:59:27 GMT+0800 (中国标准时间)
- * Author = dailycode365
- * FileBasename = MenuView.ts
- * FileBasenameNoExtension = MenuView
- * URL = db://assets/scripts/modules/menuModule/MenuView.ts
- * ManualUrl = https://docs.cocos.com/creator/3.3/manual/zh/
- *
- */
 
 @ccclass('MenuView')
 export class MenuView extends Component {

@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-18 17:07:49
- * @LastEditTime: 2021-12-20 15:30:00
+ * @LastEditTime: 2021-12-21 11:25:21
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/klotskiModule/KlotskiService.ts
@@ -390,8 +390,11 @@ export function moveBlock(
 
 	moveSize *= count;
 	moveTime *= count;
-	const scaleTime = 0.2;
-	let scale = v3(1, 1);
+	const scaleTime = 0.08;
+	let scaleMin = v3(1, 1);
+	let scaleNormal = v3(1, 1);
+	let scaleMax = v3(1, 1);
+
 	let anchorPoint = v2(0.5, 0.5);
 	let offY = 0;
 	let offX = 0;
@@ -401,25 +404,29 @@ export function moveBlock(
 	switch (curAction) {
 		case 'U':
 			newY += moveSize;
-			scale = v3(1, 0.7);
+			scaleMin = v3(1, 0.7);
+			scaleMax = v3(1, 1.3);
 			anchorPoint = v2(0.5, 1);
 			offY = contentSize.height / 2;
 			break;
 		case 'D':
 			newY -= moveSize;
-			scale = v3(1, 0.7);
+			scaleMin = v3(1, 0.7);
+			scaleMax = v3(1, 1.3);
 			anchorPoint = v2(0.5, 0);
 			offY = -contentSize.height / 2;
 			break;
 		case 'L':
 			newX -= moveSize;
-			scale = v3(0.7, 1);
+			scaleMin = v3(0.7, 1);
+			scaleMax = v3(1.3, 1);
 			anchorPoint = v2(0, 0.5);
 			offX = -contentSize.width / 2;
 			break;
 		case 'R':
 			newX += moveSize;
-			scale = v3(0.7, 1);
+			scaleMin = v3(0.7, 1);
+			scaleMax = v3(1.3, 1);
 			anchorPoint = v2(1, 0.5);
 			offX = contentSize.width / 2;
 			break;
@@ -434,8 +441,12 @@ export function moveBlock(
 	// const defaultAnchorAct = tween().call(() => {
 	// 	block.getComponent(UITransform).setAnchorPoint(v2(0.5, 0.5));
 	// });
-	const scaleAct = tween().to(scaleTime, { scale });
-	const defaultScaleAct = tween().to(scaleTime, { scale: v3(1, 1) });
+	const scaleAct = tween()
+		.to(scaleTime, { scale: scaleMin }) //缩小
+		.to(scaleTime, { scale: scaleNormal }) //正常大小
+		.to(scaleTime, { scale: scaleMax }) //放大
+		.to(scaleTime, { scale: scaleNormal }); //正常大小
+	// const defaultScaleAct = tween().to(scaleTime, { scale: v3(1, 1) });
 	const callAct = tween().call(() => {
 		step += count;
 		if (step < action.move.length) {
@@ -468,7 +479,6 @@ export function moveBlock(
 			ndFood.setPosition(srcPos.x + offX, srcPos.y + offY);
 			tween(ndFood)
 				.then(scaleAct)
-				.then(defaultScaleAct)
 				.call(() => {
 					ndFood.getComponent(UITransform).setAnchorPoint(v2(0.5, 0.5));
 					ndFood.setPosition(srcPos);
@@ -524,7 +534,7 @@ export function checkGoalState(
 // Move biggest block out of board
 //---------------------------------
 export function move2Goal(block: Node) {
-	// var newX = block.getAttr('x');
+	// let newX = block.getAttr('x');
 	// var newY = block.getAttr('y') + BOARD_BORDER_WIDTH;
 	const { x, y } = block.position;
 	console.log('x,y :>> ', x, y);
@@ -550,4 +560,78 @@ export function move2Goal(block: Node) {
 	// });
 	// audioPlayHappyPass();
 	// tweenObj.play();
+}
+
+//----------------------------------
+// screen point to board position
+//----------------------------------
+export function point2Pos(x: number, y: number) {
+	// var posX = (posY = 0);
+	let posX = 0;
+	let posY = 0;
+
+	// let offsetX = x - minX;
+	// if (offsetX < 0) offsetX = 0;
+	// while (offsetX >= BLOCK_CELL_SIZE) {
+	// 	offsetX -= BLOCK_CELL_SIZE;
+	// 	posX++;
+	// }
+
+	// let offsetY = y - minY;
+	// if (offsetY < 0) offsetY = 0;
+	// while (offsetY >= BLOCK_CELL_SIZE) {
+	// 	offsetY -= BLOCK_CELL_SIZE;
+	// 	posY++;
+	// }
+
+	// return { posX, posY, offsetX, offsetY };
+}
+
+//---------------------------------------------
+// convert board state to board string format
+// for solver to solve it
+//---------------------------------------------
+export function boardState2BoardString(
+	boardState: number[][],
+	blockObj: { [key: string]: Node }
+): string {
+	//0    1    2    3    4
+	let blockValue = ['@', 'N', 'B', 'H', 'A'];
+	let boardString = [];
+	let tmpBoardState = [];
+	let id = 0;
+
+	//copy 2 dimensional array
+	for (let x = 0; x < G_BOARD_X; x++) {
+		tmpBoardState[x] = boardState[x].slice(0);
+	}
+
+	for (let y = 0; y < G_BOARD_Y; y++) {
+		for (let x = 0; x < G_BOARD_X; x++) {
+			if ((id = tmpBoardState[x][y]) >= 0) {
+				if (id == 0) {
+					//empty block
+					boardString[x + y * G_BOARD_X] = blockValue[0];
+				} else {
+					// let style = blockObj[id].getAttr('style');
+					// let sizeX = blockObj[id].getAttr('sizeX');
+					// let sizeY = blockObj[id].getAttr('sizeY');
+					const { style, sizeX, sizeY } =
+						blockObj[id].getComponent(KlotskiBlock);
+
+					for (let yy = 0; yy < sizeY; yy++) {
+						for (let xx = 0; xx < sizeX; xx++) {
+							tmpBoardState[x + xx][y + yy] = -1;
+							boardString[x + xx + (y + yy) * G_BOARD_X] = blockValue[style];
+						}
+					}
+					blockValue[style] = String.fromCharCode(
+						blockValue[style].charCodeAt(0) + 1
+					); //ascii + 1
+				}
+			}
+		}
+	}
+
+	return boardString.join('');
 }

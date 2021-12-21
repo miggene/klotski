@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-18 16:18:37
- * @LastEditTime: 2021-12-19 17:48:39
+ * @LastEditTime: 2021-12-21 09:47:31
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/klotskiModule/components/KlotskiBlock.ts
@@ -17,7 +17,10 @@ import {
 import { resMgr } from '../../../common/mgrs/ResMgr';
 import { IBlock } from '../IKlotskiModule';
 import { BLOCK_SPRITE_FRAME_PATH } from '../KlotskiModuleCfg';
-import { getBlockContentSizeByStyle } from '../KlotskiService';
+import {
+	getBlockContentSizeByStyle,
+	getBlockSizeByStyle,
+} from '../KlotskiService';
 const { ccclass, property } = _decorator;
 
 @ccclass('KlotskiBlock')
@@ -102,6 +105,7 @@ export class KlotskiBlock extends Component {
 		this.style = style;
 		this.row = row;
 		this.col = col;
+		[this.sizeX, this.sizeY] = getBlockSizeByStyle(style);
 	}
 
 	// update (deltaTime: number) {
