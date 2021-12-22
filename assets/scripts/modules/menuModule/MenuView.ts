@@ -1,27 +1,26 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-11 17:59:27
- * @LastEditTime: 2021-12-21 14:49:40
+ * @LastEditTime: 2021-12-22 19:35:48
  * @LastEditors: zhupengfei
  * @Description:开始界面窗口
  * @FilePath: /klotski/assets/scripts/modules/menuModule/MenuView.ts
  */
-import { _decorator, Component, Node } from 'cc';
+import { _decorator, Component, Node, Label, tween, UITransform } from 'cc';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
 const { ccclass, property } = _decorator;
 
 @ccclass('MenuView')
 export class MenuView extends Component {
-	// [1]
-	// dummy = '';
-
-	// [2]
-	// @property
-	// serializableDummy = 0;
+	@property(Label)
+	lblStart: Label = null;
 
 	start() {
 		// [3]
+		tween(this.lblStart.color)
+			.repeatForever(tween().to(1, { a: 0 }).to(1, { a: 255 }).delay(1))
+			.start();
 	}
 
 	// update (deltaTime: number) {

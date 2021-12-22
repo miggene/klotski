@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 11:13:58
- * @LastEditTime: 2021-12-21 20:30:14
+ * @LastEditTime: 2021-12-22 19:38:29
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/klotskiModule/KlotskiView.ts
@@ -27,7 +27,7 @@ import {
 import { resMgr } from '../../common/mgrs/ResMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
-import { deepClone, formatTime } from '../../common/utils/Helper';
+import { bounceAct, deepClone, formatTime } from '../../common/utils/Helper';
 import { Food } from '../../components/Food';
 import Klotski, {
 	Block,
@@ -58,6 +58,7 @@ import {
 } from './KlotskiModuleCfg';
 import {
 	boardState2BoardString,
+	getBlockContentSizeByStyle,
 	getBlockPositionByStyle,
 	getBlockSizeByStyle,
 	getMoveInfo,
@@ -184,19 +185,8 @@ export class KlotskiView extends Component {
 
 	start() {
 		this._initBg();
-		// this.refreshLevel();
 		this.schedule(this._updateUsedTime, 1);
 	}
-
-	/**
-	 * initProps
-	 */
-
-	// public initView(props: Block[]) {
-	// 	this.initProps(props);
-	// 	this.refreshLevel();
-	// 	this.schedule(this._updateUsedTime, 1);
-	// }
 
 	public initProps(props: ILevelData) {
 		this.levelData = deepClone(props);
@@ -266,15 +256,44 @@ export class KlotskiView extends Component {
 			.then((prefab) => {
 				const ndBlock = instantiate(prefab as Prefab);
 				this.gridLayer.addChild(ndBlock);
+				this._blockObj[blockId] = ndBlock;
 				ndBlock
 					.getComponent(KlotskiBlock)
 					.initProps({ ...tarData, blockId, row, col });
 				const [x, y] = getBlockPositionByStyle(row, col, style);
-				ndBlock.setPosition(x, y);
-				// const x = col * CELL_W + CELL_W / 2;
-				// const y = -row * CELL_H - CELL_H / 2;
 				// ndBlock.setPosition(x, y);
-				this._blockObj[blockId] = ndBlock;
+				ndBlock.setPosition(x, y + 1000);
+				const size = getBlockContentSizeByStyle(style);
+				ndBlock.getComponent(UITransform).setContentSize(size[0], size[1]);
+
+				const scaleNormal = v3(1, 1);
+				const scaleMin = v3(1, 0.7);
+				const scaleMax = v3(1, 1.3);
+				const scaleTime = 0.08;
+				const scaleAct = tween()
+					.to(scaleTime, { scale: scaleMin })
+					.to(scaleTime, { scale: scaleNormal })
+					.to(scaleTime, { scale: scaleMax })
+					.to(scaleTime, { scale: scaleNormal });
+				tween(ndBlock)
+					.delay(1)
+					.to(0.5, { position: v3(x, y) })
+					.call(() => {
+						const ndFood = ndBlock.getChildByName('spBlock');
+						const srcPos = ndFood.getPosition();
+						ndFood.getComponent(UITransform).setAnchorPoint(0.5, 0);
+						const contentSize = ndFood.getComponent(UITransform).contentSize;
+						let offY = contentSize.height / 2;
+						ndFood.setPosition(srcPos.x, srcPos.y - offY);
+						tween(ndFood)
+							.then(scaleAct)
+							.call(() => {
+								ndFood.getComponent(UITransform).setAnchorPoint(0.5, 0.5);
+								ndFood.setPosition(srcPos);
+							})
+							.start();
+					})
+					.start();
 			})
 			.catch((err) => console.error(err));
 	}
@@ -315,7 +334,6 @@ export class KlotskiView extends Component {
 			}
 		}
 		const { x, y } = this.gridLayer.getPosition();
-
 		this.spExit.node.setPosition(x, y - TOTAL_H);
 	}
 
@@ -616,9 +634,6 @@ export class KlotskiView extends Component {
 		this.curBoardStep = 0;
 		this._initBoardState();
 		this.initProps(this.levelData);
-		// this.reset();
-		// this.blocks = this._oldBlocks;
-		// this.refreshLevel();
 		this.unschedule(this._updateUsedTime);
 		this.usedTime = 0;
 		this.schedule(this._updateUsedTime, 1);
@@ -628,13 +643,6 @@ export class KlotskiView extends Component {
 		this.node.destroy();
 		winMgr.openWin(WIN_ID.START_MENU);
 	}
-
-	// onBtnClickToNextLevel() {
-	// 	this.levelIndex++;
-	// 	this.gridLayer.destroyAllChildren();
-	// 	this.reset();
-	// 	this.refreshLevel();
-	// }
 }
 
 /**
