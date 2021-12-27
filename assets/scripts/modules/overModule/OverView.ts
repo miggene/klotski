@@ -1,19 +1,18 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-27 14:45:59
- * @LastEditTime: 2021-12-27 15:32:45
+ * @LastEditTime: 2021-12-27 17:05:17
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/overModule/OverView.ts
  */
 import { _decorator, Component, Node, Label, instantiate } from 'cc';
+import { dataMgr } from '../../common/mgrs/DataMgr';
 import { resMgr } from '../../common/mgrs/ResMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
 import { formatTime } from '../../common/utils/Helper';
 import { KlotskiView } from '../klotskiModule/KlotskiView';
-import { ILevelData } from '../levelsModule/ILevelsModule';
-import { Levels_Data_Path } from '../levelsModule/ILevelsModuleCfg';
 const { ccclass, property } = _decorator;
 
 /**
@@ -107,7 +106,7 @@ export class OverView extends Component {
 	}
 	public async onBtnClickToRetry() {
 		winMgr.clearWin();
-		const levelsData = await resMgr.loadJson(Levels_Data_Path);
+		const levelsData = await dataMgr.getlevelsDataCache();
 		const data = levelsData[this.level - 1];
 		if (data) {
 			console.log(`go to level: ${this.level}`);
@@ -121,7 +120,7 @@ export class OverView extends Component {
 	}
 	public async onBtnClickToNext() {
 		winMgr.clearWin();
-		const levelsData = await resMgr.loadJson(Levels_Data_Path);
+		const levelsData = await dataMgr.getlevelsDataCache();
 		const data = levelsData[this.level];
 		if (data) {
 			console.log(`go to level: ${this.level + 1}`);

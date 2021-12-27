@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 16:53:46
- * @LastEditTime: 2021-12-21 19:33:36
+ * @LastEditTime: 2021-12-27 17:05:11
  * @LastEditors: zhupengfei
  * @Description: 关卡选择窗口
  * @FilePath: /klotski/assets/scripts/modules/levelsModule/LevelsView.ts
@@ -17,11 +17,11 @@ import {
 } from 'cc';
 import { resMgr } from '../../common/mgrs/ResMgr';
 import { LevelItem } from './components/LevelItem';
-import { Block } from '../../libs/Klotski';
 import { ILevelData } from './ILevelsModule';
-import { Levels_Data_Path, Level_Per_Page } from './ILevelsModuleCfg';
+import { Level_Per_Page } from './ILevelsModuleCfg';
 import { winMgr } from '../../common/mgrs/WinMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
+import { dataMgr } from '../../common/mgrs/DataMgr';
 const { ccclass, property } = _decorator;
 
 /**
@@ -67,9 +67,9 @@ export class LevelsView extends Component {
 	btnPrev: Button;
 
 	start() {
-		resMgr
-			.loadJson(Levels_Data_Path)
-			.then((data: ILevelData[]) => {
+		dataMgr
+			.getlevelsDataCache()
+			.then((data) => {
 				this.levelsData = data;
 				this._loadLevels(this.curIndex);
 			})

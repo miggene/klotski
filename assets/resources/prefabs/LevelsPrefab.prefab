@@ -14,6 +14,7 @@
     "__type__": "cc.Node",
     "_name": "LevelsPrefab",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "_parent": null,
     "_children": [
       {
@@ -175,10 +176,10 @@
       "a": 255
     },
     "_spriteFrame": {
-      "__uuid__": "266267df-2a96-4632-b0f7-efc2b8db8c3b@f9941",
+      "__uuid__": "bd3d2143-adf3-4199-afb6-6f3bc90a933a@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
-    "_type": 0,
+    "_type": 1,
     "_fillType": 0,
     "_sizeMode": 0,
     "_fillCenter": {

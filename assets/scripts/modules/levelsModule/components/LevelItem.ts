@@ -1,12 +1,13 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 17:05:58
- * @LastEditTime: 2021-12-27 15:20:39
+ * @LastEditTime: 2021-12-27 18:06:34
  * @LastEditors: zhupengfei
  * @Description:关卡组件
  * @FilePath: /klotski/assets/scripts/modules/levelsModule/components/LevelItem.ts
  */
-import { _decorator, Component, Node, Label } from 'cc';
+import { _decorator, Component, Node, Label, Sprite } from 'cc';
+import { dataMgr } from '../../../common/mgrs/DataMgr';
 import { WIN_ID } from '../../../common/mgrs/WinConfig';
 import { winMgr } from '../../../common/mgrs/WinMgr';
 import { KlotskiView } from '../../klotskiModule/KlotskiView';
@@ -24,6 +25,7 @@ export class LevelItem extends Component {
 		this._level = v;
 		this.lblLevelIndex.string = `${v}`;
 		this.node.angle = Level_Item_Angles[(v - 1) % 3];
+		this.locked = v > dataMgr.unlockMaxIndex;
 	}
 
 	private _boardString: string;
@@ -42,8 +44,20 @@ export class LevelItem extends Component {
 		this._levelData = v;
 	}
 
+	private _locked: boolean;
+	public get locked(): boolean {
+		return this._locked;
+	}
+	public set locked(v: boolean) {
+		this._locked = v;
+		this.spLock.node.active = v;
+		this.lblLevelIndex.node.active = !v;
+	}
+
 	@property(Label)
 	lblLevelIndex: Label;
+	@property(Sprite)
+	spLock: Sprite;
 
 	start() {
 		// [3]
