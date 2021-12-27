@@ -3398,6 +3398,11 @@
     "asset": {
       "__id__": 0
     },
-    "fileId": "c46/YsCPVOJYA4mWEpNYRx"
+    "fileId": "c46/YsCPVOJYA4mWEpNYRx",
+    "nestedPrefabInstanceRoots": [
+      {
+        "__id__": 117
+      }
+    ]
   }
 ]

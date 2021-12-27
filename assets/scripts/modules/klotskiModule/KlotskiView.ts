@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 11:13:58
- * @LastEditTime: 2021-12-22 19:38:29
+ * @LastEditTime: 2021-12-27 13:35:22
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/klotskiModule/KlotskiView.ts
@@ -599,7 +599,8 @@ export class KlotskiView extends Component {
 			0,
 			this._moveNext.bind(this),
 			this._boardState,
-			this._blockObj
+			this._blockObj,
+			this._winCb.bind(this)
 		);
 	}
 
@@ -625,6 +626,13 @@ export class KlotskiView extends Component {
 			curBlock.setPosition(x, y);
 		}
 	}
+
+	private _winCb(block: Node) {
+		tween(block)
+			.by(0.5, { position: v3(0, -CELL_H * 2) })
+			.start();
+	}
+
 	onBtnClickToRetry() {
 		this.gridLayer.destroyAllChildren();
 		this._boardState = [];

@@ -14,6 +14,7 @@
     "__type__": "cc.Node",
     "_name": "KlotskiPrefab",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "_parent": null,
     "_children": [
       {
@@ -41,7 +42,7 @@
         "__id__": 96
       },
       {
-        "__id__": 100
+        "__id__": 102
       },
       {
         "__id__": 106
@@ -2150,7 +2151,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "gridLayer",
+    "_name": "spExit",
     "_objFlags": 0,
     "_parent": {
       "__id__": 1
@@ -2160,15 +2161,18 @@
     "_components": [
       {
         "__id__": 97
+      },
+      {
+        "__id__": 99
       }
     ],
     "_prefab": {
-      "__id__": 99
+      "__id__": 101
     },
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": 412.813,
+      "y": -34.178999999999974,
       "z": 0
     },
     "_lrot": {
@@ -2206,91 +2210,6 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 2,
-      "height": 2
-    },
-    "_anchorPoint": {
-      "__type__": "cc.Vec2",
-      "x": 0.5,
-      "y": 1
-    },
-    "_id": ""
-  },
-  {
-    "__type__": "cc.CompPrefabInfo",
-    "fileId": "99YRkW3pZD1qlGF/HIxLkh"
-  },
-  {
-    "__type__": "cc.PrefabInfo",
-    "root": {
-      "__id__": 1
-    },
-    "asset": {
-      "__id__": 0
-    },
-    "fileId": "5e+Wi/6fRIU6HLM+ro5l3E"
-  },
-  {
-    "__type__": "cc.Node",
-    "_name": "spExit",
-    "_objFlags": 0,
-    "_parent": {
-      "__id__": 1
-    },
-    "_children": [],
-    "_active": true,
-    "_components": [
-      {
-        "__id__": 101
-      },
-      {
-        "__id__": 103
-      }
-    ],
-    "_prefab": {
-      "__id__": 105
-    },
-    "_lpos": {
-      "__type__": "cc.Vec3",
-      "x": 0,
-      "y": -34.178999999999974,
-      "z": 0
-    },
-    "_lrot": {
-      "__type__": "cc.Quat",
-      "x": 0,
-      "y": 0,
-      "z": 0,
-      "w": 1
-    },
-    "_lscale": {
-      "__type__": "cc.Vec3",
-      "x": 1,
-      "y": 1,
-      "z": 1
-    },
-    "_layer": 33554432,
-    "_euler": {
-      "__type__": "cc.Vec3",
-      "x": 0,
-      "y": 0,
-      "z": 0
-    },
-    "_id": ""
-  },
-  {
-    "__type__": "cc.UITransform",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 100
-    },
-    "_enabled": true,
-    "__prefab": {
-      "__id__": 102
-    },
-    "_contentSize": {
-      "__type__": "cc.Size",
       "width": 249,
       "height": 101
     },
@@ -2310,11 +2229,11 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 100
+      "__id__": 96
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 104
+      "__id__": 100
     },
     "_visFlags": 0,
     "_customMaterial": null,
@@ -2359,6 +2278,88 @@
       "__id__": 0
     },
     "fileId": "b9IBye43pGbpu4dLLnGDtP"
+  },
+  {
+    "__type__": "cc.Node",
+    "_name": "gridLayer",
+    "_objFlags": 0,
+    "_parent": {
+      "__id__": 1
+    },
+    "_children": [],
+    "_active": true,
+    "_components": [
+      {
+        "__id__": 103
+      }
+    ],
+    "_prefab": {
+      "__id__": 105
+    },
+    "_lpos": {
+      "__type__": "cc.Vec3",
+      "x": 0,
+      "y": 412.813,
+      "z": 0
+    },
+    "_lrot": {
+      "__type__": "cc.Quat",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "w": 1
+    },
+    "_lscale": {
+      "__type__": "cc.Vec3",
+      "x": 1,
+      "y": 1,
+      "z": 1
+    },
+    "_layer": 33554432,
+    "_euler": {
+      "__type__": "cc.Vec3",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "_id": ""
+  },
+  {
+    "__type__": "cc.UITransform",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 102
+    },
+    "_enabled": true,
+    "__prefab": {
+      "__id__": 104
+    },
+    "_contentSize": {
+      "__type__": "cc.Size",
+      "width": 2,
+      "height": 2
+    },
+    "_anchorPoint": {
+      "__type__": "cc.Vec2",
+      "x": 0.5,
+      "y": 1
+    },
+    "_id": ""
+  },
+  {
+    "__type__": "cc.CompPrefabInfo",
+    "fileId": "99YRkW3pZD1qlGF/HIxLkh"
+  },
+  {
+    "__type__": "cc.PrefabInfo",
+    "root": {
+      "__id__": 1
+    },
+    "asset": {
+      "__id__": 0
+    },
+    "fileId": "5e+Wi/6fRIU6HLM+ro5l3E"
   },
   {
     "__type__": "cc.Node",
@@ -5435,7 +5436,7 @@
       "__id__": 245
     },
     "gridLayer": {
-      "__id__": 96
+      "__id__": 102
     },
     "bgNode": {
       "__id__": 14
@@ -5456,7 +5457,7 @@
       "__id__": 112
     },
     "spExit": {
-      "__id__": 103
+      "__id__": 99
     },
     "_id": ""
   },

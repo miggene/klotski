@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-18 17:07:49
- * @LastEditTime: 2021-12-21 11:25:21
+ * @LastEditTime: 2021-12-27 11:57:46
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/klotskiModule/KlotskiService.ts
@@ -372,7 +372,8 @@ export function moveBlock(
 	step: number,
 	callbackFun: Function,
 	boardState: number[][],
-	blockObj: { [key: string]: Node }
+	blockObj: { [key: string]: Node },
+	winCb?: Function
 ) {
 	let newX = block.getPosition().x;
 	let newY = block.getPosition().y;
@@ -463,7 +464,7 @@ export function moveBlock(
 			// }
 			// moveObj = [];
 			//check next status
-			const b = checkGoalState(boardState, blockObj);
+			const b = checkGoalState(boardState, blockObj, winCb);
 			if (!b) {
 				callbackFun();
 			}
@@ -508,7 +509,8 @@ export function moveBlock(
 //=======================
 export function checkGoalState(
 	boardState: number[][],
-	blockObj: { [key: string]: Node }
+	blockObj: { [key: string]: Node },
+	winCb?: Function
 ) {
 	let goalBlock, blockId;
 
@@ -525,7 +527,7 @@ export function checkGoalState(
 	}
 
 	goalBlock = blockObj[blockId];
-	move2Goal(goalBlock);
+	move2Goal(goalBlock, winCb);
 
 	return true;
 }
@@ -533,11 +535,13 @@ export function checkGoalState(
 //---------------------------------
 // Move biggest block out of board
 //---------------------------------
-export function move2Goal(block: Node) {
+export function move2Goal(block: Node, winCb?: Function) {
 	// let newX = block.getAttr('x');
 	// var newY = block.getAttr('y') + BOARD_BORDER_WIDTH;
 	const { x, y } = block.position;
-	console.log('x,y :>> ', x, y);
+	if (winCb) {
+		winCb(block);
+	}
 	// disableAllBlockDraggable();
 	// disableFunctionButton();
 	// playModeDisableButton();
