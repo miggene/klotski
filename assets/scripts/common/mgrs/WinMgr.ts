@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 11:50:28
- * @LastEditTime: 2021-12-18 14:40:33
+ * @LastEditTime: 2021-12-27 15:15:49
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/common/mgrs/WinMgr.ts
@@ -67,29 +67,12 @@ class WinMgr {
 		}
 	}
 	public closeWin(winId: WIN_ID, node?: Node | string) {}
+	public clearWin() {
+		this._winLayer?.destroyAllChildren();
+	}
 	public destroy() {
 		this._winLayer?.destroy();
 		this._winLayer = null;
-	}
-
-	private _addWin(winId: WIN_ID, node: Node) {
-		const tarWinCaches = this._winCaches.get(winId);
-		let val: WinCache;
-		if (!tarWinCaches) {
-			val = { node, uuid: node.uuid, count: 1 };
-			this._winCaches.set(winId, [val]);
-			return val;
-		}
-
-		const uuid = node.uuid;
-		const cache = tarWinCaches.find((v) => v.uuid === uuid);
-		if (!cache) {
-			val = { node, uuid, count: 1 };
-			tarWinCaches.push(val);
-			return val;
-		}
-		cache.count += 1;
-		return cache;
 	}
 }
 

@@ -2,7 +2,7 @@
   "ver": "1.0.22",
   "importer": "image",
   "imported": true,
-  "uuid": "40243b56-33c0-4f56-b2a0-296f8172ac92",
+  "uuid": "bd3d2143-adf3-4199-afb6-6f3bc90a933a",
   "files": [
     ".png",
     ".json"
@@ -10,14 +10,14 @@
   "subMetas": {
     "6c48a": {
       "importer": "texture",
-      "uuid": "40243b56-33c0-4f56-b2a0-296f8172ac92@6c48a",
-      "displayName": "font",
+      "uuid": "bd3d2143-adf3-4199-afb6-6f3bc90a933a@6c48a",
+      "displayName": "fankai",
       "id": "6c48a",
       "name": "texture",
       "userData": {
         "wrapModeS": "clamp-to-edge",
         "wrapModeT": "clamp-to-edge",
-        "imageUuidOrDatabaseUri": "40243b56-33c0-4f56-b2a0-296f8172ac92",
+        "imageUuidOrDatabaseUri": "bd3d2143-adf3-4199-afb6-6f3bc90a933a",
         "minfilter": "linear",
         "magfilter": "linear",
         "mipfilter": "none",
@@ -33,29 +33,29 @@
     },
     "f9941": {
       "importer": "sprite-frame",
-      "uuid": "40243b56-33c0-4f56-b2a0-296f8172ac92@f9941",
-      "displayName": "font",
+      "uuid": "bd3d2143-adf3-4199-afb6-6f3bc90a933a@f9941",
+      "displayName": "fankai",
       "id": "f9941",
       "name": "spriteFrame",
       "userData": {
         "trimType": "auto",
         "trimThreshold": 1,
         "rotated": false,
-        "offsetX": -2.5,
-        "offsetY": 19,
-        "trimX": 2,
-        "trimY": 2,
-        "width": 589,
-        "height": 684,
-        "rawWidth": 598,
-        "rawHeight": 726,
-        "borderTop": 0,
-        "borderBottom": 0,
-        "borderLeft": 0,
-        "borderRight": 0,
+        "offsetX": 0,
+        "offsetY": 0,
+        "trimX": 0,
+        "trimY": 0,
+        "width": 51,
+        "height": 51,
+        "rawWidth": 51,
+        "rawHeight": 51,
+        "borderTop": 23,
+        "borderBottom": 23,
+        "borderLeft": 23,
+        "borderRight": 23,
         "packable": true,
         "isUuid": true,
-        "imageUuidOrDatabaseUri": "40243b56-33c0-4f56-b2a0-296f8172ac92@6c48a",
+        "imageUuidOrDatabaseUri": "bd3d2143-adf3-4199-afb6-6f3bc90a933a@6c48a",
         "atlasUuid": ""
       },
       "ver": "1.0.9",
@@ -69,6 +69,6 @@
   "userData": {
     "type": "sprite-frame",
     "hasAlpha": true,
-    "redirect": "40243b56-33c0-4f56-b2a0-296f8172ac92@f9941"
+    "redirect": "bd3d2143-adf3-4199-afb6-6f3bc90a933a@f9941"
   }
 }

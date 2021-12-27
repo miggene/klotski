@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-11 17:59:27
- * @LastEditTime: 2021-12-22 19:35:48
+ * @LastEditTime: 2021-12-27 16:30:33
  * @LastEditors: zhupengfei
  * @Description:开始界面窗口
  * @FilePath: /klotski/assets/scripts/modules/menuModule/MenuView.ts
@@ -30,6 +30,12 @@ export class MenuView extends Component {
 		console.log(`点击开始游戏`);
 		// winMgr.openWin(WIN_ID.KLOTSKI);
 		winMgr.openWin(WIN_ID.LEVELS);
+		this.node.destroy();
+	}
+
+	onBtnClickToSetting() {
+		console.log('点击设置界面');
+		winMgr.openWin(WIN_ID.SETTING);
 		this.node.destroy();
 	}
 }

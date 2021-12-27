@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 17:05:58
- * @LastEditTime: 2021-12-21 17:52:54
+ * @LastEditTime: 2021-12-27 15:20:39
  * @LastEditors: zhupengfei
  * @Description:关卡组件
  * @FilePath: /klotski/assets/scripts/modules/levelsModule/components/LevelItem.ts
@@ -9,7 +9,6 @@
 import { _decorator, Component, Node, Label } from 'cc';
 import { WIN_ID } from '../../../common/mgrs/WinConfig';
 import { winMgr } from '../../../common/mgrs/WinMgr';
-import { Block } from '../../../libs/Klotski';
 import { KlotskiView } from '../../klotskiModule/KlotskiView';
 import { ILevelData } from '../ILevelsModule';
 import { Level_Item_Angles } from '../ILevelsModuleCfg';

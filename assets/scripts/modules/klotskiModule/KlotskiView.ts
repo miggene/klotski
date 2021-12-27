@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 11:13:58
- * @LastEditTime: 2021-12-27 13:35:22
+ * @LastEditTime: 2021-12-27 15:29:21
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/klotskiModule/KlotskiView.ts
@@ -27,23 +27,10 @@ import {
 import { resMgr } from '../../common/mgrs/ResMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
-import { bounceAct, deepClone, formatTime } from '../../common/utils/Helper';
-import { Food } from '../../components/Food';
-import Klotski, {
-	Block,
-	BOARD_CELL_BOARDER,
-	BOARD_CELL_EMPTY,
-	ESCAPE_COL,
-	ESCAPE_ROW,
-	HRD_BOARD_HEIGHT,
-	HRD_BOARD_WIDTH,
-	HRD_GAME_COL,
-	HRD_GAME_ROW,
-	Move,
-	Shape,
-} from '../../libs/Klotski';
+import { deepClone, formatTime } from '../../common/utils/Helper';
 import KlotskiSolver from '../../libs/klotskiLibs/KlotskiSolver';
 import { ILevelData } from '../levelsModule/ILevelsModule';
+import { OverView } from '../overModule/OverView';
 import { KlotskiBlock } from './components/KlotskiBlock';
 import { IBlock } from './IKlotskiModule';
 import {
@@ -60,7 +47,6 @@ import {
 	boardState2BoardString,
 	getBlockContentSizeByStyle,
 	getBlockPositionByStyle,
-	getBlockSizeByStyle,
 	getMoveInfo,
 	getStepAction,
 	key2Board,
@@ -97,14 +83,14 @@ export class KlotskiView extends Component {
 		this.lblLevelIndex.string = `${v}`;
 	}
 
-	private _moveStep: number;
-	public get moveStep(): number {
-		return this._moveStep;
-	}
-	public set moveStep(v: number) {
-		this._moveStep = v;
-		this.lblMoveStep.string = `${v}`;
-	}
+	// private _moveStep: number;
+	// public get moveStep(): number {
+	// 	return this._moveStep;
+	// }
+	// public set moveStep(v: number) {
+	// 	this._moveStep = v;
+	// 	this.lblMoveStep.string = `${v}`;
+	// }
 
 	private _usedTime: number = 0;
 	public get usedTime(): number {
@@ -193,6 +179,7 @@ export class KlotskiView extends Component {
 		const { level, board } = props;
 		this.level = level;
 		this.board = board;
+		this.curBoardStep = 0;
 		this._createBoard(board);
 	}
 
@@ -629,7 +616,17 @@ export class KlotskiView extends Component {
 
 	private _winCb(block: Node) {
 		tween(block)
+			.delay(0.5)
 			.by(0.5, { position: v3(0, -CELL_H * 2) })
+			.call(() => {
+				winMgr.openWin(WIN_ID.OVER).then((ndWin: Node) => {
+					ndWin.getComponent(OverView).initProps({
+						moveStep: this.curBoardStep,
+						time: this.usedTime,
+						curLevel: this.level,
+					});
+				});
+			})
 			.start();
 	}
 
