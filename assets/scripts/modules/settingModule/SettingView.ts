@@ -1,39 +1,72 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-27 16:26:06
- * @LastEditTime: 2021-12-27 16:31:17
+ * @LastEditTime: 2021-12-28 11:24:16
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/settingModule/SettingView.ts
  */
-import { _decorator, Component, Node } from 'cc';
+import {
+	_decorator,
+	Component,
+	Node,
+	Sprite,
+	dragonBones,
+	SpriteFrame,
+	tween,
+} from 'cc';
+import { dataMgr } from '../../common/mgrs/DataMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
 const { ccclass, property } = _decorator;
 
-/**
- * Predefined variables
- * Name = SettingView
- * DateTime = Mon Dec 27 2021 16:26:06 GMT+0800 (中国标准时间)
- * Author = dailycode365
- * FileBasename = SettingView.ts
- * FileBasenameNoExtension = SettingView
- * URL = db://assets/scripts/modules/settingModule/SettingView.ts
- * ManualUrl = https://docs.cocos.com/creator/3.4/manual/zh/
- *
- */
-
 @ccclass('SettingView')
 export class SettingView extends Component {
-	// [1]
-	// dummy = '';
+	private _soundOn: number;
+	public get soundOn(): number {
+		return this._soundOn;
+	}
+	public set soundOn(v: number) {
+		if (this._soundOn !== v) {
+			this._soundOn = v;
+			dataMgr.soundOn = v;
+			this.spSound.spriteFrame = this.spSoundList[v];
+			this.dgSound.timeScale = v === 1 ? 4 : -4;
+			this.dgSound.playAnimation('newAnimation', 1);
+		}
+	}
 
-	// [2]
-	// @property
-	// serializableDummy = 0;
+	private _shakeOn: number;
+	public get shakeOn(): number {
+		return this._shakeOn;
+	}
+	public set shakeOn(v: number) {
+		if (this._shakeOn !== v) {
+			this._shakeOn = v;
+			dataMgr.shakeOn = v;
+			this.dgShake.timeScale = v === 1 ? 4 : -4;
+			this.dgShake.playAnimation('newAnimation', 1);
+		}
+	}
+
+	@property(Sprite)
+	spShake: Sprite;
+
+	@property(Sprite)
+	spSound: Sprite;
+
+	@property(SpriteFrame)
+	spSoundList: SpriteFrame[] = []; //0关，1开
+
+	@property(dragonBones.ArmatureDisplay)
+	dgShake: dragonBones.ArmatureDisplay;
+
+	@property(dragonBones.ArmatureDisplay)
+	dgSound: dragonBones.ArmatureDisplay;
 
 	start() {
-		// [3]
+		this.soundOn = dataMgr.soundOn;
+		this.shakeOn = dataMgr.shakeOn;
 	}
 
 	// update (deltaTime: number) {
@@ -43,6 +76,18 @@ export class SettingView extends Component {
 	onBtnClickToHome() {
 		winMgr.openWin(WIN_ID.START_MENU);
 		this.node.destroy();
+	}
+
+	onBtnClickToShake() {
+		this.shakeOn = 1 ^ this.shakeOn;
+		if (this.shakeOn === 1) {
+			tween(this.spShake.node)
+				.repeat(3, tween().to(0.1, { angle: 20 }).to(0.1, { angle: -20 }))
+				.start();
+		}
+	}
+	onBtnClickToSound() {
+		this.soundOn = 1 ^ this.soundOn;
 	}
 }
 

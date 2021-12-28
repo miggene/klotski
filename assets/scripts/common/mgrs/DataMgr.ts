@@ -6,7 +6,7 @@ import { resMgr } from './ResMgr';
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-27 16:43:11
- * @LastEditTime: 2021-12-27 18:05:42
+ * @LastEditTime: 2021-12-28 11:21:11
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/common/mgrs/DataMgr.ts
@@ -15,10 +15,16 @@ const DELIMITER = '_';
 const LEVELS_DATA_PATH = 'datas/hrd_answers_straight';
 const PREFIX_LS = `${Projectrc.projectName}${DELIMITER}`;
 
+const UNLOCK_MAX_INDEX = 'unlockMaxIndex';
+// const CURRENT_LEVEL_INDEX = 'curLevelIndex';
+const SHAKE_ON = 'shakeOn';
+const SOUND_ON = 'soundOn';
 class DataMgr {
 	constructor(
 		private _curLevelIndex: number,
-		private _unlockMaxIndex: number
+		private _unlockMaxIndex: number,
+		private _shakeOn: number = 0,
+		private _soundOn: number = 1
 	) {}
 
 	private static _instance: DataMgr;
@@ -51,6 +57,26 @@ class DataMgr {
 	}
 	public set unlockMaxIndex(v: number) {
 		this._unlockMaxIndex = v;
+		this.setLS(UNLOCK_MAX_INDEX, JSON.stringify(v));
+	}
+
+	//震动开头
+	public get shakeOn(): number {
+		return this._shakeOn;
+	}
+	public set shakeOn(v: number) {
+		this._shakeOn = v;
+		this.setLS(SHAKE_ON, JSON.stringify(v));
+	}
+
+	//音乐音效开关
+
+	public get soundOn(): number {
+		return this._soundOn;
+	}
+	public set soundOn(v: number) {
+		this._soundOn = v;
+		this.setLS(SOUND_ON, JSON.stringify(v));
 	}
 
 	public async init() {
@@ -61,11 +87,18 @@ class DataMgr {
 			})
 			.catch((err) => console.error(err));
 		try {
-			this.curLevelIndex = string2Number(
-				this.getLS('curLevelIndex', JSON.stringify(this._curLevelIndex))
-			);
+			// this.curLevelIndex = string2Number(
+			// 	this.getLS(CURRENT_LEVEL_INDEX, JSON.stringify(this._curLevelIndex))
+			// );
 			this.unlockMaxIndex = string2Number(
-				this.getLS('unlockMaxIndex', JSON.stringify(this._unlockMaxIndex))
+				this.getLS(UNLOCK_MAX_INDEX, JSON.stringify(this._unlockMaxIndex))
+			);
+			this.curLevelIndex = this.unlockMaxIndex;
+			this.shakeOn = string2Number(
+				this.getLS(SHAKE_ON, JSON.stringify(this._shakeOn))
+			);
+			this.soundOn = string2Number(
+				this.getLS(SOUND_ON, JSON.stringify(this._soundOn))
 			);
 		} catch (error) {
 			console.error(error);

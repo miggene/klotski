@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-27 14:45:59
- * @LastEditTime: 2021-12-27 17:05:17
+ * @LastEditTime: 2021-12-27 18:21:52
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/overModule/OverView.ts
@@ -94,6 +94,8 @@ export class OverView extends Component {
 		this.moveStep = moveStep;
 		// this.bestTime = bestTime;
 		this.time = time;
+
+		if (this.level > dataMgr.unlockMaxIndex) dataMgr.unlockMaxIndex++;
 	}
 
 	onBtnClickToHome() {
@@ -124,6 +126,8 @@ export class OverView extends Component {
 		const data = levelsData[this.level];
 		if (data) {
 			console.log(`go to level: ${this.level + 1}`);
+			const nextLevel = this.level + 1;
+			dataMgr.curLevelIndex = nextLevel;
 			winMgr
 				.openWin(WIN_ID.KLOTSKI)
 				.then((nd: Node) => {
