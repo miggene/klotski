@@ -1,12 +1,12 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 17:05:58
- * @LastEditTime: 2021-12-27 18:06:34
+ * @LastEditTime: 2021-12-28 16:35:27
  * @LastEditors: zhupengfei
  * @Description:关卡组件
  * @FilePath: /klotski/assets/scripts/modules/levelsModule/components/LevelItem.ts
  */
-import { _decorator, Component, Node, Label, Sprite } from 'cc';
+import { _decorator, Component, Node, Label, Sprite, dragonBones } from 'cc';
 import { dataMgr } from '../../../common/mgrs/DataMgr';
 import { WIN_ID } from '../../../common/mgrs/WinConfig';
 import { winMgr } from '../../../common/mgrs/WinMgr';
@@ -26,6 +26,11 @@ export class LevelItem extends Component {
 		this.lblLevelIndex.string = `${v}`;
 		this.node.angle = Level_Item_Angles[(v - 1) % 3];
 		this.locked = v > dataMgr.unlockMaxIndex;
+		const animationName = `0${Math.floor((v - 1) % 6) + 1}`;
+		this.dgPaper.animationName = animationName;
+		if (v === dataMgr.curLevelIndex) {
+			this.dgPaper.playAnimation(animationName, 1);
+		}
 	}
 
 	private _boardString: string;
@@ -52,15 +57,40 @@ export class LevelItem extends Component {
 		this._locked = v;
 		this.spLock.node.active = v;
 		this.lblLevelIndex.node.active = !v;
+		this.lblLevelTitle.node.active = !v;
 	}
 
 	@property(Label)
 	lblLevelIndex: Label;
+	@property(Label)
+	lblLevelTitle: Label;
 	@property(Sprite)
 	spLock: Sprite;
+	@property(Node)
+	attachNode: Node;
+
+	@property(dragonBones.ArmatureDisplay)
+	dgPaper: dragonBones.ArmatureDisplay;
+
+	onEnable() {
+		this.dgPaper.once(
+			dragonBones.EventObject.COMPLETE,
+			this._playPaperLoop,
+			this
+		);
+	}
+
+	onDisable() {
+		this.dgPaper.off(
+			dragonBones.EventObject.COMPLETE,
+			this._playPaperLoop,
+			this
+		);
+	}
 
 	start() {
 		// [3]
+		// this.attachNode.angle = -90;
 	}
 
 	// update (deltaTime: number) {
@@ -75,8 +105,22 @@ export class LevelItem extends Component {
 		// this.blocks = blocks;
 	}
 
+	private _playPaperLoop() {
+		const animationName = `0${Math.floor((this.level - 1) % 6) + 1}_0`;
+		this.dgPaper.playAnimation(animationName, 0);
+	}
+
 	onBtnClickToLevel() {
 		console.log(`go to level: ${this.level}`);
+		if (this.level <= dataMgr.unlockMaxIndex) {
+			const animationName = `0${Math.floor((this.level - 1) % 6) + 1}`;
+			this.dgPaper.off(
+				dragonBones.EventObject.COMPLETE,
+				this._playPaperLoop,
+				this
+			);
+			this.dgPaper.playAnimation(animationName, 1);
+		}
 		winMgr
 			.openWin(WIN_ID.KLOTSKI)
 			.then((nd: Node) => {

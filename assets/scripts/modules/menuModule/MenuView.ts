@@ -1,12 +1,12 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-11 17:59:27
- * @LastEditTime: 2021-12-27 18:26:48
+ * @LastEditTime: 2021-12-28 17:20:32
  * @LastEditors: zhupengfei
  * @Description:开始界面窗口
  * @FilePath: /klotski/assets/scripts/modules/menuModule/MenuView.ts
  */
-import { _decorator, Component, Node, Label, tween, UITransform } from 'cc';
+import { _decorator, Component, Label, tween, UIOpacity } from 'cc';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
 const { ccclass, property } = _decorator;
@@ -17,9 +17,10 @@ export class MenuView extends Component {
 	lblStart: Label = null;
 
 	start() {
-		// [3]
-		tween(this.lblStart.color)
-			.repeatForever(tween().to(1, { a: 0 }).to(1, { a: 255 }).delay(1))
+		tween(this.lblStart.node.getComponent(UIOpacity))
+			.repeatForever(
+				tween().to(2, { opacity: 0 }).to(2, { opacity: 255 }).delay(1)
+			)
 			.start();
 	}
 

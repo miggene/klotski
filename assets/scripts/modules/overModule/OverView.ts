@@ -1,14 +1,13 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-27 14:45:59
- * @LastEditTime: 2021-12-27 18:21:52
+ * @LastEditTime: 2021-12-28 16:09:52
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/overModule/OverView.ts
  */
-import { _decorator, Component, Node, Label, instantiate } from 'cc';
+import { _decorator, Component, Node, Label } from 'cc';
 import { dataMgr } from '../../common/mgrs/DataMgr';
-import { resMgr } from '../../common/mgrs/ResMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
 import { formatTime } from '../../common/utils/Helper';
@@ -128,6 +127,9 @@ export class OverView extends Component {
 			console.log(`go to level: ${this.level + 1}`);
 			const nextLevel = this.level + 1;
 			dataMgr.curLevelIndex = nextLevel;
+			if (nextLevel > dataMgr.unlockMaxIndex) {
+				dataMgr.unlockMaxIndex = nextLevel;
+			}
 			winMgr
 				.openWin(WIN_ID.KLOTSKI)
 				.then((nd: Node) => {

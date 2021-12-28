@@ -6,7 +6,7 @@ import { resMgr } from './ResMgr';
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-27 16:43:11
- * @LastEditTime: 2021-12-28 11:21:11
+ * @LastEditTime: 2021-12-28 16:08:06
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/common/mgrs/DataMgr.ts
