@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 11:13:58
- * @LastEditTime: 2021-12-27 15:29:21
+ * @LastEditTime: 2021-12-29 14:05:10
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/klotskiModule/KlotskiView.ts
@@ -531,6 +531,7 @@ export class KlotskiView extends Component {
 		for (let x = 0; x < G_BOARD_X; ++x) {
 			tmpBoardState[x] = this._boardState[x].slice();
 		}
+		console.log('tmpBoardState :>> ', tmpBoardState);
 		for (let i = 1; i <= maxMove; ++i) {
 			const moveInfo = getMoveInfo(
 				key2Board(answers.boardList[i - 1]),
@@ -549,7 +550,6 @@ export class KlotskiView extends Component {
 				i !== 1
 			);
 		}
-		console.log('this._stepInfo :>> ', this._stepInfo);
 		this._moveNext();
 		// this._moveLast(this._stepInfo.slice());
 	}
@@ -558,6 +558,9 @@ export class KlotskiView extends Component {
 		const maxStep = this._stepInfo.length;
 		if (this.curBoardStep >= maxStep) return;
 		this.curBoardStep++;
+		console.log('this._stepInfo :>> ', this._stepInfo);
+		console.log('this.curBoardStep :>> ', this.curBoardStep);
+		console.log('this._boardState Prev:>> ', this._boardState);
 		const posInfo = stepInfo2PosInfo(this._stepInfo, this.curBoardStep);
 		const curBlock = this._blockObj[posInfo.id];
 
@@ -578,8 +581,7 @@ export class KlotskiView extends Component {
 			posInfo.id
 		);
 		curBlock.getComponent(KlotskiBlock).updatePos(posInfo.endY, posInfo.endX);
-		// const [x, y] = getBlockPositionByStyle(posInfo.endY, posInfo.endX, style);
-		// curBlock.setPosition(x, y);
+		console.log('this._boardState current:>> ', this._boardState);
 		moveBlock(
 			curBlock,
 			actions,

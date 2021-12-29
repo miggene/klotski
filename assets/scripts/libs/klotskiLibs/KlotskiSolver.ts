@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-19 09:46:46
- * @LastEditTime: 2021-12-19 12:07:10
+ * @LastEditTime: 2021-12-29 13:54:31
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/libs/klotskiLibs/KlotskiSolver.ts
@@ -34,7 +34,7 @@ const enum MOVE_MODE {
 const SKIP_MIRROR_STATE = true;
 
 export default class KlotskiSolver {
-	private moveMode;
+	// private moveMode;
 	private queue: Queue;
 	private hashMap: HashMap;
 	private exploreCount: number;
@@ -42,7 +42,10 @@ export default class KlotskiSolver {
 	private wrongBoard: number;
 	private initBoard: number[];
 
-	constructor(boardString: string, moveMode: MOVE_MODE = MOVE_MODE.STRAIGHT) {
+	constructor(
+		boardString: string,
+		private moveMode: MOVE_MODE = MOVE_MODE.STRAIGHT
+	) {
 		// this.queue = new Queue();
 		// this.hashMap = new HashMap();
 		// this.exploreCount = 0;
@@ -144,9 +147,8 @@ export default class KlotskiSolver {
 		blockX = emptyX;
 		blockY = emptyY + directionY;
 		if (blockY < 0 || blockY >= G_BOARD_Y) return 0; //out of range
-
-		if ((blockValue = curBoard[blockX + blockY * G_BOARD_X]) <= G_EMPTY_BLOCK)
-			return 0; //empty
+		blockValue = curBoard[blockX + blockY * G_BOARD_X];
+		if (blockValue <= G_EMPTY_BLOCK) return 0; //empty
 		blockSizeX = gBlockStyle[gBlockBelongTo[blockValue]][0]; //block size X
 		blockSizeY = gBlockStyle[gBlockBelongTo[blockValue]][1]; //block size Y
 
@@ -262,7 +264,7 @@ export default class KlotskiSolver {
 
 			emptyY -= directionY;
 		} while (
-			this.moveMode != MOVE_MODE.ONE_CELL_ONLY &&
+			this.moveMode !== MOVE_MODE.ONE_CELL_ONLY &&
 			emptyY >= 0 &&
 			emptyY < G_BOARD_Y &&
 			childBoard[emptyX + emptyY * G_BOARD_X] == G_EMPTY_BLOCK
@@ -388,7 +390,7 @@ export default class KlotskiSolver {
 				//   +---+---+      +---+---+
 				//---------------------------------------------------------------------------------
 				if (
-					this.moveMode == MOVE_MODE.RIGHT_ANGLE_TURN &&
+					this.moveMode === MOVE_MODE.RIGHT_ANGLE_TURN &&
 					maxMove < this.emptyCount
 				) {
 					if (minSpaceY < minBlockY && minBlockY == emptyY) {
@@ -446,7 +448,7 @@ export default class KlotskiSolver {
 
 		for (let emptyX = 0; emptyX < G_BOARD_X; emptyX++) {
 			for (let emptyY = 0; emptyY < G_BOARD_Y; emptyY++) {
-				if (boardObj.board[emptyX + emptyY * G_BOARD_X] != G_EMPTY_BLOCK)
+				if (boardObj.board[emptyX + emptyY * G_BOARD_X] !== G_EMPTY_BLOCK)
 					continue;
 				eCount++;
 
