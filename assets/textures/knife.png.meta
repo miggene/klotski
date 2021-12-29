@@ -1,8 +1,8 @@
 {
-  "ver": "1.0.21",
+  "ver": "1.0.22",
   "importer": "image",
   "imported": true,
-  "uuid": "233bbb18-0034-4cc4-8455-75938c4ba40a",
+  "uuid": "1baba323-d6f1-4cd3-b3ff-ee2fc0c8bc2a",
   "files": [
     ".png",
     ".json"
@@ -10,14 +10,14 @@
   "subMetas": {
     "6c48a": {
       "importer": "texture",
-      "uuid": "233bbb18-0034-4cc4-8455-75938c4ba40a@6c48a",
+      "uuid": "1baba323-d6f1-4cd3-b3ff-ee2fc0c8bc2a@6c48a",
       "displayName": "knife",
       "id": "6c48a",
       "name": "texture",
       "userData": {
         "wrapModeS": "clamp-to-edge",
         "wrapModeT": "clamp-to-edge",
-        "imageUuidOrDatabaseUri": "233bbb18-0034-4cc4-8455-75938c4ba40a",
+        "imageUuidOrDatabaseUri": "1baba323-d6f1-4cd3-b3ff-ee2fc0c8bc2a",
         "minfilter": "linear",
         "magfilter": "linear",
         "mipfilter": "none",
@@ -33,7 +33,7 @@
     },
     "f9941": {
       "importer": "sprite-frame",
-      "uuid": "233bbb18-0034-4cc4-8455-75938c4ba40a@f9941",
+      "uuid": "1baba323-d6f1-4cd3-b3ff-ee2fc0c8bc2a@f9941",
       "displayName": "knife",
       "id": "f9941",
       "name": "spriteFrame",
@@ -45,17 +45,17 @@
         "offsetY": 0,
         "trimX": 0,
         "trimY": 0,
-        "width": 37,
-        "height": 165,
-        "rawWidth": 37,
-        "rawHeight": 165,
+        "width": 29,
+        "height": 128,
+        "rawWidth": 29,
+        "rawHeight": 128,
         "borderTop": 0,
         "borderBottom": 0,
         "borderLeft": 0,
         "borderRight": 0,
         "packable": true,
         "isUuid": true,
-        "imageUuidOrDatabaseUri": "233bbb18-0034-4cc4-8455-75938c4ba40a@6c48a",
+        "imageUuidOrDatabaseUri": "1baba323-d6f1-4cd3-b3ff-ee2fc0c8bc2a@6c48a",
         "atlasUuid": ""
       },
       "ver": "1.0.9",
@@ -69,6 +69,6 @@
   "userData": {
     "type": "sprite-frame",
     "hasAlpha": true,
-    "redirect": "233bbb18-0034-4cc4-8455-75938c4ba40a@f9941"
+    "redirect": "1baba323-d6f1-4cd3-b3ff-ee2fc0c8bc2a@f9941"
   }
 }

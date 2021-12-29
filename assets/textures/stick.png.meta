@@ -1,8 +1,8 @@
 {
-  "ver": "1.0.21",
+  "ver": "1.0.22",
   "importer": "image",
   "imported": true,
-  "uuid": "15763038-48d2-4a52-9ee8-780a704ec795",
+  "uuid": "0df0410e-77fc-4b7d-ba72-03540c0910c4",
   "files": [
     ".png",
     ".json"
@@ -10,14 +10,14 @@
   "subMetas": {
     "6c48a": {
       "importer": "texture",
-      "uuid": "15763038-48d2-4a52-9ee8-780a704ec795@6c48a",
+      "uuid": "0df0410e-77fc-4b7d-ba72-03540c0910c4@6c48a",
       "displayName": "stick",
       "id": "6c48a",
       "name": "texture",
       "userData": {
         "wrapModeS": "clamp-to-edge",
         "wrapModeT": "clamp-to-edge",
-        "imageUuidOrDatabaseUri": "15763038-48d2-4a52-9ee8-780a704ec795",
+        "imageUuidOrDatabaseUri": "0df0410e-77fc-4b7d-ba72-03540c0910c4",
         "minfilter": "linear",
         "magfilter": "linear",
         "mipfilter": "none",
@@ -33,7 +33,7 @@
     },
     "f9941": {
       "importer": "sprite-frame",
-      "uuid": "15763038-48d2-4a52-9ee8-780a704ec795@f9941",
+      "uuid": "0df0410e-77fc-4b7d-ba72-03540c0910c4@f9941",
       "displayName": "stick",
       "id": "f9941",
       "name": "spriteFrame",
@@ -45,17 +45,17 @@
         "offsetY": 0,
         "trimX": 0,
         "trimY": 0,
-        "width": 382,
-        "height": 29,
-        "rawWidth": 382,
-        "rawHeight": 29,
+        "width": 299,
+        "height": 24,
+        "rawWidth": 299,
+        "rawHeight": 24,
         "borderTop": 0,
         "borderBottom": 0,
         "borderLeft": 0,
         "borderRight": 0,
         "packable": true,
         "isUuid": true,
-        "imageUuidOrDatabaseUri": "15763038-48d2-4a52-9ee8-780a704ec795@6c48a",
+        "imageUuidOrDatabaseUri": "0df0410e-77fc-4b7d-ba72-03540c0910c4@6c48a",
         "atlasUuid": ""
       },
       "ver": "1.0.9",
@@ -69,6 +69,6 @@
   "userData": {
     "type": "sprite-frame",
     "hasAlpha": true,
-    "redirect": "15763038-48d2-4a52-9ee8-780a704ec795@f9941"
+    "redirect": "0df0410e-77fc-4b7d-ba72-03540c0910c4@f9941"
   }
 }

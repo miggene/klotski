@@ -1,0 +1,37 @@
+[
+	{
+		"_id": {
+			"$oid": "61bd978f265672b1e151d3b4"
+		},
+		"blockName": "fries",
+		"style": 4
+	},
+	{
+		"_id": {
+			"$oid": "61bd978f265672b1e151d3b5"
+		},
+		"blockName": "icecream",
+		"style": 3
+	},
+	{
+		"_id": {
+			"$oid": "61bd978f265672b1e151d3b6"
+		},
+		"blockName": "sushi",
+		"style": 2
+	},
+	{
+		"_id": {
+			"$oid": "61bd978f265672b1e151d3b7"
+		},
+		"blockName": "zongzi",
+		"style": 0
+	},
+	{
+		"_id": {
+			"$oid": "61bd978f265672b1e151d3b8"
+		},
+		"blockName": "apple",
+		"style": 1
+	}
+]

@@ -1,11 +1,13 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-10 15:35:41
- * @LastEditTime: 2021-12-12 17:19:33
+ * @LastEditTime: 2021-12-27 17:42:14
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/common/utils/Helper.ts
  */
+
+import { Node, Tween, tween, UITransform, v2, v3 } from 'cc';
 
 export function formatTime(time: number, format: string = 'HH:MM:SS'): string {
 	const len = format.split(':').length;
@@ -35,4 +37,14 @@ export function formatTime(time: number, format: string = 'HH:MM:SS'): string {
 
 export function deepClone(obj: Object) {
 	return JSON.parse(JSON.stringify(obj));
+}
+
+// 字符串转数字
+export function string2Number(str: string): number {
+	const re = /^\d{1,}$/;
+	const result = re.exec(str);
+	if (result.length === str.length) {
+		return parseInt(str, 10);
+	}
+	throw new Error('非全部是数字');
 }

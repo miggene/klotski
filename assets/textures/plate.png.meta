@@ -1,8 +1,8 @@
 {
-  "ver": "1.0.21",
+  "ver": "1.0.22",
   "importer": "image",
   "imported": true,
-  "uuid": "5a354d7d-ee2f-48a2-9086-8574809a5475",
+  "uuid": "7332a455-6805-493e-855f-d8fe9132d10d",
   "files": [
     ".png",
     ".json"
@@ -10,14 +10,14 @@
   "subMetas": {
     "6c48a": {
       "importer": "texture",
-      "uuid": "5a354d7d-ee2f-48a2-9086-8574809a5475@6c48a",
+      "uuid": "7332a455-6805-493e-855f-d8fe9132d10d@6c48a",
       "displayName": "plate",
       "id": "6c48a",
       "name": "texture",
       "userData": {
         "wrapModeS": "clamp-to-edge",
         "wrapModeT": "clamp-to-edge",
-        "imageUuidOrDatabaseUri": "5a354d7d-ee2f-48a2-9086-8574809a5475",
+        "imageUuidOrDatabaseUri": "7332a455-6805-493e-855f-d8fe9132d10d",
         "minfilter": "linear",
         "magfilter": "linear",
         "mipfilter": "none",
@@ -33,7 +33,7 @@
     },
     "f9941": {
       "importer": "sprite-frame",
-      "uuid": "5a354d7d-ee2f-48a2-9086-8574809a5475@f9941",
+      "uuid": "7332a455-6805-493e-855f-d8fe9132d10d@f9941",
       "displayName": "plate",
       "id": "f9941",
       "name": "spriteFrame",
@@ -45,17 +45,17 @@
         "offsetY": 0,
         "trimX": 0,
         "trimY": 0,
-        "width": 262,
-        "height": 177,
-        "rawWidth": 262,
-        "rawHeight": 177,
+        "width": 204,
+        "height": 138,
+        "rawWidth": 204,
+        "rawHeight": 138,
         "borderTop": 0,
         "borderBottom": 0,
         "borderLeft": 0,
         "borderRight": 0,
         "packable": true,
         "isUuid": true,
-        "imageUuidOrDatabaseUri": "5a354d7d-ee2f-48a2-9086-8574809a5475@6c48a",
+        "imageUuidOrDatabaseUri": "7332a455-6805-493e-855f-d8fe9132d10d@6c48a",
         "atlasUuid": ""
       },
       "ver": "1.0.9",
@@ -69,6 +69,6 @@
   "userData": {
     "type": "sprite-frame",
     "hasAlpha": true,
-    "redirect": "5a354d7d-ee2f-48a2-9086-8574809a5475@f9941"
+    "redirect": "7332a455-6805-493e-855f-d8fe9132d10d@f9941"
   }
 }

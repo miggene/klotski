@@ -1,12 +1,12 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 11:50:28
- * @LastEditTime: 2021-12-12 17:24:24
+ * @LastEditTime: 2021-12-27 16:57:52
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/common/mgrs/WinMgr.ts
  */
-import { director, instantiate, Layers, Node, Prefab, Widget } from 'cc';
+import { director, instantiate, Layers, Node, Prefab, UITransform } from 'cc';
 import { WinCache } from './IMgrs';
 import { resMgr } from './ResMgr';
 import { getWinInfo, WIN_ID, WIN_ZINDEX } from './WinConfig';
@@ -32,13 +32,11 @@ class WinMgr {
 		this._winLayer = new Node('winLayer');
 		this._winLayer.layer = Layers.Enum.UI_2D;
 		this._winLayer.setSiblingIndex(WIN_ZINDEX.WINDOW);
-		const widget = this._winLayer.addComponent(Widget);
-		widget.enabled = true;
-		widget.left = 0;
-		widget.right = 0;
-		widget.top = 0;
-		widget.bottom = 0;
+		this._winLayer.addComponent(UITransform);
 		canvas.addChild(this._winLayer);
+		this._winLayer
+			.getComponent(UITransform)
+			.setContentSize(canvas.getComponent(UITransform).contentSize);
 	}
 	public async openWin(winId: WIN_ID) {
 		return new Promise((resolve, reject) => {
@@ -48,39 +46,19 @@ class WinMgr {
 				.then((prefab: Prefab) => {
 					const ndWin = instantiate(prefab);
 					this._winLayer.addChild(ndWin);
+					const size = this._winLayer.getComponent(UITransform).contentSize;
 					resolve(ndWin);
 				})
 				.catch((err) => reject(err));
 		});
-		try {
-		} catch (error) {
-			console.error(error);
-		}
 	}
 	public closeWin(winId: WIN_ID, node?: Node | string) {}
+	public clearWin() {
+		this._winLayer?.destroyAllChildren();
+	}
 	public destroy() {
 		this._winLayer?.destroy();
 		this._winLayer = null;
-	}
-
-	private _addWin(winId: WIN_ID, node: Node) {
-		const tarWinCaches = this._winCaches.get(winId);
-		let val: WinCache;
-		if (!tarWinCaches) {
-			val = { node, uuid: node.uuid, count: 1 };
-			this._winCaches.set(winId, [val]);
-			return val;
-		}
-
-		const uuid = node.uuid;
-		const cache = tarWinCaches.find((v) => v.uuid === uuid);
-		if (!cache) {
-			val = { node, uuid, count: 1 };
-			tarWinCaches.push(val);
-			return val;
-		}
-		cache.count += 1;
-		return cache;
 	}
 }
 

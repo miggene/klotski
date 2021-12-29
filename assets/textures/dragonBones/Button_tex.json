@@ -1,0 +1,1 @@
+{"name":"Button","height":128,"SubTexture":[{"name":"Button/op","x":1,"height":39,"y":1,"width":118},{"name":"Button/cl","x":1,"height":39,"y":42,"width":118},{"name":"Button/o","x":30,"height":26,"y":83,"width":26},{"name":"Button/c","x":1,"height":26,"y":83,"width":27}],"imagePath":"Button_tex.png","width":128}

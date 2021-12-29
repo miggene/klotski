@@ -1,8 +1,8 @@
 {
-  "ver": "1.0.21",
+  "ver": "1.0.22",
   "importer": "image",
   "imported": true,
-  "uuid": "4b6796e7-5451-4e69-81de-afad692895f9",
+  "uuid": "9df5be75-2b80-45b6-acb7-4b439031b686",
   "files": [
     ".png",
     ".json"
@@ -10,14 +10,14 @@
   "subMetas": {
     "6c48a": {
       "importer": "texture",
-      "uuid": "4b6796e7-5451-4e69-81de-afad692895f9@6c48a",
+      "uuid": "9df5be75-2b80-45b6-acb7-4b439031b686@6c48a",
       "displayName": "icecream",
       "id": "6c48a",
       "name": "texture",
       "userData": {
         "wrapModeS": "clamp-to-edge",
         "wrapModeT": "clamp-to-edge",
-        "imageUuidOrDatabaseUri": "4b6796e7-5451-4e69-81de-afad692895f9",
+        "imageUuidOrDatabaseUri": "9df5be75-2b80-45b6-acb7-4b439031b686",
         "minfilter": "linear",
         "magfilter": "linear",
         "mipfilter": "none",
@@ -33,7 +33,7 @@
     },
     "f9941": {
       "importer": "sprite-frame",
-      "uuid": "4b6796e7-5451-4e69-81de-afad692895f9@f9941",
+      "uuid": "9df5be75-2b80-45b6-acb7-4b439031b686@f9941",
       "displayName": "icecream",
       "id": "f9941",
       "name": "spriteFrame",
@@ -45,17 +45,17 @@
         "offsetY": 0,
         "trimX": 0,
         "trimY": 0,
-        "width": 112,
-        "height": 215,
-        "rawWidth": 112,
-        "rawHeight": 215,
+        "width": 109,
+        "height": 231,
+        "rawWidth": 109,
+        "rawHeight": 231,
         "borderTop": 0,
         "borderBottom": 0,
         "borderLeft": 0,
         "borderRight": 0,
         "packable": true,
         "isUuid": true,
-        "imageUuidOrDatabaseUri": "4b6796e7-5451-4e69-81de-afad692895f9@6c48a",
+        "imageUuidOrDatabaseUri": "9df5be75-2b80-45b6-acb7-4b439031b686@6c48a",
         "atlasUuid": ""
       },
       "ver": "1.0.9",
@@ -69,6 +69,6 @@
   "userData": {
     "type": "sprite-frame",
     "hasAlpha": true,
-    "redirect": "4b6796e7-5451-4e69-81de-afad692895f9@f9941"
+    "redirect": "9df5be75-2b80-45b6-acb7-4b439031b686@f9941"
   }
 }
