@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 11:13:58
- * @LastEditTime: 2021-12-29 17:34:07
+ * @LastEditTime: 2021-12-29 17:38:50
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/klotskiModule/KlotskiView.ts
@@ -523,7 +523,6 @@ export class KlotskiView extends Component {
 			elapsedTime: number;
 			boardList: number[];
 		} = klotskiSolver.find();
-		console.log('answers :>> ', answers);
 		const { boardList } = answers;
 		const maxMove = boardList.length - 1;
 		if (maxMove <= 0) return;
@@ -537,14 +536,7 @@ export class KlotskiView extends Component {
 				key2Board(answers.boardList[i - 1]),
 				key2Board(answers.boardList[i])
 			);
-			console.log(
-				'moveInfo.startX,moveInfo.startY :>> ',
-				moveInfo.startX,
-				moveInfo.startY
-			);
-			console.log('tmpBoardState :>> ', tmpBoardState);
 			const blockId = tmpBoardState[moveInfo.startX][moveInfo.startY];
-			console.log('blockId :>> ', blockId);
 			const style = this._blockObj[blockId].getComponent(KlotskiBlock).style;
 			setStepInfo(
 				this._stepInfo,
