@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-19 09:46:46
- * @LastEditTime: 2021-12-29 13:54:31
+ * @LastEditTime: 2021-12-29 16:06:23
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/libs/klotskiLibs/KlotskiSolver.ts
@@ -44,7 +44,7 @@ export default class KlotskiSolver {
 
 	constructor(
 		boardString: string,
-		private moveMode: MOVE_MODE = MOVE_MODE.STRAIGHT
+		private moveMode: MOVE_MODE = MOVE_MODE.RIGHT_ANGLE_TURN
 	) {
 		// this.queue = new Queue();
 		// this.hashMap = new HashMap();
@@ -57,10 +57,8 @@ export default class KlotskiSolver {
 
 	public reachGoal(curBoard: number[]) {
 		for (let i = 0; i < gGoalPos.length; i++) {
-			if (
-				curBoard[gGoalPos[i][0] + gGoalPos[i][1] * G_BOARD_X] !== G_GOAL_BLOCK
-			)
-				return false;
+			const tmp = gGoalPos[i][0] + gGoalPos[i][1] * G_BOARD_X;
+			if (curBoard[tmp] !== G_GOAL_BLOCK) return false;
 		}
 		return true;
 	}

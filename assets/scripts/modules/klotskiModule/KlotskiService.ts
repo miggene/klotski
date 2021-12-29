@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-18 17:07:49
- * @LastEditTime: 2021-12-27 11:57:46
+ * @LastEditTime: 2021-12-29 15:42:23
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/klotskiModule/KlotskiService.ts
@@ -472,7 +472,6 @@ export function moveBlock(
 	});
 	tween(block)
 		.then(moveAct)
-		.then(callAct)
 		.call(() => {
 			const ndFood = block.getChildByName('spBlock');
 			const srcPos = ndFood.getPosition();
@@ -487,6 +486,7 @@ export function moveBlock(
 					// console.log('curPosition :>> ', curPosition);
 					// ndFood.setPosition(curPosition.x - offX, curPosition.y - offY);
 				})
+				.then(callAct)
 				.start();
 		})
 		.start();

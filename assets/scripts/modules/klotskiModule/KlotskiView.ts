@@ -1,7 +1,7 @@
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 11:13:58
- * @LastEditTime: 2021-12-29 14:05:10
+ * @LastEditTime: 2021-12-29 17:34:07
  * @LastEditors: zhupengfei
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/klotskiModule/KlotskiView.ts
@@ -531,13 +531,21 @@ export class KlotskiView extends Component {
 		for (let x = 0; x < G_BOARD_X; ++x) {
 			tmpBoardState[x] = this._boardState[x].slice();
 		}
-		console.log('tmpBoardState :>> ', tmpBoardState);
+
 		for (let i = 1; i <= maxMove; ++i) {
 			const moveInfo = getMoveInfo(
 				key2Board(answers.boardList[i - 1]),
 				key2Board(answers.boardList[i])
 			);
+			console.log(
+				'moveInfo.startX,moveInfo.startY :>> ',
+				moveInfo.startX,
+				moveInfo.startY
+			);
+			console.log('tmpBoardState :>> ', tmpBoardState);
 			const blockId = tmpBoardState[moveInfo.startX][moveInfo.startY];
+			console.log('blockId :>> ', blockId);
+			const style = this._blockObj[blockId].getComponent(KlotskiBlock).style;
 			setStepInfo(
 				this._stepInfo,
 				this.curBoardStep,
@@ -548,6 +556,14 @@ export class KlotskiView extends Component {
 				moveInfo.endY,
 				true,
 				i !== 1
+			);
+			setBoardState(tmpBoardState, moveInfo.startX, moveInfo.startY, style, 0);
+			setBoardState(
+				tmpBoardState,
+				moveInfo.endX,
+				moveInfo.endY,
+				style,
+				blockId
 			);
 		}
 		this._moveNext();
