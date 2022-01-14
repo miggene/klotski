@@ -21,6 +21,10 @@ export class Main extends Component {
 
 	start() {
 		winMgr.openWin(WIN_ID.START_MENU);
+		const hrd = new hrdLib.default();
+		hrd.init('BBCCHNOIHAAIJAAKJ@@K');
+		const bloardList = hrd.find();
+		console.log('bloardList :>> ', bloardList);
 	}
 
 	onDestroy() {

@@ -41,7 +41,7 @@ export default class KlotskiSolver {
 	private emptyCount: number;
 	private wrongBoard: number;
 	private initBoard: number[];
-
+	public logkey: string = '';
 	constructor(
 		boardString: string,
 		private moveMode: MOVE_MODE = MOVE_MODE.RIGHT_ANGLE_TURN
@@ -70,7 +70,9 @@ export default class KlotskiSolver {
 		let curMirrorKey;
 		let acceptState;
 		let rc;
-
+		if (boardObj.key === -22906887074) {
+			console.log('tet');
+		}
 		if (this.hashMap.put(boardObj.key, parentKey) == null) {
 			if (SKIP_MIRROR_STATE) {
 				//don't calculate left-right mirror state
@@ -78,6 +80,7 @@ export default class KlotskiSolver {
 				this.hashMap.put(curMirrorKey, parentKey);
 			}
 			//no any state same as current, add it
+			this.logkey += `=>${boardObj.key}`;
 			this.queue.add({ board: boardObj.board.slice(0), key: boardObj.key });
 			return 1; //add new state
 		}
@@ -526,14 +529,17 @@ export default class KlotskiSolver {
 
 		while (this.queue.size() > 0) {
 			let boardObj = this.queue.remove();
-
 			if (this.reachGoal(boardObj.board)) {
 				boardList = [];
 				this.getAnswerList(boardObj.key, boardList);
 				break; //find a solution
 			}
+			if (boardObj.key === -22906764002) {
+				console.log('ss');
+			}
 			this.exploreCount += this.explore(boardObj); //find next board state
 		}
+		console.log('this.logkey :>> ', this.logkey);
 		endTime = new Date();
 
 		// delete Q;
