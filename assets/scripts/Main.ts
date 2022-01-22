@@ -12,6 +12,8 @@ import { winMgr } from './common/mgrs/WinMgr';
 import { WIN_ID } from './common/mgrs/WinConfig';
 import { dataMgr } from './common/mgrs/DataMgr';
 const { ccclass, property } = _decorator;
+
+import HrdLib from '../scripts/hrd.bundle.js';
 @ccclass('Main')
 export class Main extends Component {
 	onLoad() {
@@ -21,10 +23,10 @@ export class Main extends Component {
 
 	start() {
 		winMgr.openWin(WIN_ID.START_MENU);
-		const hrd = new hrdLib.default();
-		hrd.init('BBCCHNOIHAAIJAAKJ@@K');
-		const bloardList = hrd.find();
-		console.log('bloardList :>> ', bloardList);
+		// const hrd = new HrdLib.default();
+		// hrd.init('BBCCHNOIHAAIJAAKJ@@K');
+		// const bloardList = hrd.find();
+		// console.log('bloardList :>> ', bloardList);
 	}
 
 	onDestroy() {

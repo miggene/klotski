@@ -7,7 +7,14 @@
  * @FilePath: /klotski/assets/scripts/common/mgrs/ResMgr.ts
  */
 
-import { JsonAsset, Prefab, resources, Sprite, SpriteFrame } from 'cc';
+import {
+	dragonBones,
+	JsonAsset,
+	Prefab,
+	resources,
+	Sprite,
+	SpriteFrame,
+} from 'cc';
 
 class ResMgr {
 	private static _instance: ResMgr;
@@ -35,13 +42,39 @@ class ResMgr {
 	}
 
 	public async loadSprite(path: string) {
-		return new Promise((resolve, reject) => {
+		return new Promise<SpriteFrame>((resolve, reject) => {
 			resources.load(
 				path + '/spriteFrame',
 				SpriteFrame,
 				(err, asset: SpriteFrame) => {
 					if (err) reject(err);
 					else resolve(asset);
+				}
+			);
+		});
+	}
+
+	public async loadDragonAsset(path: string) {
+		return new Promise<dragonBones.DragonBonesAsset>((resolve, reject) => {
+			resources.load(
+				`${path}_ske`,
+				dragonBones.DragonBonesAsset,
+				(err, dragonBonesAsset: dragonBones.DragonBonesAsset) => {
+					if (err) reject(err);
+					else resolve(dragonBonesAsset);
+				}
+			);
+		});
+	}
+
+	public async loadDragonAtlasAsset(path: string) {
+		return new Promise<dragonBones.DragonBonesAtlasAsset>((resolve, reject) => {
+			resources.load(
+				`${path}_tex`,
+				dragonBones.DragonBonesAtlasAsset,
+				(err, dragonBonesAtlasAsset: dragonBones.DragonBonesAtlasAsset) => {
+					if (err) reject(err);
+					else resolve(dragonBonesAtlasAsset);
 				}
 			);
 		});

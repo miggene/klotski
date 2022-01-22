@@ -7,7 +7,7 @@
  * @FilePath: /klotski/assets/scripts/modules/klotskiModule/KlotskiService.ts
  */
 
-import { Node, tween, UITransform, v2, v3 } from 'cc';
+import { dragonBones, Node, tween, UITransform, v2, v3 } from 'cc';
 import { KlotskiBlock } from './components/KlotskiBlock';
 import { IAction, IPosInfo } from './IKlotskiModule';
 import {
@@ -399,6 +399,7 @@ export function moveBlock(
 	let anchorPoint = v2(0.5, 0.5);
 	let offY = 0;
 	let offX = 0;
+	let animationName = '';
 	const contentSize = block
 		.getChildByName('spBlock')
 		.getComponent(UITransform).contentSize;
@@ -409,6 +410,7 @@ export function moveBlock(
 			scaleMax = v3(1, 1.3);
 			anchorPoint = v2(0.5, 1);
 			offY = contentSize.height / 2;
+			animationName = 'up';
 			break;
 		case 'D':
 			newY -= moveSize;
@@ -416,6 +418,7 @@ export function moveBlock(
 			scaleMax = v3(1, 1.3);
 			anchorPoint = v2(0.5, 0);
 			offY = -contentSize.height / 2;
+			animationName = 'down';
 			break;
 		case 'L':
 			newX -= moveSize;
@@ -423,6 +426,7 @@ export function moveBlock(
 			scaleMax = v3(1.3, 1);
 			anchorPoint = v2(0, 0.5);
 			offX = -contentSize.width / 2;
+			animationName = 'left';
 			break;
 		case 'R':
 			newX += moveSize;
@@ -430,6 +434,7 @@ export function moveBlock(
 			scaleMax = v3(1.3, 1);
 			anchorPoint = v2(1, 0.5);
 			offX = contentSize.width / 2;
+			animationName = 'right';
 			break;
 		default:
 			console.error('moveBlock(): design error !');
@@ -473,35 +478,34 @@ export function moveBlock(
 	tween(block)
 		.then(moveAct)
 		.call(() => {
-			const ndFood = block.getChildByName('spBlock');
-			const srcPos = ndFood.getPosition();
-			ndFood.getComponent(UITransform).setAnchorPoint(anchorPoint);
-			ndFood.setPosition(srcPos.x + offX, srcPos.y + offY);
+			const ndFood = block.getChildByName('dragonBlock');
+			// const ndFood = block.getChildByName('spBlock');
+			// const srcPos = ndFood.getPosition();
+			// ndFood.getComponent(UITransform).setAnchorPoint(anchorPoint);
+			// ndFood.setPosition(srcPos.x + offX, srcPos.y + offY);
 			tween(ndFood)
 				.then(scaleAct)
 				.call(() => {
-					ndFood.getComponent(UITransform).setAnchorPoint(v2(0.5, 0.5));
-					ndFood.setPosition(srcPos);
+					// ndFood.getComponent(UITransform).setAnchorPoint(v2(0.5, 0.5));
+					// ndFood.setPosition(srcPos);
 					// const curPosition = ndFood.getPosition();
 					// console.log('curPosition :>> ', curPosition);
 					// ndFood.setPosition(curPosition.x - offX, curPosition.y - offY);
+					const dragonBlock = block
+						.getChildByName('dragonBlock')
+						.getComponent(dragonBones.ArmatureDisplay);
+					dragonBlock.timeScale = -1;
+					dragonBlock.playAnimation(animationName, 1);
+
+					// block
+					// 	.getChildByName('dragonBlock')
+					// 	.getComponent(dragonBones.ArmatureDisplay)
+					// 	.playAnimation('usual', 1);
 				})
 				.then(callAct)
 				.start();
 		})
 		.start();
-
-	// tween(block)
-	// 	.then(moveAct)
-	// 	.then(anchorAct)
-	// 	.delay(0.02)
-	// 	.then(scaleAct)
-	// 	.then(defaultScaleAct)
-	// 	.delay(0.02)
-	// 	.then(defaultAnchorAct)
-	// 	.delay(0.02)
-	// 	.then(callAct)
-	// 	.start();
 }
 
 //=======================

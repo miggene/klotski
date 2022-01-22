@@ -13,6 +13,8 @@ import {
 	Sprite,
 	UITransform,
 	SpriteFrame,
+	dragonBones,
+	randomRangeInt,
 } from 'cc';
 import { resMgr } from '../../../common/mgrs/ResMgr';
 import { IBlock } from '../IKlotskiModule';
@@ -31,12 +33,12 @@ export class KlotskiBlock extends Component {
 	}
 	public set blockName(v: string) {
 		this._blockName = v;
-		resMgr
-			.loadSprite(`${BLOCK_SPRITE_FRAME_PATH}${v}`)
-			.then((spriteFrame: SpriteFrame) => {
-				this.spBlock.spriteFrame = spriteFrame;
-			})
-			.catch((err) => console.error(err));
+		// resMgr
+		// 	.loadSprite(`${BLOCK_SPRITE_FRAME_PATH}${v}`)
+		// 	.then((spriteFrame: SpriteFrame) => {
+		// 		this.spBlock.spriteFrame = spriteFrame;
+		// 	})
+		// 	.catch((err) => console.error(err));
 	}
 
 	private _style: number;
@@ -91,11 +93,40 @@ export class KlotskiBlock extends Component {
 		this._sizeY = v;
 	}
 
+	private _isPlaying: boolean;
+	public get isPlaying(): boolean {
+		return this._isPlaying;
+	}
+	public set isPlaying(v: boolean) {
+		this._isPlaying = v;
+	}
+
 	@property(Sprite)
 	spBlock: Sprite;
 
+	@property(dragonBones.ArmatureDisplay)
+	dragonBlock: dragonBones.ArmatureDisplay;
+
 	start() {
 		// [3]
+		this.schedule(this._refreshUsualAnimation, 5);
+	}
+
+	onEnable() {
+		this.dragonBlock.addEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._animationEventHandler,
+			this
+		);
+	}
+
+	onDisable() {
+		this.dragonBlock.removeEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._animationEventHandler,
+			this
+		);
+		this.unschedule(this._refreshUsualAnimation);
 	}
 
 	public initProps(props: IBlock) {
@@ -106,6 +137,7 @@ export class KlotskiBlock extends Component {
 		this.row = row;
 		this.col = col;
 		[this.sizeX, this.sizeY] = getBlockSizeByStyle(style);
+		this.loadDragons();
 	}
 
 	// update (deltaTime: number) {
@@ -118,6 +150,57 @@ export class KlotskiBlock extends Component {
 	public updatePos(row: number, col: number) {
 		this.row = row;
 		this.col = col;
+	}
+
+	/**
+	 * loadDragons
+	 */
+	public async loadDragons() {
+		const path = `dragonBones/${this.blockName}`;
+		try {
+			const dragonBonesAsset = await resMgr.loadDragonAsset(path);
+			const dragonBonesAtlasAsset = await resMgr.loadDragonAtlasAsset(path);
+			this.dragonBlock.dragonAsset = dragonBonesAsset;
+			this.dragonBlock.dragonAtlasAsset = dragonBonesAtlasAsset;
+			this.dragonBlock.armatureName = 'Armature';
+			// this.scheduleOnce(this._refreshUsualAnimation, randomRangeInt(5, 20));
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	private _animationEventHandler(event: {
+		type: string;
+		animationState: { name: string };
+	}) {
+		if (event.type === dragonBones.EventObject.COMPLETE) {
+			if (
+				['up', 'down', 'left', 'right'].indexOf(event.animationState.name) >
+					-1 &&
+				this.dragonBlock.timeScale === -1
+			) {
+				this.dragonBlock.timeScale = 1;
+				this.dragonBlock.playAnimation('usual', 1);
+				return;
+			}
+
+			if (event.animationState.name === 'shake') {
+				this.dragonBlock.playAnimation('usual', 1);
+				this.isPlaying = false;
+				return;
+			}
+			if (event.animationState.name === 'usual') {
+				this.isPlaying = false;
+			}
+		}
+	}
+
+	private _refreshUsualAnimation() {
+		if (this.isPlaying) return;
+		this.scheduleOnce(() => {
+			this.dragonBlock.playAnimation('usual', 1);
+			this.isPlaying = true;
+		}, randomRangeInt(2, 20));
 	}
 }
 

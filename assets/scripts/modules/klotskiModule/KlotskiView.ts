@@ -23,6 +23,7 @@ import {
 	UITransform,
 	Vec2,
 	Sprite,
+	dragonBones,
 } from 'cc';
 import { resMgr } from '../../common/mgrs/ResMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
@@ -125,7 +126,7 @@ export class KlotskiView extends Component {
 		this._levelData = v;
 	}
 
-	private _targetId: number = null;
+	public _targetId: number = null;
 	public get targetId(): number {
 		return this._targetId;
 	}
@@ -181,6 +182,8 @@ export class KlotskiView extends Component {
 		this.board = board;
 		this.curBoardStep = 0;
 		this._createBoard(board);
+
+		// this.schedule(this._refreshUsualAnimation, 5);
 	}
 
 	private _initBoardState() {
@@ -237,11 +240,14 @@ export class KlotskiView extends Component {
 		style: number
 	) {
 		const data = await resMgr.loadJson(HRD_FOODS_JSON_PATH);
-		const tarData = (data as IBlock[]).find((v) => v.style === style);
+		// const tarData = (data as IBlock[]).find((v) => v.style === style);
+		const filterData = (data as IBlock[]).filter((v) => v.style === style);
+		const tarData = filterData[randomRangeInt(0, filterData.length)];
 		resMgr
 			.loadPrefab(FOOD_PATH)
 			.then((prefab) => {
 				const ndBlock = instantiate(prefab as Prefab);
+				ndBlock.setSiblingIndex(blockId);
 				this.gridLayer.addChild(ndBlock);
 				this._blockObj[blockId] = ndBlock;
 				ndBlock
@@ -266,26 +272,13 @@ export class KlotskiView extends Component {
 					.delay(1)
 					.to(0.5, { position: v3(x, y) })
 					.call(() => {
-						const ndFood = ndBlock.getChildByName('spBlock');
-						const srcPos = ndFood.getPosition();
-						ndFood.getComponent(UITransform).setAnchorPoint(0.5, 0);
-						const contentSize = ndFood.getComponent(UITransform).contentSize;
-						let offY = contentSize.height / 2;
-						ndFood.setPosition(srcPos.x, srcPos.y - offY);
-						tween(ndFood)
-							.then(scaleAct)
-							.call(() => {
-								ndFood.getComponent(UITransform).setAnchorPoint(0.5, 0.5);
-								ndFood.setPosition(srcPos);
-							})
-							.start();
+						const ndFood = ndBlock.getChildByName('dragonBlock');
+						tween(ndFood).then(scaleAct).start();
 					})
 					.start();
 			})
 			.catch((err) => console.error(err));
 	}
-
-	private _getGridPositionByRC(row: number, col: number) {}
 
 	onDisable() {
 		this.gridLayer.off(Node.EventType.TOUCH_START, this._tchS, this);
@@ -339,6 +332,11 @@ export class KlotskiView extends Component {
 					.contains(v2(lp.x, lp.y));
 				if (b) {
 					this.targetId = parseInt(key, 10);
+					const tchedBlock = this._blockObj[this.targetId];
+					tchedBlock
+						.getComponent(KlotskiBlock)
+						.dragonBlock.playAnimation('click', 1);
+					tchedBlock.getComponent(KlotskiBlock).isPlaying = true;
 					break;
 				}
 			}
@@ -445,6 +443,10 @@ export class KlotskiView extends Component {
 						true
 					);
 					this._moveNext();
+					tchedBlock
+						.getComponent(KlotskiBlock)
+						.dragonBlock.playAnimation('left', 1);
+					tchedBlock.getComponent(KlotskiBlock).isPlaying = true;
 					this.targetId = null;
 					return;
 				}
@@ -462,10 +464,18 @@ export class KlotskiView extends Component {
 						true
 					);
 					this._moveNext();
+					tchedBlock
+						.getComponent(KlotskiBlock)
+						.dragonBlock.playAnimation('right', 1);
+					tchedBlock.getComponent(KlotskiBlock).isPlaying = true;
+
 					this.targetId = null;
 					return;
 				}
-
+				tchedBlock
+					.getComponent(KlotskiBlock)
+					.dragonBlock.playAnimation('shake', 1);
+				tchedBlock.getComponent(KlotskiBlock).isPlaying = true;
 				return;
 			}
 			//上下移动
@@ -483,7 +493,11 @@ export class KlotskiView extends Component {
 					true
 				);
 				this._moveNext();
-				this.targetId = null;
+				tchedBlock
+					.getComponent(KlotskiBlock)
+					.dragonBlock.playAnimation('up', 1);
+				tchedBlock.getComponent(KlotskiBlock).isPlaying = true;
+				// this.targetId = null;
 				return;
 			}
 			// 向右
@@ -500,9 +514,17 @@ export class KlotskiView extends Component {
 					true
 				);
 				this._moveNext();
-				this.targetId = null;
+				tchedBlock
+					.getComponent(KlotskiBlock)
+					.dragonBlock.playAnimation('down', 1);
+				tchedBlock.getComponent(KlotskiBlock).isPlaying = true;
+				// this.targetId = null;
 				return;
 			}
+			tchedBlock
+				.getComponent(KlotskiBlock)
+				.dragonBlock.playAnimation('shake', 1);
+			tchedBlock.getComponent(KlotskiBlock).isPlaying = true;
 		}
 	}
 	_tchC(e: EventTouch) {
@@ -566,9 +588,6 @@ export class KlotskiView extends Component {
 		const maxStep = this._stepInfo.length;
 		if (this.curBoardStep >= maxStep) return;
 		this.curBoardStep++;
-		console.log('this._stepInfo :>> ', this._stepInfo);
-		console.log('this.curBoardStep :>> ', this.curBoardStep);
-		console.log('this._boardState Prev:>> ', this._boardState);
 		const posInfo = stepInfo2PosInfo(this._stepInfo, this.curBoardStep);
 		const curBlock = this._blockObj[posInfo.id];
 
@@ -589,7 +608,6 @@ export class KlotskiView extends Component {
 			posInfo.id
 		);
 		curBlock.getComponent(KlotskiBlock).updatePos(posInfo.endY, posInfo.endX);
-		console.log('this._boardState current:>> ', this._boardState);
 		moveBlock(
 			curBlock,
 			actions,
@@ -627,8 +645,12 @@ export class KlotskiView extends Component {
 	private _winCb(block: Node) {
 		tween(block)
 			.delay(0.5)
-			.by(0.5, { position: v3(0, -CELL_H * 2) })
+			.by(0.5, { position: v3(0, -CELL_H * 2.5) })
 			.call(() => {
+				block
+					.getComponent(KlotskiBlock)
+					.dragonBlock.playAnimation('victory', 0);
+				block.getComponent(KlotskiBlock).isPlaying = true;
 				winMgr.openWin(WIN_ID.OVER).then((ndWin: Node) => {
 					ndWin.getComponent(OverView).initProps({
 						moveStep: this.curBoardStep,
@@ -657,6 +679,22 @@ export class KlotskiView extends Component {
 	onBtnClickToHome() {
 		this.node.destroy();
 		winMgr.openWin(WIN_ID.START_MENU);
+	}
+
+	_refreshUsualAnimation() {
+		const num = randomRangeInt(1, 3);
+		const len = Object.keys(this._blockObj).length;
+		let idList: number[] = Array(len)
+			.fill(0)
+			.map((v, index) => index + 1);
+		const id1 = randomRangeInt(1, len + 1);
+		if (this._targetId === id1) return;
+
+		if (this._blockObj[id1].getComponent(KlotskiBlock).isPlaying) return;
+		this._blockObj[id1]
+			.getComponent(KlotskiBlock)
+			.dragonBlock.playAnimation('usual', 1);
+		this._blockObj[id1].getComponent(KlotskiBlock).isPlaying = true;
 	}
 }
 
