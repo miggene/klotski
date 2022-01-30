@@ -13,7 +13,6 @@ import {
 	Vec3,
 	Label,
 	EventTouch,
-	UITransformComponent,
 	v3,
 	v2,
 	tween,
@@ -21,9 +20,13 @@ import {
 	instantiate,
 	Prefab,
 	UITransform,
-	Vec2,
 	Sprite,
 	dragonBones,
+	bezierByTime,
+	randomRange,
+	TweenEasing,
+	View,
+	random,
 } from 'cc';
 import { resMgr } from '../../common/mgrs/ResMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
@@ -136,6 +139,10 @@ export class KlotskiView extends Component {
 
 	private _tchStartPos: Vec3 = null;
 
+	private _basePlatePos: Vec3 = null;
+	private _baseKnifePos: Vec3 = null;
+	private _baseForkPos: Vec3 = null;
+
 	@property(Node)
 	gridLayer: Node;
 	@property(Node)
@@ -185,6 +192,14 @@ export class KlotskiView extends Component {
 
 		this._initBoardState();
 		this.gridLayer.destroyAllChildren();
+
+		this._basePlatePos = this._getRandomBasePos();
+		this._baseKnifePos = this._getRandomBasePos();
+		this._baseForkPos = this._getRandomBasePos();
+
+		this.spPlate.node.setPosition(this._basePlatePos);
+		this.spKnife.node.setPosition(this._baseKnifePos);
+		this.spFork.node.setPosition(this._baseForkPos);
 	}
 
 	onEnable() {
@@ -734,8 +749,15 @@ export class KlotskiView extends Component {
 	}
 
 	onBtnClickToHome() {
-		this.node.destroy();
-		winMgr.openWin(WIN_ID.START_MENU);
+		// this.node.destroy();
+		// winMgr.openWin(WIN_ID.START_MENU);
+		this._playKnifeForkAnimationOut(() => {
+			this.node.destroy();
+			winMgr.openWin(WIN_ID.START_MENU);
+		});
+		this.dragonGlass.playAnimation('disappear', 1);
+		this.dragonTower.playAnimation('disappear', 1);
+		this.dragonTable.playAnimation('disappear', 1);
 	}
 
 	private _refreshUsualAnimation() {
@@ -754,17 +776,70 @@ export class KlotskiView extends Component {
 		this._blockObj[id1].getComponent(KlotskiBlock).isPlaying = true;
 	}
 
-	private _playKnifeForkAnimation() {
+	private _getRandomBasePos() {
+		const width = this.node.getComponent(UITransform).width;
+		const height = this.node.getComponent(UITransform).height;
+		const w = randomRange(width, 2 * width) * (random() > 0.5 ? 1 : -1);
+		const h = randomRange(height / 2, height);
+		return v3(w, h, 0);
+	}
+
+	private _playKnifeForkAnimationIn() {
+		const duration = randomRange(1, 2);
+		const easing: TweenEasing = 'sineInOut';
 		const plateTarPos = this.targetPlate.getPosition();
-		const plateMoveAct = tween().to(0.5, { position: plateTarPos });
+		const plateMoveAct = tween().to(
+			duration,
+			{ position: plateTarPos },
+			{ easing }
+		);
 		tween(this.spPlate.node).then(plateMoveAct).start();
 
 		const knifeTarPos = this.targetKnife.getPosition();
-		const knifeMoveAct = tween().to(0.5, { position: knifeTarPos });
+		const knifeMoveAct = tween().to(
+			duration,
+			{ position: knifeTarPos },
+			{ easing }
+		);
 		tween(this.spKnife.node).then(knifeMoveAct).start();
 
 		const forkTarPos = this.targetFork.getPosition();
-		const forkMoveAct = tween().to(0.5, { position: forkTarPos });
+		const forkMoveAct = tween().to(
+			duration,
+			{ position: forkTarPos },
+			{ easing }
+		);
+		tween(this.spFork.node).then(forkMoveAct).start();
+	}
+
+	private _playKnifeForkAnimationOut(cb?: Function) {
+		const duration = randomRange(1, 2);
+		const easing: TweenEasing = 'sineInOut';
+
+		const plateMoveAct = tween().to(
+			duration,
+			{ position: this._basePlatePos },
+			{ easing }
+		);
+		tween(this.spPlate.node)
+			.then(plateMoveAct)
+			.call(() => {
+				if (cb) cb();
+			})
+			.start();
+
+		const knifeMoveAct = tween().to(
+			duration,
+			{ position: this._baseKnifePos },
+			{ easing }
+		);
+		tween(this.spKnife.node).then(knifeMoveAct).start();
+
+		const forkMoveAct = tween().to(
+			duration,
+			{ position: this._baseForkPos },
+			{ easing }
+		);
 		tween(this.spFork.node).then(forkMoveAct).start();
 	}
 
@@ -787,7 +862,10 @@ export class KlotskiView extends Component {
 	}) {
 		if (event.type === dragonBones.EventObject.COMPLETE) {
 			if (event.animationState.name === 'appear') {
-				this._playKnifeForkAnimation();
+				this._playKnifeForkAnimationIn();
+			}
+			if (event.animationState.name === 'disappear') {
+				this.dragonTower.node.active = false;
 			}
 		}
 	}
