@@ -479,28 +479,15 @@ export function moveBlock(
 		.then(moveAct)
 		.call(() => {
 			const ndFood = block.getChildByName('dragonBlock');
-			// const ndFood = block.getChildByName('spBlock');
-			// const srcPos = ndFood.getPosition();
-			// ndFood.getComponent(UITransform).setAnchorPoint(anchorPoint);
-			// ndFood.setPosition(srcPos.x + offX, srcPos.y + offY);
+
 			tween(ndFood)
 				.then(scaleAct)
 				.call(() => {
-					// ndFood.getComponent(UITransform).setAnchorPoint(v2(0.5, 0.5));
-					// ndFood.setPosition(srcPos);
-					// const curPosition = ndFood.getPosition();
-					// console.log('curPosition :>> ', curPosition);
-					// ndFood.setPosition(curPosition.x - offX, curPosition.y - offY);
 					const dragonBlock = block
 						.getChildByName('dragonBlock')
 						.getComponent(dragonBones.ArmatureDisplay);
 					dragonBlock.timeScale = -1;
 					dragonBlock.playAnimation(animationName, 1);
-
-					// block
-					// 	.getChildByName('dragonBlock')
-					// 	.getComponent(dragonBones.ArmatureDisplay)
-					// 	.playAnimation('usual', 1);
 				})
 				.then(callAct)
 				.start();

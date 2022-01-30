@@ -1,0 +1,1 @@
+{"name":"stick","height":256,"SubTexture":[{"name":"stick/sign","x":1,"height":157,"y":1,"width":145},{"name":"stick/stick","x":1,"height":24,"y":160,"width":299},{"name":"stick/paper","x":148,"height":108,"y":1,"width":85},{"name":"stick/clip","x":148,"height":33,"y":111,"width":14}],"imagePath":"stick_tex.png","width":512}

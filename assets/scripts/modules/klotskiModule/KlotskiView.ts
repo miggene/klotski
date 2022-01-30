@@ -153,12 +153,36 @@ export class KlotskiView extends Component {
 	@property(Sprite)
 	spExit: Sprite;
 
+	@property(Sprite)
+	spPlate: Sprite;
+	@property(Sprite)
+	spKnife: Sprite;
+	@property(Sprite)
+	spFork: Sprite;
+
+	@property(Node)
+	targetFork: Node;
+	@property(Node)
+	targetKnife: Node;
+	@property(Node)
+	targetPlate: Node;
+
+	@property(dragonBones.ArmatureDisplay)
+	dragonStick: dragonBones.ArmatureDisplay;
+	@property(dragonBones.ArmatureDisplay)
+	dragonTable: dragonBones.ArmatureDisplay;
+	@property(dragonBones.ArmatureDisplay)
+	dragonTower: dragonBones.ArmatureDisplay;
+	@property(dragonBones.ArmatureDisplay)
+	dragonGlass: dragonBones.ArmatureDisplay;
+
 	onLoad() {
 		// this.klotski = new Klotski();
 		// this.moveStep = 0;
 		// this.usedTime = 0;
 		// this.levelIndex = 0;
 		// this.lblWin.node.active = false;
+
 		this._initBoardState();
 		this.gridLayer.destroyAllChildren();
 	}
@@ -173,6 +197,28 @@ export class KlotskiView extends Component {
 	start() {
 		this._initBg();
 		this.schedule(this._updateUsedTime, 1);
+		// this.dragonStick.playAnimation('B', 10);
+		// const stickWidth = this.dragonStick.node.getComponent(UITransform).width;
+		const parentWidth =
+			this.dragonStick.node.parent.getComponent(UITransform).width;
+		// console.log('stickWidth,parentWidth :>> ', stickWidth, parentWidth);
+		this.dragonStick.node.setPosition(
+			-parentWidth / 2,
+			this.dragonStick.node.getPosition().y
+		);
+
+		this.dragonTable.playAnimation('appear', 1);
+
+		this.dragonTable.addEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._tableAnimEventHandler,
+			this
+		);
+		this.dragonTower.addEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._towerAnimEventHandler,
+			this
+		);
 	}
 
 	public initProps(props: ILevelData) {
@@ -247,7 +293,7 @@ export class KlotskiView extends Component {
 			.loadPrefab(FOOD_PATH)
 			.then((prefab) => {
 				const ndBlock = instantiate(prefab as Prefab);
-				ndBlock.setSiblingIndex(blockId);
+				ndBlock.setSiblingIndex(row * G_BOARD_X + col);
 				this.gridLayer.addChild(ndBlock);
 				this._blockObj[blockId] = ndBlock;
 				ndBlock
@@ -285,6 +331,17 @@ export class KlotskiView extends Component {
 		this.gridLayer.off(Node.EventType.TOUCH_MOVE, this._tchM, this);
 		this.gridLayer.off(Node.EventType.TOUCH_END, this._tchE, this);
 		this.gridLayer.off(Node.EventType.TOUCH_CANCEL, this._tchC, this);
+
+		this.dragonTable.removeEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._tableAnimEventHandler,
+			this
+		);
+		this.dragonTower.removeEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._towerAnimEventHandler,
+			this
+		);
 	}
 
 	// update (deltaTime: number) {
@@ -681,7 +738,7 @@ export class KlotskiView extends Component {
 		winMgr.openWin(WIN_ID.START_MENU);
 	}
 
-	_refreshUsualAnimation() {
+	private _refreshUsualAnimation() {
 		const num = randomRangeInt(1, 3);
 		const len = Object.keys(this._blockObj).length;
 		let idList: number[] = Array(len)
@@ -695,6 +752,44 @@ export class KlotskiView extends Component {
 			.getComponent(KlotskiBlock)
 			.dragonBlock.playAnimation('usual', 1);
 		this._blockObj[id1].getComponent(KlotskiBlock).isPlaying = true;
+	}
+
+	private _playKnifeForkAnimation() {
+		const plateTarPos = this.targetPlate.getPosition();
+		const plateMoveAct = tween().to(0.5, { position: plateTarPos });
+		tween(this.spPlate.node).then(plateMoveAct).start();
+
+		const knifeTarPos = this.targetKnife.getPosition();
+		const knifeMoveAct = tween().to(0.5, { position: knifeTarPos });
+		tween(this.spKnife.node).then(knifeMoveAct).start();
+
+		const forkTarPos = this.targetFork.getPosition();
+		const forkMoveAct = tween().to(0.5, { position: forkTarPos });
+		tween(this.spFork.node).then(forkMoveAct).start();
+	}
+
+	private _tableAnimEventHandler(event: {
+		type: string;
+		animationState: { name: string };
+	}) {
+		if (event.type === dragonBones.EventObject.COMPLETE) {
+			if (event.animationState.name === 'appear') {
+				this.dragonTower.node.active = true;
+				this.dragonTower.playAnimation('appear', 1);
+				this.dragonGlass.playAnimation('appear', 1);
+			}
+		}
+	}
+
+	private _towerAnimEventHandler(event: {
+		type: string;
+		animationState: { name: string };
+	}) {
+		if (event.type === dragonBones.EventObject.COMPLETE) {
+			if (event.animationState.name === 'appear') {
+				this._playKnifeForkAnimation();
+			}
+		}
 	}
 }
 
