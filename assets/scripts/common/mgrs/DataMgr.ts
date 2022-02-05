@@ -108,6 +108,7 @@ class DataMgr {
 	public async getlevelsDataCache() {
 		if (!this.levelsDataCache) {
 			await this.init();
+			return this.levelsDataCache;
 		}
 		return this.levelsDataCache;
 	}

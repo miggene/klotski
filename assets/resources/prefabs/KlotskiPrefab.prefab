@@ -2824,7 +2824,7 @@
         "__id__": 153
       }
     ],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 180
@@ -5672,7 +5672,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 33.75,
+      "width": 11.25,
       "height": 40
     },
     "_anchorPoint": {
@@ -5708,7 +5708,7 @@
       "b": 50,
       "a": 255
     },
-    "_string": "19",
+    "_string": "1",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 36,
@@ -5803,7 +5803,7 @@
     },
     "_armatureName": "Armature",
     "_animationName": "B",
-    "_animationIndexValue": 3,
+    "_animationIndexValue": 1,
     "_defaultCacheModeValue": 0,
     "_timeScale": 1,
     "_playTimes": -1,
@@ -5818,7 +5818,7 @@
   },
   {
     "__type__": "dragonBones.ArmatureDisplay.DragonBoneSocket",
-    "path": "root/stick/clip/all_paper/paper/levelIndex",
+    "path": "root/stick/clip/all_paper/paper/label",
     "target": {
       "__id__": 248
     }
