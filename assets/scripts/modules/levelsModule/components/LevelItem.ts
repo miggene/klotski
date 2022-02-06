@@ -10,6 +10,7 @@ import { _decorator, Component, Node, Label, Sprite, dragonBones } from 'cc';
 import { dataMgr } from '../../../common/mgrs/DataMgr';
 import { WIN_ID } from '../../../common/mgrs/WinConfig';
 import { winMgr } from '../../../common/mgrs/WinMgr';
+import { Main } from '../../../Main';
 import { KlotskiView } from '../../klotskiModule/KlotskiView';
 import { ILevelData } from '../ILevelsModule';
 import { Level_Item_Angles } from '../ILevelsModuleCfg';
@@ -17,6 +18,14 @@ const { ccclass, property } = _decorator;
 
 @ccclass('LevelItem')
 export class LevelItem extends Component {
+	private _animationState: dragonBones.AnimationState;
+	public get animationState(): dragonBones.AnimationState {
+		return this._animationState;
+	}
+	public set animationState(v: dragonBones.AnimationState) {
+		this._animationState = v;
+	}
+
 	private _level: number;
 	public get level(): number {
 		return this._level;
@@ -26,10 +35,16 @@ export class LevelItem extends Component {
 		this.lblLevelIndex.string = `${v}`;
 		this.node.angle = Level_Item_Angles[(v - 1) % 3];
 		this.locked = v > dataMgr.unlockMaxIndex;
+		if (this.locked && this.animationState) {
+			this.animationState.stop();
+		}
 		const animationName = `0${Math.floor((v - 1) % 6) + 1}`;
 		this.dgPaper.animationName = animationName;
 		if (v === dataMgr.curLevelIndex) {
-			this.dgPaper.playAnimation(animationName, 1);
+			this.dgPaper.timeScale = 1;
+			this.animationState = this.dgPaper.playAnimation(animationName, 1);
+		} else {
+			this.dgPaper.timeScale = 0;
 		}
 	}
 
@@ -125,7 +140,12 @@ export class LevelItem extends Component {
 			.openWin(WIN_ID.KLOTSKI)
 			.then((nd: Node) => {
 				nd.getComponent(KlotskiView).initProps(this.levelData);
-				this.node.parent.parent.parent.parent.parent.destroy();
+				// this.node.parent.parent.parent.parent.parent.destroy();
+				this.node.parent.destroy();
+				const mainScript = this.node.parent.parent.getComponent(Main);
+				const curIndex = mainScript.curIndex;
+				mainScript.node.getChildByName(`dragonBook_${curIndex}`)?.destroy();
+				mainScript.dragonBook.node.destroy();
 			})
 			.catch((err) => console.error(err));
 	}

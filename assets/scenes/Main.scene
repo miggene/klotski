@@ -783,15 +783,15 @@
     "_prefab": null,
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": -2.5564501932200994e-14,
-      "y": -208.75,
+      "x": -1.6767304908422104e-13,
+      "y": -1701.5,
       "z": 0
     },
     "_lrot": {
       "__type__": "cc.Quat",
       "x": 0,
       "y": 0,
-      "z": -3.0616169978683824e-17,
+      "z": -3.061616997868383e-17,
       "w": 1
     },
     "_lscale": {
@@ -805,7 +805,7 @@
       "__type__": "cc.Vec3",
       "x": 0,
       "y": 0,
-      "z": -3.5083546492674376e-15
+      "z": -3.508354649267438e-15
     },
     "_id": "57q46BQAlIEIqHZGiUFyrl"
   },
@@ -946,10 +946,10 @@
       "__expectedType__": "dragonBones.DragonBonesAtlasAsset"
     },
     "_armatureName": "Armature",
-    "_animationName": "",
-    "_animationIndexValue": 0,
+    "_animationName": "appear",
+    "_animationIndexValue": 6,
     "_defaultCacheModeValue": 0,
-    "_timeScale": 0.5,
+    "_timeScale": 1,
     "_playTimes": -1,
     "_debugBones": false,
     "_enableBatch": false,
@@ -3120,7 +3120,11 @@
       "__id__": 25
     },
     "prefBook": {
-      "__uuid__": "38b52a4c-6e41-4130-800e-605b6babb603",
+      "__uuid__": "0ec8c78c-76fc-4217-b5ef-210c6b4b93ef",
+      "__expectedType__": "cc.Prefab"
+    },
+    "prefLevel": {
+      "__uuid__": "f7dd7102-bd6c-4150-bb42-ae0467f64aac",
       "__expectedType__": "cc.Prefab"
     },
     "btnSetting": {

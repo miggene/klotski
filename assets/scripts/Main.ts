@@ -27,6 +27,7 @@ import { ILevelData } from './modules/levelsModule/ILevelsModule';
 import { Level_Per_Page } from './modules/levelsModule/ILevelsModuleCfg';
 import { resMgr } from './common/mgrs/ResMgr';
 import { LevelItem } from './modules/levelsModule/components/LevelItem';
+import { DragonLevel } from './modules/DragonLevel';
 
 // import lodash from 'lodash-es';
 // import Hrd from 'hrd-solver';
@@ -42,6 +43,8 @@ export class Main extends Component {
 
 	@property(Prefab)
 	prefBook: Prefab;
+	@property(Prefab)
+	prefLevel: Prefab;
 
 	@property(Button)
 	btnSetting: Button;
@@ -82,6 +85,7 @@ export class Main extends Component {
 
 	onLoad() {
 		winMgr.init();
+		dataMgr.init();
 		resMgr.loadJson(LEVELS_DATA_PATH).then((data: ILevelData[]) => {
 			this.levelsData = data;
 		});
@@ -89,9 +93,25 @@ export class Main extends Component {
 		this.btnNext.node.active = false;
 	}
 
+	onEnable() {
+		this.dragonBook.addEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._dragonBookListener,
+			this
+		);
+	}
+
+	onDisable() {
+		this.dragonBook.removeEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._dragonBookListener,
+			this
+		);
+	}
+
 	start() {
 		this.dragonBook.node.active = true;
-		this.dragonBook.playAnimation('usual', 0);
+		this.dragonBook.playAnimation('appear', 1);
 
 		// winMgr.openWin(WIN_ID.START_MENU);
 		// console.log('lodash :>> ', lodash);
@@ -102,8 +122,34 @@ export class Main extends Component {
 		// console.log('bloardList :>> ', bloardList);
 	}
 
+	private _dragonBookListener(event) {
+		if (event.animationState.name === 'appear') {
+			this.dragonBook.playAnimation('usual', 0);
+			return;
+		}
+		if (event.animationState.name === 'open_1') {
+			// this._createDragonLevel();
+			this.curIndex = 0;
+		}
+	}
+
 	onDestroy() {
 		winMgr.destroy();
+	}
+
+	private _createDragonLevel() {
+		const [start, end] = [0, 1].map(
+			(v) => (v + this.curIndex) * Level_Per_Page
+		);
+		const list = this.levelsData.slice(start, end);
+		const name = 'DragonLevel';
+		let levelNode = this.node.getChildByName(name);
+		if (!levelNode) {
+			levelNode = instantiate(this.prefLevel);
+			levelNode.name = name;
+			this.node.addChild(levelNode);
+		}
+		levelNode.getComponent(DragonLevel).show(this.curIndex, list);
 	}
 
 	onBtnClickToLevel() {
@@ -169,7 +215,7 @@ export class Main extends Component {
 		bookNode.setSiblingIndex(bAnti ? FRONT : AFTER);
 		const dragonBook = bookNode.getComponent(dragonBones.ArmatureDisplay);
 		const timeScale = bAnti ? -0.8 : 0.8;
-		const animationName = bAnti ? 'open_2B' : 'open_2B_0';
+		const animationName = bAnti ? 'open_2C' : 'open_2C_0';
 		dragonBook.timeScale = timeScale;
 		dragonBook.animationName = animationName;
 		dragonBook.once(
@@ -181,20 +227,26 @@ export class Main extends Component {
 	}
 
 	private _showLevels(bAnti: boolean, bookNode: Node, event: any) {
-		if (event.animationState.name === 'open_2B_0') {
-			this._refreshLevelIndex(bookNode, this.curIndex, true);
-			if (!bAnti) {
-				this._refreshLevelIndex(bookNode, this.curIndex, true);
-			}
+		if (event.animationState.name === 'open_2C_0') {
+			// this._refreshLevelIndex(bookNode, this.curIndex, true);
+			// if (!bAnti) {
+			// this._refreshLevelIndex(bookNode, this.curIndex, true);
+			// }
+			this.scheduleOnce(() => {
+				this._createDragonLevel();
+			}, 0.8);
 		}
-		if (event.animationState.name === 'open_2B') {
-			this._refreshLevelIndex(bookNode, this.curIndex, true);
+		if (event.animationState.name === 'open_2C') {
+			// this._refreshLevelIndex(bookNode, this.curIndex, true);
 			this.node.getChildByName(`dragonBook_${this.curIndex + 1}`)?.destroy();
+			this._createDragonLevel();
 		}
 	}
 
-	private _playBookNext(index: number, cb: Function) {
-		const bookNode = this.node.getChildByName(`dragonBook_${index}`);
+	private _playBookNext(cb?: Function) {
+		const bookNode = this.node.getChildByName(
+			`dragonBook_${this.curIndex - 1}`
+		);
 		bookNode.setSiblingIndex(FRONT);
 		const dragonBook = bookNode.getComponent(dragonBones.ArmatureDisplay);
 		dragonBook.once(
@@ -204,31 +256,48 @@ export class Main extends Component {
 			},
 			this
 		);
-		const children = bookNode.getChildByName('container').children;
-		const len = children.length;
-		children.forEach((child, index) => {
-			tween(child.getComponent(UIOpacity))
-				.to(1, { opacity: 0 })
-				.call(() => {
-					if (index === len - 1) {
-						dragonBook.timeScale = 0.8;
-						dragonBook.playAnimation('open_2B', 1);
-						cb();
-					}
-				})
-				.start();
-		});
+		dragonBook.playAnimation('open_2C', 1);
+		// const children = bookNode.getChildByName('container').children;
+		// const len = children.length;
+		// children.forEach((child, index) => {
+		// 	tween(child.getComponent(UIOpacity))
+		// 		.to(1, { opacity: 0 })
+		// 		.call(() => {
+		// 			if (index === len - 1) {
+		// 				dragonBook.timeScale = 0.8;
+		// 				dragonBook.playAnimation('open_2B', 1);
+		// 				cb();
+		// 			}
+		// 		})
+		// 		.start();
+		// });
 	}
 
 	onBtnClickToNext() {
-		this._playBookNext(this.curIndex, () => {
-			this.curIndex++;
+		this.curIndex++;
+		const levelScript = this.node
+			.getChildByName('DragonLevel')
+			.getComponent(DragonLevel);
+		levelScript.hide(() => {
+			this._playBookNext();
 			this._createBook();
 		});
+
+		// this._playBookNext(this.curIndex, () => {
+		// 	this.curIndex++;
+		// 	this._createBook();
+		// });
 	}
 	onBtnClickToPrev() {
 		this.curIndex--;
-		this._createBook(true);
+		const levelScript = this.node
+			.getChildByName('DragonLevel')
+			.getComponent(DragonLevel);
+		levelScript.hide(() => {
+			// this._playBookNext();
+			this._createBook(true);
+		});
+		// this._createBook(true);
 	}
 }
 
