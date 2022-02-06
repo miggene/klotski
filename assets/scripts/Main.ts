@@ -215,7 +215,7 @@ export class Main extends Component {
 		bookNode.setSiblingIndex(bAnti ? FRONT : AFTER);
 		const dragonBook = bookNode.getComponent(dragonBones.ArmatureDisplay);
 		const timeScale = bAnti ? -0.8 : 0.8;
-		const animationName = bAnti ? 'open_2C' : 'open_2C_0';
+		const animationName = bAnti ? 'open_2B' : 'open_2B_0';
 		dragonBook.timeScale = timeScale;
 		dragonBook.animationName = animationName;
 		dragonBook.once(
@@ -227,16 +227,13 @@ export class Main extends Component {
 	}
 
 	private _showLevels(bAnti: boolean, bookNode: Node, event: any) {
-		if (event.animationState.name === 'open_2C_0') {
-			// this._refreshLevelIndex(bookNode, this.curIndex, true);
-			// if (!bAnti) {
-			// this._refreshLevelIndex(bookNode, this.curIndex, true);
-			// }
-			this.scheduleOnce(() => {
-				this._createDragonLevel();
-			}, 0.8);
+		if (event.animationState.name === 'open_2B_0') {
+			// this.scheduleOnce(() => {
+			// 	this._createDragonLevel();
+			// }, 0.8);
+			this._createDragonLevel();
 		}
-		if (event.animationState.name === 'open_2C') {
+		if (event.animationState.name === 'open_2B') {
 			// this._refreshLevelIndex(bookNode, this.curIndex, true);
 			this.node.getChildByName(`dragonBook_${this.curIndex + 1}`)?.destroy();
 			this._createDragonLevel();
@@ -256,7 +253,8 @@ export class Main extends Component {
 			},
 			this
 		);
-		dragonBook.playAnimation('open_2C', 1);
+		dragonBook.timeScale = 0.8;
+		dragonBook.playAnimation('open_2B', 1);
 		// const children = bookNode.getChildByName('container').children;
 		// const len = children.length;
 		// children.forEach((child, index) => {

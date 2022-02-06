@@ -74,7 +74,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 476,
-      "height": 950.3
+      "height": 953
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -121,7 +121,7 @@
       "__expectedType__": "dragonBones.DragonBonesAtlasAsset"
     },
     "_armatureName": "Armature",
-    "_animationName": "open_2C_0",
+    "_animationName": "open_2B_0",
     "_animationIndexValue": 5,
     "_defaultCacheModeValue": 0,
     "_timeScale": 1,
