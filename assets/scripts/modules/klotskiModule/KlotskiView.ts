@@ -27,6 +27,7 @@ import {
 	TweenEasing,
 	View,
 	random,
+	director,
 } from 'cc';
 import { resMgr } from '../../common/mgrs/ResMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
@@ -212,15 +213,15 @@ export class KlotskiView extends Component {
 	start() {
 		this._initBg();
 		this.schedule(this._updateUsedTime, 1);
-		// this.dragonStick.playAnimation('B', 10);
-		// const stickWidth = this.dragonStick.node.getComponent(UITransform).width;
-		const parentWidth =
-			this.dragonStick.node.parent.getComponent(UITransform).width;
-		// console.log('stickWidth,parentWidth :>> ', stickWidth, parentWidth);
-		this.dragonStick.node.setPosition(
-			-parentWidth / 2,
-			this.dragonStick.node.getPosition().y
-		);
+		this.scheduleOnce(() => {
+			const parentWidth =
+				this.dragonStick.node.parent.getComponent(UITransform).width;
+			this.dragonStick.node.setPosition(
+				-parentWidth / 2,
+				this.dragonStick.node.getPosition().y
+			);
+			this.dragonStick.playAnimation('B', 1);
+		}, 2);
 
 		this.dragonTable.playAnimation('appear', 1);
 

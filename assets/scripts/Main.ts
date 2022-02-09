@@ -28,6 +28,7 @@ import { Level_Per_Page } from './modules/levelsModule/ILevelsModuleCfg';
 import { resMgr } from './common/mgrs/ResMgr';
 import { LevelItem } from './modules/levelsModule/components/LevelItem';
 import { DragonLevel } from './modules/DragonLevel';
+import { database } from './Database';
 
 // import lodash from 'lodash-es';
 // import Hrd from 'hrd-solver';
@@ -86,6 +87,7 @@ export class Main extends Component {
 	onLoad() {
 		winMgr.init();
 		dataMgr.init();
+		database.init();
 		resMgr.loadJson(LEVELS_DATA_PATH).then((data: ILevelData[]) => {
 			this.levelsData = data;
 		});

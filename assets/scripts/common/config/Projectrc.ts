@@ -6,7 +6,7 @@
  * @Description:
  * @FilePath: /klotski/assets/scripts/common/config/projectrc.ts
  */
-export default {
-	projectName: 'HRD',
-	projectVersion: '1.0.0',
+export const project = {
+	name: 'hrd',
+	version: '0.0.1',
 };

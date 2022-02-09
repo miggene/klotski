@@ -11,6 +11,7 @@ import { dataMgr } from '../../common/mgrs/DataMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
 import { formatTime } from '../../common/utils/Helper';
+import { database } from '../../Database';
 import { KlotskiView } from '../klotskiModule/KlotskiView';
 const { ccclass, property } = _decorator;
 
@@ -94,7 +95,8 @@ export class OverView extends Component {
 		// this.bestTime = bestTime;
 		this.time = time;
 
-		if (this.level > dataMgr.unlockMaxIndex) dataMgr.unlockMaxIndex++;
+		if (this.level > database.user.maxUnlockLevel)
+			database.user.maxUnlockLevel++;
 	}
 
 	onBtnClickToHome() {
@@ -126,9 +128,12 @@ export class OverView extends Component {
 		if (data) {
 			console.log(`go to level: ${this.level + 1}`);
 			const nextLevel = this.level + 1;
-			dataMgr.curLevelIndex = nextLevel;
-			if (nextLevel > dataMgr.unlockMaxIndex) {
-				dataMgr.unlockMaxIndex = nextLevel;
+			// dataMgr.curLevelIndex = nextLevel;
+			// database.user.curLevel = nextLevel;
+			database.user.setState({ curLevel: nextLevel });
+			if (nextLevel > database.user.maxUnlockLevel) {
+				database.user.maxUnlockLevel = nextLevel;
+				database.user.setState({ maxUnlockLevel: nextLevel });
 			}
 			winMgr
 				.openWin(WIN_ID.KLOTSKI)

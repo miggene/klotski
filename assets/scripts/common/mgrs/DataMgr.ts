@@ -1,5 +1,5 @@
 import { ILevelData } from '../../modules/levelsModule/ILevelsModule';
-import Projectrc from '../config/Projectrc';
+// import Projectrc from '../config/Projectrc';
 import { string2Number } from '../utils/Helper';
 import { resMgr } from './ResMgr';
 
@@ -13,7 +13,7 @@ import { resMgr } from './ResMgr';
  */
 const DELIMITER = '_';
 const LEVELS_DATA_PATH = 'datas/hrd_answers_straight';
-const PREFIX_LS = `${Projectrc.projectName}${DELIMITER}`;
+// const PREFIX_LS = `${Projectrc.projectName}${DELIMITER}`;
 
 const UNLOCK_MAX_INDEX = 'unlockMaxIndex';
 // const CURRENT_LEVEL_INDEX = 'curLevelIndex';
@@ -52,32 +52,32 @@ class DataMgr {
 
 	//当前已解琐的最大关卡
 	// private _unlockMaxIndex: number;
-	public get unlockMaxIndex(): number {
-		return this._unlockMaxIndex;
-	}
-	public set unlockMaxIndex(v: number) {
-		this._unlockMaxIndex = v;
-		this.setLS(UNLOCK_MAX_INDEX, JSON.stringify(v));
-	}
+	// public get unlockMaxIndex(): number {
+	// 	return this._unlockMaxIndex;
+	// }
+	// public set unlockMaxIndex(v: number) {
+	// 	this._unlockMaxIndex = v;
+	// 	this.setLS(UNLOCK_MAX_INDEX, JSON.stringify(v));
+	// }
 
 	//震动开头
-	public get shakeOn(): number {
-		return this._shakeOn;
-	}
-	public set shakeOn(v: number) {
-		this._shakeOn = v;
-		this.setLS(SHAKE_ON, JSON.stringify(v));
-	}
+	// public get shakeOn(): number {
+	// 	return this._shakeOn;
+	// }
+	// public set shakeOn(v: number) {
+	// 	this._shakeOn = v;
+	// 	this.setLS(SHAKE_ON, JSON.stringify(v));
+	// }
 
 	//音乐音效开关
 
-	public get soundOn(): number {
-		return this._soundOn;
-	}
-	public set soundOn(v: number) {
-		this._soundOn = v;
-		this.setLS(SOUND_ON, JSON.stringify(v));
-	}
+	// public get soundOn(): number {
+	// 	return this._soundOn;
+	// }
+	// public set soundOn(v: number) {
+	// 	this._soundOn = v;
+	// 	this.setLS(SOUND_ON, JSON.stringify(v));
+	// }
 
 	public async init() {
 		resMgr
@@ -86,23 +86,23 @@ class DataMgr {
 				this.levelsDataCache = data;
 			})
 			.catch((err) => console.error(err));
-		try {
-			// this.curLevelIndex = string2Number(
-			// 	this.getLS(CURRENT_LEVEL_INDEX, JSON.stringify(this._curLevelIndex))
-			// );
-			this.unlockMaxIndex = string2Number(
-				this.getLS(UNLOCK_MAX_INDEX, JSON.stringify(this._unlockMaxIndex))
-			);
-			this.curLevelIndex = this.unlockMaxIndex;
-			this.shakeOn = string2Number(
-				this.getLS(SHAKE_ON, JSON.stringify(this._shakeOn))
-			);
-			this.soundOn = string2Number(
-				this.getLS(SOUND_ON, JSON.stringify(this._soundOn))
-			);
-		} catch (error) {
-			console.error(error);
-		}
+		// try {
+		// 	// this.curLevelIndex = string2Number(
+		// 	// 	this.getLS(CURRENT_LEVEL_INDEX, JSON.stringify(this._curLevelIndex))
+		// 	// );
+		// 	this.unlockMaxIndex = string2Number(
+		// 		this.getLS(UNLOCK_MAX_INDEX, JSON.stringify(this._unlockMaxIndex))
+		// 	);
+		// 	this.curLevelIndex = this.unlockMaxIndex;
+		// 	this.shakeOn = string2Number(
+		// 		this.getLS(SHAKE_ON, JSON.stringify(this._shakeOn))
+		// 	);
+		// 	this.soundOn = string2Number(
+		// 		this.getLS(SOUND_ON, JSON.stringify(this._soundOn))
+		// 	);
+		// } catch (error) {
+		// 	console.error(error);
+		// }
 	}
 
 	public async getlevelsDataCache() {
@@ -113,20 +113,20 @@ class DataMgr {
 		return this.levelsDataCache;
 	}
 
-	public getLS(key: string, df: string): string {
-		const prefixKey = PREFIX_LS + key;
-		let ls = localStorage.getItem(prefixKey);
-		if (ls === null) {
-			ls = df;
-			localStorage.setItem(prefixKey, df);
-		}
-		return ls;
-	}
+	// public getLS(key: string, df: string): string {
+	// 	const prefixKey = PREFIX_LS + key;
+	// 	let ls = localStorage.getItem(prefixKey);
+	// 	if (ls === null) {
+	// 		ls = df;
+	// 		localStorage.setItem(prefixKey, df);
+	// 	}
+	// 	return ls;
+	// }
 
-	public setLS(key: string, value: string) {
-		const prefixKey = PREFIX_LS + key;
-		localStorage.setItem(prefixKey, value);
-	}
+	// public setLS(key: string, value: string) {
+	// 	const prefixKey = PREFIX_LS + key;
+	// 	localStorage.setItem(prefixKey, value);
+	// }
 }
 
 export const dataMgr = DataMgr.instance;
