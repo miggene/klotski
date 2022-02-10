@@ -6,12 +6,13 @@
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/overModule/OverView.ts
  */
-import { _decorator, Component, Node, Label } from 'cc';
+import { _decorator, Component, Node, Label, director } from 'cc';
 import { dataMgr } from '../../common/mgrs/DataMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
 import { formatTime } from '../../common/utils/Helper';
 import { database } from '../../Database';
+import { Main } from '../../Main';
 import { KlotskiView } from '../klotskiModule/KlotskiView';
 const { ccclass, property } = _decorator;
 
@@ -95,17 +96,30 @@ export class OverView extends Component {
 		// this.bestTime = bestTime;
 		this.time = time;
 
-		if (this.level > database.user.maxUnlockLevel)
-			database.user.maxUnlockLevel++;
+		if (this.level > database.user.maxUnlockLevel) {
+			const maxUnlockLevel = database.user.maxUnlockLevel + 1;
+			database.user.setState({ maxUnlockLevel });
+		}
+
+		const nextLevelIndex = this.level;
+		database.user.setState({ curLevel: nextLevelIndex });
 	}
 
 	onBtnClickToHome() {
 		winMgr.clearWin();
-		winMgr.openWin(WIN_ID.START_MENU);
+		const mainScript = director
+			.getScene()
+			.getChildByName('Canvas')
+			.getComponent(Main);
+		mainScript.showMain();
 	}
 	onBtnClickToLevels() {
 		winMgr.clearWin();
-		winMgr.openWin(WIN_ID.LEVELS);
+		const mainScript = director
+			.getScene()
+			.getChildByName('Canvas')
+			.getComponent(Main);
+		mainScript.showLevel();
 	}
 	public async onBtnClickToRetry() {
 		winMgr.clearWin();
@@ -124,17 +138,10 @@ export class OverView extends Component {
 	public async onBtnClickToNext() {
 		winMgr.clearWin();
 		const levelsData = await dataMgr.getlevelsDataCache();
+		// this.level++;
 		const data = levelsData[this.level];
 		if (data) {
 			console.log(`go to level: ${this.level + 1}`);
-			const nextLevel = this.level + 1;
-			// dataMgr.curLevelIndex = nextLevel;
-			// database.user.curLevel = nextLevel;
-			database.user.setState({ curLevel: nextLevel });
-			if (nextLevel > database.user.maxUnlockLevel) {
-				database.user.maxUnlockLevel = nextLevel;
-				database.user.setState({ maxUnlockLevel: nextLevel });
-			}
 			winMgr
 				.openWin(WIN_ID.KLOTSKI)
 				.then((nd: Node) => {

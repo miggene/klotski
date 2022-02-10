@@ -58,6 +58,8 @@ export class Main extends Component {
 	@property(Button)
 	btnPrev: Button;
 
+	private _bOpenLevelImmediately: boolean = false;
+
 	private _lastBook: Node = null;
 	private _curBook: Node = null;
 
@@ -126,7 +128,12 @@ export class Main extends Component {
 
 	private _dragonBookListener(event) {
 		if (event.animationState.name === 'appear') {
-			this.dragonBook.playAnimation('usual', 0);
+			if (this._bOpenLevelImmediately) {
+				this.onBtnClickToLevel();
+			} else {
+				this.dragonBook.playAnimation('usual', 0);
+			}
+
 			return;
 		}
 		if (event.animationState.name === 'open_1') {
@@ -298,6 +305,27 @@ export class Main extends Component {
 			this._createBook(true);
 		});
 		// this._createBook(true);
+	}
+
+	public hideMain() {
+		this.node.getChildByName(`dragonBook_${this.curIndex}`)?.destroy();
+		const leftPos = this.dragonBook.node.getPosition().subtract(v3(1000, 0, 0));
+		tween(this.dragonBook.node).to(1, { position: leftPos }).start();
+		this.btnNext.node.active = false;
+		this.btnPrev.node.active = false;
+	}
+
+	public showMain() {
+		this._bOpenLevelImmediately = false;
+		const centerPos = v3(0, 0, 0);
+		this.dragonBook.node.setPosition(centerPos);
+		this.dragonBook.playAnimation('appear', 1);
+	}
+	public showLevel() {
+		this._bOpenLevelImmediately = true;
+		const centerPos = v3(0, 0, 0);
+		this.dragonBook.node.setPosition(centerPos);
+		this.dragonBook.playAnimation('appear', 1);
 	}
 }
 

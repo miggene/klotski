@@ -197,12 +197,7 @@ export class DragonLevel extends Component {
 					// this.node.parent.parent.parent.parent.parent.destroy();
 					this.node.destroy();
 					const mainScript = this.node.parent.getComponent(Main);
-					mainScript.node
-						.getChildByName(`dragonBook_${mainScript.curIndex}`)
-						?.destroy();
-					mainScript.dragonBook.node.destroy();
-					mainScript.btnNext.node.active = false;
-					mainScript.btnPrev.node.active = false;
+					mainScript.hideMain();
 				})
 				.catch((err) => console.error(err));
 		}

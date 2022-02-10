@@ -34,6 +34,7 @@ import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
 import { deepClone, formatTime } from '../../common/utils/Helper';
 import KlotskiSolver from '../../libs/klotskiLibs/KlotskiSolver';
+import { Main } from '../../Main';
 import { ILevelData } from '../levelsModule/ILevelsModule';
 import { OverView } from '../overModule/OverView';
 import { KlotskiBlock } from './components/KlotskiBlock';
@@ -183,6 +184,8 @@ export class KlotskiView extends Component {
 	dragonTower: dragonBones.ArmatureDisplay;
 	@property(dragonBones.ArmatureDisplay)
 	dragonGlass: dragonBones.ArmatureDisplay;
+	@property(dragonBones.ArmatureDisplay)
+	dragonOven: dragonBones.ArmatureDisplay;
 
 	onLoad() {
 		// this.klotski = new Klotski();
@@ -208,6 +211,12 @@ export class KlotskiView extends Component {
 		this.gridLayer.on(Node.EventType.TOUCH_MOVE, this._tchM, this);
 		this.gridLayer.on(Node.EventType.TOUCH_END, this._tchE, this);
 		this.gridLayer.on(Node.EventType.TOUCH_CANCEL, this._tchC, this);
+
+		// this.dragonOven.addEventListener(
+		// 	dragonBones.EventObject.COMPLETE,
+		// 	this._ovenAnimEventHandler,
+		// 	this
+		// );
 	}
 
 	start() {
@@ -220,6 +229,7 @@ export class KlotskiView extends Component {
 				-parentWidth / 2,
 				this.dragonStick.node.getPosition().y
 			);
+			this.dragonStick.timeScale = 1;
 			this.dragonStick.playAnimation('B', 1);
 		}, 2);
 
@@ -235,6 +245,7 @@ export class KlotskiView extends Component {
 			this._towerAnimEventHandler,
 			this
 		);
+		this.dragonOven.playAnimation('appear', 1);
 	}
 
 	public initProps(props: ILevelData) {
@@ -358,6 +369,12 @@ export class KlotskiView extends Component {
 			this._towerAnimEventHandler,
 			this
 		);
+
+		// this.dragonOven.removeEventListener(
+		// 	dragonBones.EventObject.COMPLETE,
+		// 	this._ovenAnimEventHandler,
+		// 	this
+		// );
 	}
 
 	// update (deltaTime: number) {
@@ -753,12 +770,22 @@ export class KlotskiView extends Component {
 		// this.node.destroy();
 		// winMgr.openWin(WIN_ID.START_MENU);
 		this._playKnifeForkAnimationOut(() => {
+			// winMgr.openWin(WIN_ID.START_MENU);
+			const mainScript = this.node.parent.parent.getComponent(Main);
+			mainScript.showMain();
 			this.node.destroy();
-			winMgr.openWin(WIN_ID.START_MENU);
 		});
+		this.gridLayer.children.forEach((child) =>
+			tween(child)
+				.to(1, { position: child.getPosition().add(v3(0, 1000, 0)) })
+				.start()
+		);
 		this.dragonGlass.playAnimation('disappear', 1);
 		this.dragonTower.playAnimation('disappear', 1);
 		this.dragonTable.playAnimation('disappear', 1);
+		this.dragonOven.playAnimation('disappear', 1);
+		this.dragonStick.timeScale = -1;
+		this.dragonStick.playAnimation('B', 1);
 	}
 
 	private _refreshUsualAnimation() {
@@ -870,6 +897,17 @@ export class KlotskiView extends Component {
 			}
 		}
 	}
+
+	// private _ovenAnimEventHandler(event: {
+	// 	type: string;
+	// 	animationState: { name: string };
+	// }) {
+	// 	if (event.type === dragonBones.EventObject.COMPLETE) {
+	// 		if (event.animationState.name === 'disappear') {
+	// 			this.node.destroy();
+	// 		}
+	// 	}
+	// }
 }
 
 /**
