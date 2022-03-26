@@ -6,7 +6,7 @@
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/overModule/OverView.ts
  */
-import { _decorator, Component, Node, Label, director } from 'cc';
+import { _decorator, Component, Node, Label, director, dragonBones } from 'cc';
 import { dataMgr } from '../../common/mgrs/DataMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
@@ -73,6 +73,9 @@ export class OverView extends Component {
 
 	@property(Label)
 	lblTime: Label;
+
+	// @property(dragonBones.ArmatureDisplay)
+	// drgRope: dragonBones.ArmatureDisplay;
 
 	start() {
 		// [3]
