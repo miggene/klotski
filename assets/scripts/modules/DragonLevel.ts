@@ -203,6 +203,11 @@ export class DragonLevel extends Component {
 		}
 	}
 
+	onBtnClickToHome() {
+		const mainScript = this.node.parent.getComponent(Main);
+		mainScript.showLevelToMain();
+	}
+
 	private _dragonStarListener(event) {
 		this.dragonStar.node.active = false;
 	}

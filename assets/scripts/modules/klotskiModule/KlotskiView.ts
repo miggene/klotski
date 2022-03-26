@@ -28,6 +28,7 @@ import {
 	View,
 	random,
 	director,
+	UIOpacity,
 } from 'cc';
 import { resMgr } from '../../common/mgrs/ResMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
@@ -187,13 +188,16 @@ export class KlotskiView extends Component {
 	@property(dragonBones.ArmatureDisplay)
 	dragonOven: dragonBones.ArmatureDisplay;
 
-	onLoad() {
-		// this.klotski = new Klotski();
-		// this.moveStep = 0;
-		// this.usedTime = 0;
-		// this.levelIndex = 0;
-		// this.lblWin.node.active = false;
+	@property(Sprite)
+	spDog: Sprite;
+	@property(Sprite)
+	spCat: Sprite;
+	@property(Node)
+	layout: Node;
+	@property(Node)
+	blackMask: Node;
 
+	onLoad() {
 		this._initBoardState();
 		this.gridLayer.destroyAllChildren();
 
@@ -211,12 +215,6 @@ export class KlotskiView extends Component {
 		this.gridLayer.on(Node.EventType.TOUCH_MOVE, this._tchM, this);
 		this.gridLayer.on(Node.EventType.TOUCH_END, this._tchE, this);
 		this.gridLayer.on(Node.EventType.TOUCH_CANCEL, this._tchC, this);
-
-		// this.dragonOven.addEventListener(
-		// 	dragonBones.EventObject.COMPLETE,
-		// 	this._ovenAnimEventHandler,
-		// 	this
-		// );
 	}
 
 	start() {
@@ -369,12 +367,6 @@ export class KlotskiView extends Component {
 			this._towerAnimEventHandler,
 			this
 		);
-
-		// this.dragonOven.removeEventListener(
-		// 	dragonBones.EventObject.COMPLETE,
-		// 	this._ovenAnimEventHandler,
-		// 	this
-		// );
 	}
 
 	// update (deltaTime: number) {
@@ -399,6 +391,9 @@ export class KlotskiView extends Component {
 						const y = -j * CELL_H - CELL_H / 2;
 						ndBgGrid.setPosition(x, y);
 						ndBgGrid.getComponent(UITransform).setContentSize(CELL_W, CELL_H);
+						tween(ndBgGrid.getComponent(UIOpacity))
+							.to(0.5, { opacity: 255 })
+							.start();
 					})
 					.catch((err) => console.error(err));
 			}
@@ -733,10 +728,12 @@ export class KlotskiView extends Component {
 	}
 
 	private _winCb(block: Node) {
+		this.unschedule(this._updateUsedTime);
 		tween(block)
 			.delay(0.5)
 			.by(0.5, { position: v3(0, -CELL_H * 2.5) })
 			.call(() => {
+				this._showCatDogWin();
 				block
 					.getComponent(KlotskiBlock)
 					.dragonBlock.playAnimation('victory', 0);
@@ -767,10 +764,7 @@ export class KlotskiView extends Component {
 	}
 
 	onBtnClickToHome() {
-		// this.node.destroy();
-		// winMgr.openWin(WIN_ID.START_MENU);
 		this._playKnifeForkAnimationOut(() => {
-			// winMgr.openWin(WIN_ID.START_MENU);
 			const mainScript = this.node.parent.parent.getComponent(Main);
 			mainScript.showMain();
 			this.node.destroy();
@@ -779,6 +773,9 @@ export class KlotskiView extends Component {
 			tween(child)
 				.to(1, { position: child.getPosition().add(v3(0, 1000, 0)) })
 				.start()
+		);
+		this.gridBgLayer.children.forEach((child) =>
+			tween(child.getComponent(UIOpacity)).to(1, { opacity: 0 }).start()
 		);
 		this.dragonGlass.playAnimation('disappear', 1);
 		this.dragonTower.playAnimation('disappear', 1);
@@ -898,16 +895,12 @@ export class KlotskiView extends Component {
 		}
 	}
 
-	// private _ovenAnimEventHandler(event: {
-	// 	type: string;
-	// 	animationState: { name: string };
-	// }) {
-	// 	if (event.type === dragonBones.EventObject.COMPLETE) {
-	// 		if (event.animationState.name === 'disappear') {
-	// 			this.node.destroy();
-	// 		}
-	// 	}
-	// }
+	private _showCatDogWin() {
+		this.blackMask.active = true;
+		tween(this.layout)
+			.to(1, { position: v3(0, -150, 0) }, { easing: 'sineOutIn' })
+			.start();
+	}
 }
 
 /**

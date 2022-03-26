@@ -18,6 +18,8 @@ import {
 	instantiate,
 	dragonBones,
 	UIOpacity,
+	Vec3,
+	Sprite,
 } from 'cc';
 
 import { winMgr } from './common/mgrs/WinMgr';
@@ -58,6 +60,14 @@ export class Main extends Component {
 	@property(Button)
 	btnPrev: Button;
 
+	@property(dragonBones.ArmatureDisplay)
+	drgLeft: dragonBones.ArmatureDisplay;
+	@property(dragonBones.ArmatureDisplay)
+	drgRight: dragonBones.ArmatureDisplay;
+
+	@property(Sprite)
+	spCookGirl: Sprite;
+
 	private _bOpenLevelImmediately: boolean = false;
 
 	private _lastBook: Node = null;
@@ -86,6 +96,15 @@ export class Main extends Component {
 		this.btnPrev.node.setSiblingIndex(100);
 	}
 
+	private _srcLeftPos: Vec3;
+	private _srcRightPos: Vec3;
+
+	private _srcSettingPos: Vec3;
+	private _srcRankPos: Vec3;
+	private _srcDinnerPos: Vec3;
+
+	private _srcCookGirlPos: Vec3;
+
 	onLoad() {
 		winMgr.init();
 		dataMgr.init();
@@ -95,6 +114,20 @@ export class Main extends Component {
 		});
 		this.btnPrev.node.active = false;
 		this.btnNext.node.active = false;
+		this._srcLeftPos = this.drgLeft.node.getPosition();
+		this._srcRightPos = this.drgRight.node.getPosition();
+
+		tween(this.drgLeft.node)
+			.to(0, { position: v3(0, this._srcLeftPos.y, this._srcLeftPos.z) })
+			.start();
+		tween(this.drgRight.node)
+			.to(0, { position: v3(0, this._srcRightPos.y, this._srcRightPos.z) })
+			.start();
+
+		this._srcRankPos = this.btnRank.node.getPosition();
+		this._srcSettingPos = this.btnSetting.node.getPosition();
+		this._srcDinnerPos = this.btnDinner.node.getPosition();
+		this._srcCookGirlPos = this.spCookGirl.node.getPosition();
 	}
 
 	onEnable() {
@@ -116,14 +149,6 @@ export class Main extends Component {
 	start() {
 		this.dragonBook.node.active = true;
 		this.dragonBook.playAnimation('appear', 1);
-
-		// winMgr.openWin(WIN_ID.START_MENU);
-		// console.log('lodash :>> ', lodash);
-		// console.log('Hrd :>> ', Hrd);
-		// const hrd = new Hrd.Hrd();
-		// hrd.init('BBCCHNOIHAAIJAAKJ@@K');
-		// const bloardList = hrd.find();
-		// console.log('bloardList :>> ', bloardList);
 	}
 
 	private _dragonBookListener(event) {
@@ -132,13 +157,76 @@ export class Main extends Component {
 				this.onBtnClickToLevel();
 			} else {
 				this.dragonBook.playAnimation('usual', 0);
+				tween(this.btnSetting.node)
+					.to(0.5, { position: this._srcSettingPos }, { easing: 'sineInOut' })
+					.start();
+				tween(this.btnSetting.node.getComponent(UIOpacity))
+					.to(0.5, { opacity: 255 }, { easing: 'sineOutIn' })
+					.start();
+				this.drgLeft.node.getComponent(UIOpacity).opacity = 255;
+				tween(this.drgLeft.node)
+					.to(0.5, {
+						position: v3(
+							this._srcLeftPos.x,
+							this._srcLeftPos.y,
+							this._srcLeftPos.z
+						),
+					})
+					.start();
+				this.drgRight.node.getComponent(UIOpacity).opacity = 255;
+				tween(this.drgRight.node)
+					.to(1.5, {
+						position: v3(
+							this._srcRightPos.x,
+							this._srcRightPos.y,
+							this._srcRightPos.z
+						),
+					})
+					.start();
 			}
 
 			return;
 		}
 		if (event.animationState.name === 'open_1') {
-			// this._createDragonLevel();
 			this.curIndex = 0;
+			if (this.dragonBook.timeScale === -1) {
+				this.btnNext.node.active = false;
+				this.btnPrev.node.active = false;
+
+				this.btnNext.node.setSiblingIndex(100);
+				this.btnPrev.node.setSiblingIndex(100);
+				this.dragonBook.timeScale = 1;
+				this.dragonBook.playAnimation('usual', 0);
+				this.node.getChildByName('DragonLevel')?.destroy();
+				tween(this.btnSetting.node)
+					.to(0.5, {
+						position: this._srcSettingPos,
+					})
+					.start();
+				tween(this.btnDinner.node)
+					.to(0.5, {
+						position: this._srcDinnerPos,
+					})
+					.start();
+				tween(this.btnRank.node)
+					.to(0.5, {
+						position: this._srcRankPos,
+					})
+					.start();
+				this.drgLeft.node.getComponent(UIOpacity).opacity = 255;
+				this.drgRight.node.getComponent(UIOpacity).opacity = 255;
+				tween(this.drgLeft.node)
+					.to(0.5, { position: this._srcLeftPos }, { easing: 'sineOutIn' })
+					.start();
+				tween(this.drgRight.node)
+					.to(1.5, { position: this._srcRightPos }, { easing: 'sineOutIn' })
+					.start();
+				// tween(this.spCookGirl.node)
+				// 	.to(0.5, {
+				// 		position: this._srcCookGirlPos,
+				// 	})
+				// 	.start();
+			}
 		}
 	}
 
@@ -163,13 +251,19 @@ export class Main extends Component {
 
 	onBtnClickToLevel() {
 		console.log(`go to level`);
-		const btnSettingX = this.btnSetting.node.getPosition().x;
-		const bntRankX = this.btnRank.node.getPosition().x;
-		const btnDinnerX = this.btnDinner.node.getPosition().x;
+		this.drgLeft.node.getComponent(UIOpacity).opacity = 0;
+		this.drgRight.node.getComponent(UIOpacity).opacity = 0;
+		tween(this.drgLeft.node)
+			.to(0.5, { position: v3(0, this._srcLeftPos.y, this._srcLeftPos.z) })
+			.start();
+		tween(this.drgRight.node)
+			.to(0.5, { position: v3(0, this._srcRightPos.y, this._srcRightPos.z) })
+			.start();
+
 		tween(this.btnSetting.node)
 			.to(0.5, {
 				position: v3(
-					btnSettingX,
+					this._srcSettingPos.x,
 					-this.node.getComponent(UITransform).height * 2,
 					0
 				),
@@ -178,7 +272,7 @@ export class Main extends Component {
 		tween(this.btnDinner.node)
 			.to(0.5, {
 				position: v3(
-					btnDinnerX,
+					this._srcDinnerPos.x,
 					-this.node.getComponent(UITransform).height * 2,
 					0
 				),
@@ -187,7 +281,7 @@ export class Main extends Component {
 		tween(this.btnRank.node)
 			.to(0.5, {
 				position: v3(
-					bntRankX,
+					this._srcRankPos.x,
 					-this.node.getComponent(UITransform).height * 2,
 					0
 				),
@@ -197,6 +291,12 @@ export class Main extends Component {
 				this._createBook();
 			})
 			.start();
+
+		// tween(this.spCookGirl.node)
+		// 	.to(0.5, {
+		// 		position: v3(this._srcCookGirlPos.x, 2000, this._srcCookGirlPos.z),
+		// 	})
+		// 	.start();
 	}
 
 	private _refreshLevelIndex(book: Node, index: number, delateShow: boolean) {
@@ -218,7 +318,8 @@ export class Main extends Component {
 
 	private _createBook(bAnti: boolean = false) {
 		const name = `dragonBook_${this.curIndex}`;
-		const bookNode = instantiate(this.prefBook);
+		let bookNode = this.node.getChildByName(name);
+		bookNode = bookNode ? bookNode : instantiate(this.prefBook);
 		bookNode.name = name;
 		this.node.addChild(bookNode);
 		bookNode.setSiblingIndex(bAnti ? FRONT : AFTER);
@@ -237,13 +338,9 @@ export class Main extends Component {
 
 	private _showLevels(bAnti: boolean, bookNode: Node, event: any) {
 		if (event.animationState.name === 'open_2B_0') {
-			// this.scheduleOnce(() => {
-			// 	this._createDragonLevel();
-			// }, 0.8);
 			this._createDragonLevel();
 		}
 		if (event.animationState.name === 'open_2B') {
-			// this._refreshLevelIndex(bookNode, this.curIndex, true);
 			this.node.getChildByName(`dragonBook_${this.curIndex + 1}`)?.destroy();
 			this._createDragonLevel();
 		}
@@ -264,20 +361,6 @@ export class Main extends Component {
 		);
 		dragonBook.timeScale = 0.8;
 		dragonBook.playAnimation('open_2B', 1);
-		// const children = bookNode.getChildByName('container').children;
-		// const len = children.length;
-		// children.forEach((child, index) => {
-		// 	tween(child.getComponent(UIOpacity))
-		// 		.to(1, { opacity: 0 })
-		// 		.call(() => {
-		// 			if (index === len - 1) {
-		// 				dragonBook.timeScale = 0.8;
-		// 				dragonBook.playAnimation('open_2B', 1);
-		// 				cb();
-		// 			}
-		// 		})
-		// 		.start();
-		// });
 	}
 
 	onBtnClickToNext() {
@@ -289,11 +372,6 @@ export class Main extends Component {
 			this._playBookNext();
 			this._createBook();
 		});
-
-		// this._playBookNext(this.curIndex, () => {
-		// 	this.curIndex++;
-		// 	this._createBook();
-		// });
 	}
 	onBtnClickToPrev() {
 		this.curIndex--;
@@ -301,10 +379,8 @@ export class Main extends Component {
 			.getChildByName('DragonLevel')
 			.getComponent(DragonLevel);
 		levelScript.hide(() => {
-			// this._playBookNext();
 			this._createBook(true);
 		});
-		// this._createBook(true);
 	}
 
 	public hideMain() {
@@ -326,6 +402,23 @@ export class Main extends Component {
 		const centerPos = v3(0, 0, 0);
 		this.dragonBook.node.setPosition(centerPos);
 		this.dragonBook.playAnimation('appear', 1);
+	}
+	public showLevelToMain() {
+		this.btnNext.node.active = false;
+		this.btnPrev.node.active = false;
+
+		this.btnNext.node.setSiblingIndex(100);
+		this.btnPrev.node.setSiblingIndex(100);
+		const levelScript = this.node
+			.getChildByName('DragonLevel')
+			.getComponent(DragonLevel);
+		levelScript.hide(() => {
+			this._bOpenLevelImmediately = false;
+			this.dragonBook.timeScale = -1;
+			this.dragonBook.playAnimation('open_1', 1);
+			const centerPos = v3(0, 0, 0);
+			this.dragonBook.node.setPosition(centerPos);
+		});
 	}
 }
 

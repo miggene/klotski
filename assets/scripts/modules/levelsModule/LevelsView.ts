@@ -107,7 +107,7 @@ export class LevelsView extends Component {
 	}
 	onBtnClickToHome() {
 		this.node.destroy();
-		winMgr.openWin(WIN_ID.START_MENU);
+		// winMgr.openWin(WIN_ID.START_MENU);
 	}
 }
 
