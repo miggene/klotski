@@ -15,9 +15,11 @@ import {
 	SpriteFrame,
 	tween,
 } from 'cc';
+import { audioMgr, SOUND_CLIPS } from '../../AudioMgr';
 import { dataMgr } from '../../common/mgrs/DataMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
+import { Main } from '../../Main';
 const { ccclass, property } = _decorator;
 
 @ccclass('SettingView')
@@ -74,11 +76,12 @@ export class SettingView extends Component {
 	// }
 
 	onBtnClickToHome() {
-		winMgr.openWin(WIN_ID.START_MENU);
-		this.node.destroy();
+		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+		this.node.parent.getComponent(Main).showSettingToMain();
 	}
 
 	onBtnClickToShake() {
+		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		this.shakeOn = 1 ^ this.shakeOn;
 		if (this.shakeOn === 1) {
 			tween(this.spShake.node)
@@ -87,7 +90,15 @@ export class SettingView extends Component {
 		}
 	}
 	onBtnClickToSound() {
+		!!this.soundOn && audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		this.soundOn = 1 ^ this.soundOn;
+		if (this.soundOn === 1) {
+			audioMgr.playBgMusic();
+			return;
+		}
+		if (this.soundOn !== 1) {
+			audioMgr.stopBgMusic();
+		}
 	}
 }
 

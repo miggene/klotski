@@ -29,7 +29,9 @@ import {
 	random,
 	director,
 	UIOpacity,
+	UITransformComponent,
 } from 'cc';
+import { audioMgr, SOUND_CLIPS } from '../../AudioMgr';
 import { resMgr } from '../../common/mgrs/ResMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
@@ -196,6 +198,10 @@ export class KlotskiView extends Component {
 	layout: Node;
 	@property(Node)
 	blackMask: Node;
+	@property(Node)
+	winNode: Node;
+	// @property(Node)
+	// deskTopPlatesNode: Node;
 
 	onLoad() {
 		this._initBoardState();
@@ -253,8 +259,9 @@ export class KlotskiView extends Component {
 		this.board = board;
 		this.curBoardStep = 0;
 		this._createBoard(board);
-
-		// this.schedule(this._refreshUsualAnimation, 5);
+		this.scheduleOnce(() => {
+			audioMgr.playSound(SOUND_CLIPS.FOOD_ENTER);
+		}, 2);
 	}
 
 	private _initBoardState() {
@@ -269,7 +276,7 @@ export class KlotskiView extends Component {
 	private _createBoard(boardString: string) {
 		let blockId = 1; //blockObj[0] : for empty (don't use)
 		let i = 0;
-		// let VOID_CHAR = '?';
+		// let VOID_CHAR = '?;
 		for (let row = 0; row < G_BOARD_Y; row++) {
 			for (let col = 0; col < G_BOARD_X; col++) {
 				if (this._boardState[col][row] >= 0) {
@@ -403,6 +410,7 @@ export class KlotskiView extends Component {
 	}
 
 	_tchS(e: EventTouch) {
+		audioMgr.playSound(SOUND_CLIPS.CLICK_FOOD);
 		const wp = e.getUILocation();
 		const lp = this.gridLayer
 			.getComponent(UITransform)
@@ -621,7 +629,7 @@ export class KlotskiView extends Component {
 	}
 
 	onBtnClickToTip(e: EventTouch) {
-		// this.makeMoveTip();
+		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		const klotskiSolver = new KlotskiSolver(
 			boardState2BoardString(this._boardState, this._blockObj)
 		);
@@ -729,11 +737,41 @@ export class KlotskiView extends Component {
 
 	private _winCb(block: Node) {
 		this.unschedule(this._updateUsedTime);
+		// this.gridLayer.children.forEach((child) => {
+		// 	if (
+		// 		child.getComponent(KlotskiBlock).blockId ===
+		// 		block.getComponent(KlotskiBlock).blockId
+		// 	) {
+		// 		tween(block)
+		// 			.delay(0.5)
+		// 			.by(0.5, { position: v3(0, -CELL_H * 2.5) })
+		// 			.call(() => {
+		// 				// this._showCatDogWin();
+		// 				// this._movePlate(block);
+		// 				block
+		// 					.getComponent(KlotskiBlock)
+		// 					.dragonBlock.playAnimation('victory', 0);
+		// 				block.getComponent(KlotskiBlock).isPlaying = true;
+		// 				winMgr.openWin(WIN_ID.OVER).then((ndWin: Node) => {
+		// 					ndWin.getComponent(OverView).initProps({
+		// 						moveStep: this.curBoardStep,
+		// 						time: this.usedTime,
+		// 						curLevel: this.level,
+		// 					});
+		// 				});
+		// 			})
+		// 			.start();
+		// 	}
+		// 	else {
+		// 		tween(child.getComponent(UIOpacity)).to(0.5, { opacity: 0 }).start();
+		// 	}
+		// });
 		tween(block)
 			.delay(0.5)
 			.by(0.5, { position: v3(0, -CELL_H * 2.5) })
 			.call(() => {
-				this._showCatDogWin();
+				// this._showCatDogWin();
+				// this._movePlate(block);
 				block
 					.getComponent(KlotskiBlock)
 					.dragonBlock.playAnimation('victory', 0);
@@ -750,6 +788,7 @@ export class KlotskiView extends Component {
 	}
 
 	onBtnClickToRetry() {
+		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		this.gridLayer.destroyAllChildren();
 		this._boardState = [];
 		this._blockObj = {};
@@ -764,6 +803,7 @@ export class KlotskiView extends Component {
 	}
 
 	onBtnClickToHome() {
+		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		this._playKnifeForkAnimationOut(() => {
 			const mainScript = this.node.parent.parent.getComponent(Main);
 			mainScript.showMain();
@@ -899,6 +939,38 @@ export class KlotskiView extends Component {
 		this.blackMask.active = true;
 		tween(this.layout)
 			.to(1, { position: v3(0, -150, 0) }, { easing: 'sineOutIn' })
+			.start();
+	}
+
+	// private _createTopPlate() {
+	// 	const tmpPlateNode = instantiate(this.spPlate.node);
+	// 	this.deskTopPlatesNode.addChild(tmpPlateNode);
+	// }
+
+	private _movePlate(block: Node) {
+		const winNodeWorldPos = this.winNode.getWorldPosition();
+		const refPlatePos = this.spPlate.node.parent
+			.getComponent(UITransform)
+			.convertToNodeSpaceAR(winNodeWorldPos);
+		const offKnifePos = this.spKnife.node
+			.getPosition()
+			.clone()
+			.subtract(this.spPlate.node.getPosition());
+		const offForkPos = this.spFork.node
+			.getPosition()
+			.clone()
+			.subtract(this.spPlate.node.getPosition());
+		const refKnifePos = refPlatePos.clone().add(offKnifePos);
+		const refForkPos = refPlatePos.clone().add(offForkPos);
+
+		tween(this.spPlate.node).to(1, { position: refPlatePos }).start();
+		tween(this.spKnife.node).to(1, { position: refKnifePos }).start();
+		tween(this.spFork.node).to(1, { position: refForkPos }).start();
+		const refFoodPos = block.parent
+			.getComponent(UITransform)
+			.convertToNodeSpaceAR(winNodeWorldPos);
+		tween(block)
+			.to(1, { position: refFoodPos.clone().add(v3(0, 0, 0)) })
 			.start();
 	}
 }

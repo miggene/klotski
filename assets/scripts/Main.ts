@@ -20,6 +20,7 @@ import {
 	UIOpacity,
 	Vec3,
 	Sprite,
+	AudioSource,
 } from 'cc';
 
 import { winMgr } from './common/mgrs/WinMgr';
@@ -31,6 +32,7 @@ import { resMgr } from './common/mgrs/ResMgr';
 import { LevelItem } from './modules/levelsModule/components/LevelItem';
 import { DragonLevel } from './modules/DragonLevel';
 import { database } from './Database';
+import { audioMgr, SOUND_CLIPS } from './AudioMgr';
 
 // import lodash from 'lodash-es';
 // import Hrd from 'hrd-solver';
@@ -68,6 +70,9 @@ export class Main extends Component {
 	@property(Sprite)
 	spCookGirl: Sprite;
 
+	@property(Node)
+	settingView: Node;
+
 	private _bOpenLevelImmediately: boolean = false;
 
 	private _lastBook: Node = null;
@@ -104,8 +109,13 @@ export class Main extends Component {
 	private _srcDinnerPos: Vec3;
 
 	private _srcCookGirlPos: Vec3;
+	private _animFromSetting = false;
 
 	onLoad() {
+		// audioMgr.init(this.node.getComponent(AudioSource));
+		const audioSource = this.node.addComponent(AudioSource);
+		audioMgr.init(audioSource);
+		audioMgr.playBgMusic();
 		winMgr.init();
 		dataMgr.init();
 		database.init();
@@ -188,6 +198,20 @@ export class Main extends Component {
 			return;
 		}
 		if (event.animationState.name === 'open_1') {
+			if (this._animFromSetting) {
+				this.btnNext.node.active = false;
+				this.btnPrev.node.active = false;
+
+				this.btnNext.node.setSiblingIndex(100);
+				this.btnPrev.node.setSiblingIndex(100);
+				if (this.dragonBook.timeScale === -1) {
+					this.dragonBook.timeScale = 1;
+					this.dragonBook.playAnimation('usual', 0);
+					this.settingView.active = false;
+					this._animFromSetting = false;
+				}
+				return;
+			}
 			this.curIndex = 0;
 			if (this.dragonBook.timeScale === -1) {
 				this.btnNext.node.active = false;
@@ -251,6 +275,7 @@ export class Main extends Component {
 
 	onBtnClickToLevel() {
 		console.log(`go to level`);
+		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		this.drgLeft.node.getComponent(UIOpacity).opacity = 0;
 		this.drgRight.node.getComponent(UIOpacity).opacity = 0;
 		tween(this.drgLeft.node)
@@ -288,6 +313,7 @@ export class Main extends Component {
 			})
 			.call(() => {
 				this.dragonBook.playAnimation('open_1', 1);
+				audioMgr.playSound(SOUND_CLIPS.FLIP);
 				this._createBook();
 			})
 			.start();
@@ -364,6 +390,8 @@ export class Main extends Component {
 	}
 
 	onBtnClickToNext() {
+		// audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+		audioMgr.playSound(SOUND_CLIPS.FLIP);
 		this.curIndex++;
 		const levelScript = this.node
 			.getChildByName('DragonLevel')
@@ -374,6 +402,8 @@ export class Main extends Component {
 		});
 	}
 	onBtnClickToPrev() {
+		// audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+		audioMgr.playSound(SOUND_CLIPS.FLIP);
 		this.curIndex--;
 		const levelScript = this.node
 			.getChildByName('DragonLevel')
@@ -416,9 +446,32 @@ export class Main extends Component {
 			this._bOpenLevelImmediately = false;
 			this.dragonBook.timeScale = -1;
 			this.dragonBook.playAnimation('open_1', 1);
+			audioMgr.playSound(SOUND_CLIPS.FLIP);
 			const centerPos = v3(0, 0, 0);
 			this.dragonBook.node.setPosition(centerPos);
 		});
+	}
+	public showSettingToMain() {
+		this.dragonBook.timeScale = -1;
+		this.dragonBook.playAnimation('open_1', 1);
+		audioMgr.playSound(SOUND_CLIPS.FLIP);
+	}
+
+	onBtnClickToSetting() {
+		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+		this._animFromSetting = true;
+		tween(this.btnSetting.node)
+			.to(0.5, {
+				position: v3(
+					this._srcSettingPos.x,
+					-this.node.getComponent(UITransform).height * 2,
+					0
+				),
+			})
+			.start();
+		this.settingView.active = true;
+		this.dragonBook.playAnimation('open_1', 1);
+		audioMgr.playSound(SOUND_CLIPS.FLIP);
 	}
 }
 

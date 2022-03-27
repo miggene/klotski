@@ -8,6 +8,7 @@
  */
 
 import { dragonBones, Node, tween, UITransform, v2, v3 } from 'cc';
+import { audioMgr, SOUND_CLIPS } from '../../AudioMgr';
 import { KlotskiBlock } from './components/KlotskiBlock';
 import { IAction, IPosInfo } from './IKlotskiModule';
 import {
@@ -475,6 +476,7 @@ export function moveBlock(
 			}
 		}
 	});
+	audioMgr.playSound(SOUND_CLIPS.SLIDE);
 	tween(block)
 		.then(moveAct)
 		.call(() => {

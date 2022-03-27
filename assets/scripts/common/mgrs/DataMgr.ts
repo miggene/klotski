@@ -17,14 +17,15 @@ const LEVELS_DATA_PATH = 'datas/hrd_answers_straight';
 
 const UNLOCK_MAX_INDEX = 'unlockMaxIndex';
 // const CURRENT_LEVEL_INDEX = 'curLevelIndex';
-const SHAKE_ON = 'shakeOn';
-const SOUND_ON = 'soundOn';
+export const APP = 'hrd';
+const SHAKE_ON = APP + '_shakeOn';
+const SOUND_ON = APP + '_soundOn';
 class DataMgr {
 	constructor(
 		private _curLevelIndex: number,
 		private _unlockMaxIndex: number,
-		private _shakeOn: number = 0,
-		private _soundOn: number = 1
+		private _shakeOn = 0,
+		private _soundOn = 1
 	) {}
 
 	private static _instance: DataMgr;
@@ -60,24 +61,26 @@ class DataMgr {
 	// 	this.setLS(UNLOCK_MAX_INDEX, JSON.stringify(v));
 	// }
 
-	//震动开头
-	// public get shakeOn(): number {
-	// 	return this._shakeOn;
-	// }
-	// public set shakeOn(v: number) {
-	// 	this._shakeOn = v;
-	// 	this.setLS(SHAKE_ON, JSON.stringify(v));
-	// }
+	// 震动开头;
+	public get shakeOn(): number {
+		return this._shakeOn;
+	}
+	public set shakeOn(v: number) {
+		this._shakeOn = v;
+		// this.setLS(SHAKE_ON, JSON.stringify(v));
+		localStorage.setItem(SHAKE_ON, JSON.stringify(v));
+	}
 
 	//音乐音效开关
 
-	// public get soundOn(): number {
-	// 	return this._soundOn;
-	// }
-	// public set soundOn(v: number) {
-	// 	this._soundOn = v;
-	// 	this.setLS(SOUND_ON, JSON.stringify(v));
-	// }
+	public get soundOn(): number {
+		return this._soundOn;
+	}
+	public set soundOn(v: number) {
+		this._soundOn = v;
+		// this.setLS(SOUND_ON, JSON.stringify(v));
+		localStorage.setItem(SOUND_ON, JSON.stringify(v));
+	}
 
 	public async init() {
 		resMgr
@@ -103,6 +106,26 @@ class DataMgr {
 		// } catch (error) {
 		// 	console.error(error);
 		// }
+
+		// this.shakeOn = string2Number(
+		// this.getLS(SHAKE_ON, JSON.stringify(this._shakeOn))
+		// );
+		// this.soundOn = string2Number(
+		// this.getLS(SOUND_ON, JSON.stringify(this._soundOn))
+		// );
+		const shakeOn = localStorage.getItem(SHAKE_ON);
+		if (shakeOn) {
+			this.shakeOn = parseInt(JSON.parse(shakeOn), 10);
+		} else {
+			this.shakeOn = 0;
+		}
+
+		const soundOn = localStorage.getItem(SOUND_ON);
+		if (soundOn) {
+			this.soundOn = parseInt(JSON.parse(soundOn), 10);
+		} else {
+			this.soundOn = 1;
+		}
 	}
 
 	public async getlevelsDataCache() {

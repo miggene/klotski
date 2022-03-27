@@ -10,6 +10,7 @@ import {
 	EventTouch,
 	Vec3,
 } from 'cc';
+import { audioMgr, SOUND_CLIPS } from '../AudioMgr';
 import { dataMgr } from '../common/mgrs/DataMgr';
 import { WIN_ID } from '../common/mgrs/WinConfig';
 import { winMgr } from '../common/mgrs/WinMgr';
@@ -188,6 +189,7 @@ export class DragonLevel extends Component {
 		if (level > maxUnlockLevel) {
 			this.dragonLevel.playAnimation(`label${index}_locked`, 1);
 		} else {
+			audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 			this.dragonLevel.playAnimation(`label${index}_activation`, 1);
 			this._showDragonStar((event.target as Node).parent.getPosition());
 			winMgr
@@ -204,6 +206,7 @@ export class DragonLevel extends Component {
 	}
 
 	onBtnClickToHome() {
+		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		const mainScript = this.node.parent.getComponent(Main);
 		mainScript.showLevelToMain();
 	}

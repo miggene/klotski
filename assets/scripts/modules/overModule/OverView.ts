@@ -6,11 +6,12 @@
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/overModule/OverView.ts
  */
-import { _decorator, Component, Node, Label, director, dragonBones } from 'cc';
+import { _decorator, Component, Node, director, instantiate, macro } from 'cc';
+import { audioMgr, SOUND_CLIPS } from '../../AudioMgr';
 import { dataMgr } from '../../common/mgrs/DataMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
-import { formatTime } from '../../common/utils/Helper';
+
 import { database } from '../../Database';
 import { Main } from '../../Main';
 import { KlotskiView } from '../klotskiModule/KlotskiView';
@@ -36,7 +37,7 @@ export class OverView extends Component {
 	}
 	public set time(v: number) {
 		this._time = v;
-		this.lblTime.string = formatTime(v);
+		// this.lblTime.string = formatTime(v);
 	}
 
 	private _moveStep: number;
@@ -45,7 +46,7 @@ export class OverView extends Component {
 	}
 	public set moveStep(v: number) {
 		this._moveStep = v;
-		this.lblMoveStep.string = `${v}`;
+		// this.lblMoveStep.string = `${v}`;
 	}
 
 	private _bestTime: number;
@@ -54,7 +55,7 @@ export class OverView extends Component {
 	}
 	public set bestTime(v: number) {
 		this._bestTime = v;
-		this.lblBestTime.string = formatTime(v);
+		// this.lblBestTime.string = formatTime(v);
 	}
 
 	private _level: number;
@@ -65,25 +66,34 @@ export class OverView extends Component {
 		this._level = v;
 	}
 
-	@property(Label)
-	lblBestTime: Label;
+	@property(Node)
+	winTip: Node;
 
-	@property(Label)
-	lblMoveStep: Label;
+	// @property(Label)
+	// lblBestTime: Label;
 
-	@property(Label)
-	lblTime: Label;
+	// @property(Label)
+	// lblMoveStep: Label;
+
+	// @property(Label)
+	// lblTime: Label;
 
 	// @property(dragonBones.ArmatureDisplay)
 	// drgRope: dragonBones.ArmatureDisplay;
 
 	start() {
 		// [3]
+		audioMgr.playSound(SOUND_CLIPS.WIN);
+		this.schedule(this._createWinTip, 2, macro.REPEAT_FOREVER, 1);
 	}
 
 	// update (deltaTime: number) {
 	//     // [4]
 	// }
+
+	onDestroy() {
+		this.unschedule(this._createWinTip);
+	}
 
 	/**
 	 *  initProps
@@ -139,6 +149,7 @@ export class OverView extends Component {
 		}
 	}
 	public async onBtnClickToNext() {
+		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		winMgr.clearWin();
 		const levelsData = await dataMgr.getlevelsDataCache();
 		// this.level++;
@@ -154,10 +165,20 @@ export class OverView extends Component {
 		}
 	}
 	onBtnClickToShare() {
+		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		console.log('share');
 	}
 	onBtnClickToDinner() {
+		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		console.log('dinner');
+	}
+
+	private _createWinTip() {
+		for (let i = 0; i < 2; ++i) {
+			const tip = instantiate(this.winTip);
+			tip.active = true;
+			this.node.addChild(tip);
+		}
 	}
 }
 
