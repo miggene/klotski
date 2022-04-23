@@ -200,6 +200,7 @@ export class DragonLevel extends Component {
 					this.node.destroy();
 					const mainScript = this.node.parent.getComponent(Main);
 					mainScript.hideMain();
+					mainScript.adjustGirl();
 				})
 				.catch((err) => console.error(err));
 		}

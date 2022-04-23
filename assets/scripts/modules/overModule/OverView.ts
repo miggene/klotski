@@ -6,11 +6,24 @@
  * @Description:
  * @FilePath: /klotski/assets/scripts/modules/overModule/OverView.ts
  */
-import { _decorator, Component, Node, director, instantiate, macro } from 'cc';
+import {
+	_decorator,
+	Component,
+	Node,
+	director,
+	instantiate,
+	macro,
+	dragonBones,
+	UIOpacity,
+	tween,
+	Label,
+} from 'cc';
 import { audioMgr, SOUND_CLIPS } from '../../AudioMgr';
 import { dataMgr } from '../../common/mgrs/DataMgr';
+import { resMgr } from '../../common/mgrs/ResMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
+import { formatTime } from '../../common/utils/Helper';
 
 import { database } from '../../Database';
 import { Main } from '../../Main';
@@ -46,7 +59,7 @@ export class OverView extends Component {
 	}
 	public set moveStep(v: number) {
 		this._moveStep = v;
-		// this.lblMoveStep.string = `${v}`;
+		this.lblMoveStep.string = `${v}`;
 	}
 
 	private _bestTime: number;
@@ -55,7 +68,7 @@ export class OverView extends Component {
 	}
 	public set bestTime(v: number) {
 		this._bestTime = v;
-		// this.lblBestTime.string = formatTime(v);
+		this.lblBestTime.string = formatTime(v);
 	}
 
 	private _level: number;
@@ -66,30 +79,58 @@ export class OverView extends Component {
 		this._level = v;
 	}
 
+	private _blockName: string;
+
 	@property(Node)
 	winTip: Node;
 
-	// @property(Label)
-	// lblBestTime: Label;
+	@property(dragonBones.ArmatureDisplay)
+	drgFood: dragonBones.ArmatureDisplay;
+	@property(dragonBones.ArmatureDisplay)
+	drgEnd: dragonBones.ArmatureDisplay;
 
-	// @property(Label)
-	// lblMoveStep: Label;
+	@property(Label)
+	lblBestTime: Label;
+
+	@property(Label)
+	lblMoveStep: Label;
+	@property(dragonBones.ArmatureDisplay)
+	drgBB: dragonBones.ArmatureDisplay;
 
 	// @property(Label)
 	// lblTime: Label;
 
 	// @property(dragonBones.ArmatureDisplay)
 	// drgRope: dragonBones.ArmatureDisplay;
-
 	start() {
 		// [3]
 		audioMgr.playSound(SOUND_CLIPS.WIN);
 		this.schedule(this._createWinTip, 2, macro.REPEAT_FOREVER, 1);
+		this.scheduleOnce(() => {
+			this.drgBB.playAnimation('apper', 1);
+			this.bestTime = this._bestTime;
+		}, 2);
 	}
 
 	// update (deltaTime: number) {
 	//     // [4]
 	// }
+
+	onEnable() {
+		this.drgBB.addEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._bbAnimEventHandler,
+			this
+		);
+	}
+
+	onDisable() {
+		this.drgBB.removeEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._bbAnimEventHandler,
+			this
+		);
+	}
 
 	onDestroy() {
 		this.unschedule(this._createWinTip);
@@ -98,24 +139,43 @@ export class OverView extends Component {
 	/**
 	 *  initProps
 	 */
-	public initProps(props: {
+	public async initProps(props: {
 		moveStep: number;
 		time: number;
 		curLevel: number;
+		blockName: string;
 	}) {
-		const { moveStep, time, curLevel } = props;
-		this.level = curLevel;
-		this.moveStep = moveStep;
-		// this.bestTime = bestTime;
-		this.time = time;
+		console.log('2');
 
+		const { moveStep, time, curLevel, blockName } = props;
+		this.level = curLevel;
+		// this.moveStep = moveStep;
+
+		this._bestTime = this._updateBestTime(curLevel, time);
+
+		this.time = time;
+		this._blockName = blockName;
 		if (this.level > database.user.maxUnlockLevel) {
 			const maxUnlockLevel = database.user.maxUnlockLevel + 1;
 			database.user.setState({ maxUnlockLevel });
 		}
-
+		const path = `dragonBones/${this._blockName}`;
+		const dragonBonesAsset = await resMgr.loadDragonAsset(path);
+		const dragonBonesAtlasAsset = await resMgr.loadDragonAtlasAsset(path);
+		this.drgFood.dragonAsset = dragonBonesAsset;
+		this.drgFood.dragonAtlasAsset = dragonBonesAtlasAsset;
+		this.drgFood.armatureName = 'Armature';
+		this.drgFood.playAnimation('victory', 0);
+		this.drgFood.node.getComponent(UIOpacity).opacity = 0;
 		const nextLevelIndex = this.level;
 		database.user.setState({ curLevel: nextLevelIndex });
+		tween(this.drgFood.node.getComponent(UIOpacity))
+			.delay(0.3)
+			.to(0.1, { opacity: 255 })
+			.call(() => {
+				this.drgFood.playAnimation('victory', 0);
+			})
+			.start();
 	}
 
 	onBtnClickToHome() {
@@ -178,6 +238,19 @@ export class OverView extends Component {
 			const tip = instantiate(this.winTip);
 			tip.active = true;
 			this.node.addChild(tip);
+		}
+	}
+
+	private _updateBestTime(level: number, usedTime: number) {
+		const lastBestTime = dataMgr.getLastBestTimeByLevel(level, `${usedTime}`);
+		const bestTime = Math.min(lastBestTime, usedTime);
+		dataMgr.setBestTimeByLevel(level, bestTime);
+		return bestTime;
+	}
+
+	_bbAnimEventHandler(event) {
+		if (event.animationState.name === 'apper') {
+			this.drgBB.playAnimation('standby', 0);
 		}
 	}
 }

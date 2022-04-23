@@ -92,14 +92,14 @@ export class KlotskiView extends Component {
 		this.lblLevelIndex.string = `${v}`;
 	}
 
-	// private _moveStep: number;
-	// public get moveStep(): number {
-	// 	return this._moveStep;
-	// }
-	// public set moveStep(v: number) {
-	// 	this._moveStep = v;
-	// 	this.lblMoveStep.string = `${v}`;
-	// }
+	private _moveStep: number;
+	public get moveStep(): number {
+		return this._moveStep;
+	}
+	public set moveStep(v: number) {
+		this._moveStep = v;
+		this.lblMoveStep.string = `${v}`;
+	}
 
 	private _usedTime: number = 0;
 	public get usedTime(): number {
@@ -190,18 +190,20 @@ export class KlotskiView extends Component {
 	@property(dragonBones.ArmatureDisplay)
 	dragonOven: dragonBones.ArmatureDisplay;
 
-	@property(Sprite)
-	spDog: Sprite;
-	@property(Sprite)
-	spCat: Sprite;
+	// @property(Sprite)
+	// spDog: Sprite;
+	// @property(Sprite)
+	// spCat: Sprite;
 	@property(Node)
 	layout: Node;
 	@property(Node)
 	blackMask: Node;
 	@property(Node)
 	winNode: Node;
-	// @property(Node)
-	// deskTopPlatesNode: Node;
+	@property(dragonBones.ArmatureDisplay)
+	drgCat: dragonBones.ArmatureDisplay;
+	@property(dragonBones.ArmatureDisplay)
+	drgDog: dragonBones.ArmatureDisplay;
 
 	onLoad() {
 		this._initBoardState();
@@ -214,6 +216,9 @@ export class KlotskiView extends Component {
 		this.spPlate.node.setPosition(this._basePlatePos);
 		this.spKnife.node.setPosition(this._baseKnifePos);
 		this.spFork.node.setPosition(this._baseForkPos);
+
+		this.lblMoveStep.node.getComponent(UIOpacity).opacity = 0;
+		this.lblUsedTime.node.getComponent(UIOpacity).opacity = 0;
 	}
 
 	onEnable() {
@@ -221,6 +226,8 @@ export class KlotskiView extends Component {
 		this.gridLayer.on(Node.EventType.TOUCH_MOVE, this._tchM, this);
 		this.gridLayer.on(Node.EventType.TOUCH_END, this._tchE, this);
 		this.gridLayer.on(Node.EventType.TOUCH_CANCEL, this._tchC, this);
+
+		this.schedule(this._showRandGirlAnimations, 10);
 	}
 
 	start() {
@@ -249,7 +256,23 @@ export class KlotskiView extends Component {
 			this._towerAnimEventHandler,
 			this
 		);
+		this.drgCat.addEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._catAnimEventHandler,
+			this
+		);
+		this.drgDog.addEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._dogAnimEventHandler,
+			this
+		);
+
 		this.dragonOven.playAnimation('appear', 1);
+	}
+
+	private _showRandGirlAnimations() {
+		const mainScript = this.node.parent.parent.getComponent(Main);
+		mainScript.showGirlAnimations();
 	}
 
 	public initProps(props: ILevelData) {
@@ -374,6 +397,18 @@ export class KlotskiView extends Component {
 			this._towerAnimEventHandler,
 			this
 		);
+		this.drgCat.removeEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._catAnimEventHandler,
+			this
+		);
+		this.drgDog.removeEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._dogAnimEventHandler,
+			this
+		);
+
+		this.unschedule(this._showRandGirlAnimations);
 	}
 
 	// update (deltaTime: number) {
@@ -737,50 +772,23 @@ export class KlotskiView extends Component {
 
 	private _winCb(block: Node) {
 		this.unschedule(this._updateUsedTime);
-		// this.gridLayer.children.forEach((child) => {
-		// 	if (
-		// 		child.getComponent(KlotskiBlock).blockId ===
-		// 		block.getComponent(KlotskiBlock).blockId
-		// 	) {
-		// 		tween(block)
-		// 			.delay(0.5)
-		// 			.by(0.5, { position: v3(0, -CELL_H * 2.5) })
-		// 			.call(() => {
-		// 				// this._showCatDogWin();
-		// 				// this._movePlate(block);
-		// 				block
-		// 					.getComponent(KlotskiBlock)
-		// 					.dragonBlock.playAnimation('victory', 0);
-		// 				block.getComponent(KlotskiBlock).isPlaying = true;
-		// 				winMgr.openWin(WIN_ID.OVER).then((ndWin: Node) => {
-		// 					ndWin.getComponent(OverView).initProps({
-		// 						moveStep: this.curBoardStep,
-		// 						time: this.usedTime,
-		// 						curLevel: this.level,
-		// 					});
-		// 				});
-		// 			})
-		// 			.start();
-		// 	}
-		// 	else {
-		// 		tween(child.getComponent(UIOpacity)).to(0.5, { opacity: 0 }).start();
-		// 	}
-		// });
 		tween(block)
 			.delay(0.5)
 			.by(0.5, { position: v3(0, -CELL_H * 2.5) })
 			.call(() => {
-				// this._showCatDogWin();
+				this._showCatDogWin();
 				// this._movePlate(block);
 				block
 					.getComponent(KlotskiBlock)
 					.dragonBlock.playAnimation('victory', 0);
 				block.getComponent(KlotskiBlock).isPlaying = true;
+				const { blockName } = block.getComponent(KlotskiBlock);
 				winMgr.openWin(WIN_ID.OVER).then((ndWin: Node) => {
 					ndWin.getComponent(OverView).initProps({
 						moveStep: this.curBoardStep,
 						time: this.usedTime,
 						curLevel: this.level,
+						blockName,
 					});
 				});
 			})
@@ -917,6 +925,15 @@ export class KlotskiView extends Component {
 				this.dragonTower.node.active = true;
 				this.dragonTower.playAnimation('appear', 1);
 				this.dragonGlass.playAnimation('appear', 1);
+				this.lblMoveStep.node.getComponent(UIOpacity).opacity = 255;
+				this.lblUsedTime.node.getComponent(UIOpacity).opacity = 255;
+				this.drgCat.playAnimation('appear', 1);
+				tween(this.drgDog.node)
+					.delay(1)
+					.call(() => {
+						this.drgDog.playAnimation('appear', 1);
+					})
+					.start();
 			}
 		}
 	}
@@ -931,6 +948,27 @@ export class KlotskiView extends Component {
 			}
 			if (event.animationState.name === 'disappear') {
 				this.dragonTower.node.active = false;
+			}
+		}
+	}
+
+	private _catAnimEventHandler(event: {
+		type: string;
+		animationState: { name: string };
+	}) {
+		if (event.type === dragonBones.EventObject.COMPLETE) {
+			if (event.animationState.name === 'appear') {
+				this.drgCat.playAnimation('standby', 0);
+			}
+		}
+	}
+	private _dogAnimEventHandler(event: {
+		type: string;
+		animationState: { name: string };
+	}) {
+		if (event.type === dragonBones.EventObject.COMPLETE) {
+			if (event.animationState.name === 'appear') {
+				this.drgDog.playAnimation('standby', 0);
 			}
 		}
 	}

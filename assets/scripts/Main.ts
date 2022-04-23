@@ -21,6 +21,7 @@ import {
 	Vec3,
 	Sprite,
 	AudioSource,
+	macro,
 } from 'cc';
 
 import { winMgr } from './common/mgrs/WinMgr';
@@ -70,6 +71,9 @@ export class Main extends Component {
 	@property(Sprite)
 	spCookGirl: Sprite;
 
+	@property(dragonBones.ArmatureDisplay)
+	drgGirl: dragonBones.ArmatureDisplay;
+
 	@property(Node)
 	settingView: Node;
 
@@ -111,6 +115,8 @@ export class Main extends Component {
 	private _srcCookGirlPos: Vec3;
 	private _animFromSetting = false;
 
+	private _randGrilAnimName: string;
+
 	onLoad() {
 		// audioMgr.init(this.node.getComponent(AudioSource));
 		const audioSource = this.node.addComponent(AudioSource);
@@ -146,6 +152,11 @@ export class Main extends Component {
 			this._dragonBookListener,
 			this
 		);
+		this.drgGirl.addEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._dgnGirlListener,
+			this
+		);
 	}
 
 	onDisable() {
@@ -154,11 +165,18 @@ export class Main extends Component {
 			this._dragonBookListener,
 			this
 		);
+		this.drgGirl.removeEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._dgnGirlListener,
+			this
+		);
 	}
 
 	start() {
 		this.dragonBook.node.active = true;
 		this.dragonBook.playAnimation('appear', 1);
+
+		this.drgGirl.playAnimation('appear', 1);
 	}
 
 	private _dragonBookListener(event) {
@@ -251,6 +269,32 @@ export class Main extends Component {
 				// 	})
 				// 	.start();
 			}
+		}
+	}
+
+	private _dgnGirlListener(event) {
+		if (event.animationState.name === 'appear') {
+			this.drgGirl.playAnimation('standby', 0);
+		} else if (
+			event.animationState.name === 'blink' ||
+			event.animationState.name === 'daze'
+		) {
+			if (this.drgGirl.timeScale === 1) {
+				this.drgGirl.timeScale = -1;
+				const randTime = Math.floor(Math.random() * 5);
+				this.scheduleOnce(() => {
+					this.drgGirl.playAnimation(this._randGrilAnimName, 1);
+				}, randTime);
+			} else {
+				this.drgGirl.playAnimation('standby', 0);
+			}
+		} else if (event.animationState.name === 'shock') {
+			const randTime = Math.floor(Math.random() * 5);
+			this.scheduleOnce(() => {
+				this.drgGirl.playAnimation('shocktostandby', 1);
+			}, randTime);
+		} else if (event.animationState.name === 'shocktostnadby') {
+			this.drgGirl.playAnimation('standby', 0);
 		}
 	}
 
@@ -426,6 +470,8 @@ export class Main extends Component {
 		const centerPos = v3(0, 0, 0);
 		this.dragonBook.node.setPosition(centerPos);
 		this.dragonBook.playAnimation('appear', 1);
+		const { y } = this.drgGirl.node.getPosition();
+		this.drgGirl.node.setPosition(0, y + 50);
 	}
 	public showLevel() {
 		this._bOpenLevelImmediately = true;
@@ -472,6 +518,26 @@ export class Main extends Component {
 		this.settingView.active = true;
 		this.dragonBook.playAnimation('open_1', 1);
 		audioMgr.playSound(SOUND_CLIPS.FLIP);
+	}
+
+	public adjustGirl() {
+		const { x, y } = this.drgGirl.node.getPosition();
+		this.drgGirl.node.setPosition(x + 20, y - 50);
+	}
+
+	public showGirlAnimations() {
+		const randTime = Math.floor(Math.random() * 5);
+		// this.schedule(this._randGirlAnims, 3, macro.REPEAT_FOREVER, 1);
+		this.scheduleOnce(this._randGirlAnims, randTime);
+	}
+	public hideGirlAnimations() {
+		this.unschedule(this._randGirlAnims);
+	}
+	private _randGirlAnims() {
+		const rand = Math.floor(Math.random() * 3);
+		this._randGrilAnimName = ['blink', 'daze', 'shock'][rand];
+		this.drgGirl.timeScale = 1;
+		this.drgGirl.playAnimation(this._randGrilAnimName, 1);
 	}
 }
 

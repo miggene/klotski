@@ -20,6 +20,7 @@ const UNLOCK_MAX_INDEX = 'unlockMaxIndex';
 export const APP = 'hrd';
 const SHAKE_ON = APP + '_shakeOn';
 const SOUND_ON = APP + '_soundOn';
+const BEST_TIME_PREFIX = APP + '_bestTime_level_';
 class DataMgr {
 	constructor(
 		private _curLevelIndex: number,
@@ -150,6 +151,27 @@ class DataMgr {
 	// 	const prefixKey = PREFIX_LS + key;
 	// 	localStorage.setItem(prefixKey, value);
 	// }
+
+	public getLastBestTimeByLevel(
+		level: number,
+		defaultBestTime = `${24 * 3600}`
+	) {
+		const bestTime = localStorage.getItem(`${BEST_TIME_PREFIX}${level}`);
+		if (bestTime === null || bestTime === undefined) {
+			localStorage.setItem(`${BEST_TIME_PREFIX}${level}`, defaultBestTime);
+			return parseInt(defaultBestTime, 10);
+		}
+		return parseInt(bestTime, 10);
+
+		// const curTime = parseInt(defaultBestTime, 10);
+		// const curBestTime = Math.min(lastBestTime, curTime);
+		// localStorage.setItem(`${BEST_TIME_PREFIX}${level}`, `${curBestTime}`);
+		// return `${curBestTime}`;
+	}
+
+	public setBestTimeByLevel(level: number, bestTime: number) {
+		localStorage.setItem(`${BEST_TIME_PREFIX}${level}`, `${bestTime}`);
+	}
 }
 
 export const dataMgr = DataMgr.instance;
