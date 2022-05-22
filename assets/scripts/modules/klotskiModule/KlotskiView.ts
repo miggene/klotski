@@ -205,6 +205,12 @@ export class KlotskiView extends Component {
 	@property(dragonBones.ArmatureDisplay)
 	drgDog: dragonBones.ArmatureDisplay;
 
+	@property(dragonBones.ArmatureDisplay)
+	drgHome: dragonBones.ArmatureDisplay;
+
+	@property(dragonBones.ArmatureDisplay)
+	drgTips: dragonBones.ArmatureDisplay;
+
 	onLoad() {
 		this._initBoardState();
 		this.gridLayer.destroyAllChildren();
@@ -267,7 +273,21 @@ export class KlotskiView extends Component {
 			this
 		);
 
+		this.drgTips.addEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._tipsAnimEventHandler,
+			this
+		);
+		this.drgHome.addEventListener(
+			dragonBones.EventObject.COMPLETE,
+			this._homeAnimEventHandler,
+			this
+		);
+
 		this.dragonOven.playAnimation('appear', 1);
+
+		this.drgHome.playAnimation('b', 1);
+		this.drgTips.playAnimation('a', 1);
 	}
 
 	private _showRandGirlAnimations() {
@@ -777,7 +797,6 @@ export class KlotskiView extends Component {
 			.by(0.5, { position: v3(0, -CELL_H * 2.5) })
 			.call(() => {
 				this._showCatDogWin();
-				// this._movePlate(block);
 				block
 					.getComponent(KlotskiBlock)
 					.dragonBlock.playAnimation('victory', 0);
@@ -973,6 +992,24 @@ export class KlotskiView extends Component {
 		}
 	}
 
+	private _tipsAnimEventHandler(event: {
+		type: string;
+		animationState: { name: string };
+	}) {
+		if (event.type === dragonBones.EventObject.COMPLETE) {
+			this._refreshDrgTips();
+		}
+	}
+
+	private _homeAnimEventHandler(event: {
+		type: string;
+		animationState: { name: string };
+	}) {
+		if (event.type === dragonBones.EventObject.COMPLETE) {
+			this._refreshDrgHome();
+		}
+	}
+
 	private _showCatDogWin() {
 		this.blackMask.active = true;
 		tween(this.layout)
@@ -985,31 +1022,15 @@ export class KlotskiView extends Component {
 	// 	this.deskTopPlatesNode.addChild(tmpPlateNode);
 	// }
 
-	private _movePlate(block: Node) {
-		const winNodeWorldPos = this.winNode.getWorldPosition();
-		const refPlatePos = this.spPlate.node.parent
-			.getComponent(UITransform)
-			.convertToNodeSpaceAR(winNodeWorldPos);
-		const offKnifePos = this.spKnife.node
-			.getPosition()
-			.clone()
-			.subtract(this.spPlate.node.getPosition());
-		const offForkPos = this.spFork.node
-			.getPosition()
-			.clone()
-			.subtract(this.spPlate.node.getPosition());
-		const refKnifePos = refPlatePos.clone().add(offKnifePos);
-		const refForkPos = refPlatePos.clone().add(offForkPos);
-
-		tween(this.spPlate.node).to(1, { position: refPlatePos }).start();
-		tween(this.spKnife.node).to(1, { position: refKnifePos }).start();
-		tween(this.spFork.node).to(1, { position: refForkPos }).start();
-		const refFoodPos = block.parent
-			.getComponent(UITransform)
-			.convertToNodeSpaceAR(winNodeWorldPos);
-		tween(block)
-			.to(1, { position: refFoodPos.clone().add(v3(0, 0, 0)) })
-			.start();
+	private _refreshDrgTips() {
+		this.scheduleOnce(() => {
+			this.drgTips.playAnimation('a_standby', 1);
+		}, 5 + Math.floor(Math.random() * 5));
+	}
+	private _refreshDrgHome() {
+		this.scheduleOnce(() => {
+			this.drgHome.playAnimation('b_standby', 1);
+		}, 5 + Math.floor(Math.random() * 5));
 	}
 }
 
