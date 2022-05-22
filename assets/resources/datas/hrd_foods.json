@@ -1,51 +1,90 @@
 [
 	{
-		"_id": {
-			"$oid": "61bd978f265672b1e151d3b4"
-		},
 		"blockName": "zongzi",
 		"style": 4
 	},
 	{
-		"_id": {
-			"$oid": "61bd978f265672b1e151d3b5"
-		},
 		"blockName": "corn",
 		"style": 3
 	},
 	{
-		"_id": {
-			"$oid": "61bd978f265672b1e151d3b6"
-		},
 		"blockName": "bun",
 		"style": 2
 	},
 	{
-		"_id": {
-			"$oid": "61bd978f265672b1e151d3b6"
-		},
 		"blockName": "dumpling",
 		"style": 1
 	},
 	{
-		"_id": {
-			"$oid": "61bd978f265672b1e151d3b7"
-		},
 		"blockName": "orange",
 		"style": 1
 	},
 	{
-		"_id": {
-			"$oid": "61bd978f265672b1e151d3b7"
-		},
 		"blockName": "peach",
 		"style": 1
 	},
 	{
-		"_id": {
-			"$oid": "61bd978f265672b1e151d3b8"
-		},
 		"blockName": "apple",
 		"style": 1
+	},
+	{
+		"blockName": "avocado",
+		"style": 1
+	},
+	{
+		"blockName": "chips",
+		"style": 4
+	},
+	{
+		"blockName": "Croissant",
+		"style": 2
+	},
+	{
+		"blockName": "eggplant",
+		"style": 3
+	},
+	{
+		"blockName": "EggRoll",
+		"style": 2
+	},
+	{
+		"blockName": "Fishball",
+		"style": 3
+	},
+	{
+		"blockName": "Icecream",
+		"style": 3
+	},
+	{
+		"blockName": "MatchaCake",
+		"style": 2
+	},
+	{
+		"blockName": "milk",
+		"style": 3
+	},
+	{
+		"blockName": "milkytea",
+		"style": 3
+	},
+	{
+		"blockName": "peas",
+		"style": 2
+	},
+	{
+		"blockName": "Pudding",
+		"style": 3
+	},
+	{
+		"blockName": "sausage",
+		"style": 2
+	},
+	{
+		"blockName": "sushi",
+		"style": 2
+	},
+	{
+		"blockName": "toast",
+		"style": 4
 	}
 ]
