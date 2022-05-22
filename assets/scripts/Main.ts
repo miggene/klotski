@@ -22,6 +22,7 @@ import {
 	Sprite,
 	AudioSource,
 	macro,
+	TERRAIN_NORTH_INDEX,
 } from 'cc';
 
 import { winMgr } from './common/mgrs/WinMgr';
@@ -40,8 +41,8 @@ import { audioMgr, SOUND_CLIPS } from './AudioMgr';
 const { ccclass, property } = _decorator;
 
 const LEVELS_DATA_PATH = 'datas/hrd_answers_straight';
-const FRONT = 11;
-const AFTER = 3;
+const FRONT = 13;
+const AFTER = 5;
 @ccclass('Main')
 export class Main extends Component {
 	@property(dragonBones.ArmatureDisplay)
@@ -76,6 +77,9 @@ export class Main extends Component {
 
 	@property(Node)
 	settingView: Node;
+
+	@property(Node)
+	bgMask: Node;
 
 	private _bOpenLevelImmediately: boolean = false;
 
@@ -133,12 +137,31 @@ export class Main extends Component {
 		this._srcLeftPos = this.drgLeft.node.getPosition();
 		this._srcRightPos = this.drgRight.node.getPosition();
 
-		tween(this.drgLeft.node)
-			.to(0, { position: v3(0, this._srcLeftPos.y, this._srcLeftPos.z) })
-			.start();
-		tween(this.drgRight.node)
-			.to(0, { position: v3(0, this._srcRightPos.y, this._srcRightPos.z) })
-			.start();
+		this.dragonBook.node.active = true;
+		this.dragonBook.playAnimation('appear', 1);
+		this.drgGirl.playAnimation('appear', 1);
+
+		this.drgLeft.node.setPosition(
+			v3(0, this._srcLeftPos.y, this._srcLeftPos.z)
+		);
+		this.drgRight.node.setPosition(
+			v3(0, this._srcRightPos.y, this._srcRightPos.z)
+		);
+
+		const leftZIndex = this.drgLeft.node.getSiblingIndex();
+		const rightZIndex = this.drgRight.node.getSiblingIndex();
+		console.log('leftZIndex :>> ', leftZIndex);
+		console.log('rightZIndex :>> ', rightZIndex);
+		// this.drgLeft.node.getComponent(UIOpacity).opacity = 0;
+		// this.drgRight.node.getComponent(UIOpacity).opacity = 0;
+
+		// tween(this.drgLeft.node)
+		// 	.to(0, { position: v3(0, this._srcLeftPos.y, this._srcLeftPos.z) })
+		// 	.start();
+
+		// tween(this.drgRight.node)
+		// 	.to(0, { position: v3(0, this._srcRightPos.y, this._srcRightPos.z) })
+		// 	.start();
 
 		this._srcRankPos = this.btnRank.node.getPosition();
 		this._srcSettingPos = this.btnSetting.node.getPosition();
@@ -172,18 +195,14 @@ export class Main extends Component {
 		);
 	}
 
-	start() {
-		this.dragonBook.node.active = true;
-		this.dragonBook.playAnimation('appear', 1);
-
-		this.drgGirl.playAnimation('appear', 1);
-	}
+	start() {}
 
 	private _dragonBookListener(event) {
 		if (event.animationState.name === 'appear') {
 			if (this._bOpenLevelImmediately) {
 				this.onBtnClickToLevel();
 			} else {
+				this.bgMask.active = false;
 				this.dragonBook.playAnimation('usual', 0);
 				tween(this.btnSetting.node)
 					.to(0.5, { position: this._srcSettingPos }, { easing: 'sineInOut' })
@@ -463,6 +482,9 @@ export class Main extends Component {
 		tween(this.dragonBook.node).to(1, { position: leftPos }).start();
 		this.btnNext.node.active = false;
 		this.btnPrev.node.active = false;
+
+		this.drgLeft.node.active = false;
+		this.drgRight.node.active = false;
 	}
 
 	public showMain() {
@@ -472,6 +494,11 @@ export class Main extends Component {
 		this.dragonBook.playAnimation('appear', 1);
 		const { y } = this.drgGirl.node.getPosition();
 		this.drgGirl.node.setPosition(0, y + 50);
+		this.drgLeft.node.active = true;
+		this.drgLeft.playAnimation('usual', 0);
+		this.drgRight.node.active = true;
+		this.drgRight.playAnimation('usual', 0);
+		this.bgMask.active = true;
 	}
 	public showLevel() {
 		this._bOpenLevelImmediately = true;
