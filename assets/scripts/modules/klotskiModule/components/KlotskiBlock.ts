@@ -193,6 +193,7 @@ export class KlotskiBlock extends Component {
 			}
 			if (event.animationState.name === 'usual') {
 				this.isPlaying = false;
+				// if(this.dragonBlock.name)
 			}
 		}
 	}

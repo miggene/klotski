@@ -496,6 +496,10 @@ export class KlotskiView extends Component {
 	}
 
 	_tchS(e: EventTouch) {
+		if (this.level === 1 && this.finger.node.active) {
+			this.finger.node.active = !this.finger.node.active;
+		}
+
 		audioMgr.playSound(SOUND_CLIPS.CLICK_FOOD);
 		const wp = e.getUILocation();
 		const lp = this.gridLayer

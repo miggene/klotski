@@ -3948,11 +3948,11 @@
     "premultipliedAlpha": false,
     "_defaultArmatureIndexValue": 0,
     "_dragonAsset": {
-      "__uuid__": "6c7d76fd-9b72-43c7-91bf-d2248716d8fc",
+      "__uuid__": "ea0fac45-f7d6-419b-8233-b7ba0e003980",
       "__expectedType__": "dragonBones.DragonBonesAsset"
     },
     "_dragonAtlasAsset": {
-      "__uuid__": "0c39aac7-30dd-4665-bd0b-6829d028f6cc",
+      "__uuid__": "2e7b4279-841c-4df5-87d0-405e98f556d1",
       "__expectedType__": "dragonBones.DragonBonesAtlasAsset"
     },
     "_armatureName": "Armature",
