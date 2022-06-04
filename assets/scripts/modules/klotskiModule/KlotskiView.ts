@@ -94,14 +94,14 @@ export class KlotskiView extends Component {
 		this.lblLevelIndex.string = `${v}`;
 	}
 
-	private _moveStep: number;
-	public get moveStep(): number {
-		return this._moveStep;
-	}
-	public set moveStep(v: number) {
-		this._moveStep = v;
-		this.lblMoveStep.string = `${v}`;
-	}
+	// private _moveStep: number;
+	// public get moveStep(): number {
+	// 	return this._moveStep;
+	// }
+	// public set moveStep(v: number) {
+	// 	this._moveStep = v;
+	// 	this.lblMoveStep.string = `${v}`;
+	// }
 
 	private _usedTime: number = 0;
 	public get usedTime(): number {
@@ -125,7 +125,9 @@ export class KlotskiView extends Component {
 	}
 	public set curBoardStep(v: number) {
 		this._curBoardStep = v;
-		this.lblMoveStep.string = `${v}`;
+		console.log('this.levelData :>> ', this.levelData);
+		const leftStep = this.levelData.mini - v;
+		this.lblMoveStep.string = `${leftStep >= 0 ? leftStep : 0}`;
 	}
 
 	private _levelData: ILevelData;
@@ -389,7 +391,6 @@ export class KlotskiView extends Component {
 		if (tarData.style === 4) {
 			const { blockName } = tarData;
 			const path = `foods/tipperFoods/${blockName}`;
-
 			this.spTipper.spriteFrame = await resMgr.loadSprite(path);
 		}
 		resMgr
@@ -888,6 +889,9 @@ export class KlotskiView extends Component {
 		this.dragonOven.playAnimation('disappear', 1);
 		this.dragonStick.timeScale = -1;
 		this.dragonStick.playAnimation('B', 1);
+
+		this.drgDog.node.active = false;
+		this.drgCat.node.active = false;
 	}
 
 	private _refreshUsualAnimation() {
