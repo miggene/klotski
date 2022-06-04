@@ -30,6 +30,7 @@ import {
 	director,
 	UIOpacity,
 	UITransformComponent,
+	resources,
 } from 'cc';
 import { audioMgr, SOUND_CLIPS } from '../../AudioMgr';
 import { resMgr } from '../../common/mgrs/ResMgr';
@@ -41,6 +42,7 @@ import { Main } from '../../Main';
 import { ILevelData } from '../levelsModule/ILevelsModule';
 import { OverView } from '../overModule/OverView';
 import { KlotskiBlock } from './components/KlotskiBlock';
+import { Finger } from './Finger';
 import { IBlock } from './IKlotskiModule';
 import {
 	BOARD_H,
@@ -211,6 +213,18 @@ export class KlotskiView extends Component {
 	@property(dragonBones.ArmatureDisplay)
 	drgTips: dragonBones.ArmatureDisplay;
 
+	@property(Node)
+	tipperLayer: Node;
+	@property(dragonBones.ArmatureDisplay)
+	drgTipper: dragonBones.ArmatureDisplay;
+	@property(Sprite)
+	spTipper: Sprite;
+
+	@property(Finger)
+	finger: Finger;
+
+	private _fingerPos: Vec3;
+
 	onLoad() {
 		this._initBoardState();
 		this.gridLayer.destroyAllChildren();
@@ -225,6 +239,9 @@ export class KlotskiView extends Component {
 
 		this.lblMoveStep.node.getComponent(UIOpacity).opacity = 0;
 		this.lblUsedTime.node.getComponent(UIOpacity).opacity = 0;
+
+		this.tipperLayer.active = true;
+		this.tipperLayer.getChildByName('mask').active = false;
 	}
 
 	onEnable() {
@@ -305,6 +322,11 @@ export class KlotskiView extends Component {
 		this.scheduleOnce(() => {
 			audioMgr.playSound(SOUND_CLIPS.FOOD_ENTER);
 		}, 2);
+
+		this.scheduleOnce(() => {
+			this.tipperLayer.getChildByName('mask').active = true;
+			this.drgTipper.playAnimation('in', 1);
+		}, 3);
 	}
 
 	private _initBoardState() {
@@ -364,6 +386,12 @@ export class KlotskiView extends Component {
 		// const tarData = (data as IBlock[]).find((v) => v.style === style);
 		const filterData = (data as IBlock[]).filter((v) => v.style === style);
 		const tarData = filterData[randomRangeInt(0, filterData.length)];
+		if (tarData.style === 4) {
+			const { blockName } = tarData;
+			const path = `foods/tipperFoods/${blockName}`;
+
+			this.spTipper.spriteFrame = await resMgr.loadSprite(path);
+		}
 		resMgr
 			.loadPrefab(FOOD_PATH)
 			.then((prefab) => {
@@ -377,6 +405,9 @@ export class KlotskiView extends Component {
 				const [x, y] = getBlockPositionByStyle(row, col, style);
 				// ndBlock.setPosition(x, y);
 				ndBlock.setPosition(x, y + 1000);
+				if (tarData.style === 4) {
+					this._fingerPos = v3(x, y, 0);
+				}
 				const size = getBlockContentSizeByStyle(style);
 				ndBlock.getComponent(UITransform).setContentSize(size[0], size[1]);
 
@@ -827,6 +858,9 @@ export class KlotskiView extends Component {
 		this.unschedule(this._updateUsedTime);
 		this.usedTime = 0;
 		this.schedule(this._updateUsedTime, 1);
+
+		this.tipperLayer.active = !this.tipperLayer.active;
+		this.tipperLayer.getChildByName('mask').active = false;
 	}
 
 	onBtnClickToHome() {
@@ -1031,6 +1065,14 @@ export class KlotskiView extends Component {
 		this.scheduleOnce(() => {
 			this.drgHome.playAnimation('b_standby', 1);
 		}, 5 + Math.floor(Math.random() * 5));
+	}
+
+	public onBtnClickToTipper() {
+		this.tipperLayer.active = !this.tipperLayer.active;
+		this.tipperLayer.getChildByName('mask').active = false;
+		if (this.level === 1 && this._fingerPos) {
+			this.finger.show(this._fingerPos);
+		}
 	}
 }
 
