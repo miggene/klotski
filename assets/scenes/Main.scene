@@ -506,7 +506,6 @@
     "_timeScale": 1,
     "_playTimes": -1,
     "_debugBones": false,
-    "_enableBatch": false,
     "_sockets": [],
     "_id": "d9vT2XFdpHRZZa78bF1GjO"
   },
@@ -618,7 +617,6 @@
     "_timeScale": 1,
     "_playTimes": -1,
     "_debugBones": false,
-    "_enableBatch": false,
     "_sockets": [],
     "_id": "acairk8b1C/LrG1mFA6pzQ"
   },
@@ -742,7 +740,6 @@
     "_timeScale": 1,
     "_playTimes": -1,
     "_debugBones": false,
-    "_enableBatch": false,
     "_sockets": [],
     "_id": "603EsAY0xIwoibeNc6uDJ2"
   },
@@ -3403,7 +3400,6 @@
     "_timeScale": 1,
     "_playTimes": -1,
     "_debugBones": false,
-    "_enableBatch": false,
     "_sockets": [],
     "_id": "f68S916GBGM7AZu9LxkhJB"
   },
@@ -3578,7 +3574,6 @@
     "_timeScale": 1,
     "_playTimes": -1,
     "_debugBones": false,
-    "_enableBatch": false,
     "_sockets": [],
     "_id": "f07VixeI5I6Jmn4GE8Kz3G"
   },
@@ -3967,7 +3962,6 @@
     "_timeScale": 1,
     "_playTimes": -1,
     "_debugBones": false,
-    "_enableBatch": false,
     "_sockets": [
       {
         "__id__": 110
@@ -5547,7 +5541,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": -167.79,
-      "y": 50.071,
+      "y": -14.118,
       "z": 0
     },
     "_lrot": {
@@ -5722,7 +5716,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 242.404,
-      "y": 50.071,
+      "y": -14.118,
       "z": 0
     },
     "_lrot": {

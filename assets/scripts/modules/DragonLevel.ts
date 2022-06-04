@@ -195,7 +195,9 @@ export class DragonLevel extends Component {
 			winMgr
 				.openWin(WIN_ID.KLOTSKI)
 				.then((nd: Node) => {
-					nd.getComponent(KlotskiView).initProps(this.levelDataList[level]);
+					nd.getComponent(KlotskiView).initProps(
+						this.levelDataList[level % Level_Per_Page]
+					);
 					// this.node.parent.parent.parent.parent.parent.destroy();
 					this.node.destroy();
 					const mainScript = this.node.parent.getComponent(Main);

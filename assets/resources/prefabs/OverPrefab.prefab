@@ -636,7 +636,6 @@
     "_timeScale": 1,
     "_playTimes": -1,
     "_debugBones": false,
-    "_enableBatch": false,
     "_sockets": [],
     "_id": ""
   },
@@ -762,7 +761,6 @@
     "_timeScale": 1,
     "_playTimes": -1,
     "_debugBones": false,
-    "_enableBatch": false,
     "_sockets": [],
     "_id": ""
   },
@@ -916,7 +914,6 @@
     "_timeScale": 1,
     "_playTimes": -1,
     "_debugBones": false,
-    "_enableBatch": false,
     "_sockets": [],
     "_id": ""
   },
@@ -1406,7 +1403,6 @@
     "_timeScale": 1,
     "_playTimes": -1,
     "_debugBones": false,
-    "_enableBatch": false,
     "_sockets": [
       {
         "__id__": 61
@@ -4247,7 +4243,6 @@
     "_timeScale": 1,
     "_playTimes": -1,
     "_debugBones": false,
-    "_enableBatch": false,
     "_sockets": [
       {
         "__id__": 185
@@ -4873,7 +4868,6 @@
     "_timeScale": 1,
     "_playTimes": -1,
     "_debugBones": false,
-    "_enableBatch": false,
     "_sockets": [],
     "_id": ""
   },

@@ -131,9 +131,14 @@ export class Main extends Component {
 		database.init();
 		resMgr.loadJson(LEVELS_DATA_PATH).then((data: ILevelData[]) => {
 			this.levelsData = data;
+			console.log('database.user.curLevel :>> ', database.user.curLevel);
+			this.curIndex = Math.floor(database.user.curLevel / Level_Per_Page);
+			console.log('this.curIndex :>> ', this.curIndex);
+			this.btnPrev.node.active = false;
+			this.btnNext.node.active = false;
 		});
-		this.btnPrev.node.active = false;
-		this.btnNext.node.active = false;
+		// this.btnPrev.node.active = false;
+		// this.btnNext.node.active = false;
 		this._srcLeftPos = this.drgLeft.node.getPosition();
 		this._srcRightPos = this.drgRight.node.getPosition();
 
@@ -148,10 +153,11 @@ export class Main extends Component {
 			v3(0, this._srcRightPos.y, this._srcRightPos.z)
 		);
 
-		const leftZIndex = this.drgLeft.node.getSiblingIndex();
-		const rightZIndex = this.drgRight.node.getSiblingIndex();
-		console.log('leftZIndex :>> ', leftZIndex);
-		console.log('rightZIndex :>> ', rightZIndex);
+		// const leftZIndex = this.drgLeft.node.getSiblingIndex();
+		// const rightZIndex = this.drgRight.node.getSiblingIndex();
+		// console.log('leftZIndex :>> ', leftZIndex);
+		// console.log('rightZIndex :>> ', rightZIndex);
+
 		// this.drgLeft.node.getComponent(UIOpacity).opacity = 0;
 		// this.drgRight.node.getComponent(UIOpacity).opacity = 0;
 
@@ -243,13 +249,14 @@ export class Main extends Component {
 				this.btnPrev.node.setSiblingIndex(100);
 				if (this.dragonBook.timeScale === -1) {
 					this.dragonBook.timeScale = 1;
+
 					this.dragonBook.playAnimation('usual', 0);
 					this.settingView.active = false;
 					this._animFromSetting = false;
 				}
 				return;
 			}
-			this.curIndex = 0;
+			this.curIndex = Math.floor(database.user.curLevel / Level_Per_Page);
 			if (this.dragonBook.timeScale === -1) {
 				this.btnNext.node.active = false;
 				this.btnPrev.node.active = false;
@@ -257,6 +264,7 @@ export class Main extends Component {
 				this.btnNext.node.setSiblingIndex(100);
 				this.btnPrev.node.setSiblingIndex(100);
 				this.dragonBook.timeScale = 1;
+
 				this.dragonBook.playAnimation('usual', 0);
 				this.node.getChildByName('DragonLevel')?.destroy();
 				tween(this.btnSetting.node)
@@ -274,7 +282,10 @@ export class Main extends Component {
 						position: this._srcRankPos,
 					})
 					.start();
+				this.drgLeft.node.active = true;
 				this.drgLeft.node.getComponent(UIOpacity).opacity = 255;
+
+				this.drgRight.node.active = true;
 				this.drgRight.node.getComponent(UIOpacity).opacity = 255;
 				tween(this.drgLeft.node)
 					.to(0.5, { position: this._srcLeftPos }, { easing: 'sineOutIn' })
@@ -322,6 +333,7 @@ export class Main extends Component {
 	}
 
 	private _createDragonLevel() {
+		console.log('this.curIndex :>> ', this.curIndex);
 		const [start, end] = [0, 1].map(
 			(v) => (v + this.curIndex) * Level_Per_Page
 		);
@@ -338,6 +350,10 @@ export class Main extends Component {
 
 	onBtnClickToLevel() {
 		console.log(`go to level`);
+
+		this.btnPrev.node.active = false;
+		this.btnNext.node.active = false;
+
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		this.drgLeft.node.getComponent(UIOpacity).opacity = 0;
 		this.drgRight.node.getComponent(UIOpacity).opacity = 0;
@@ -517,17 +533,28 @@ export class Main extends Component {
 			.getComponent(DragonLevel);
 		levelScript.hide(() => {
 			this._bOpenLevelImmediately = false;
+			this.dragonBook.node.setSiblingIndex(15);
 			this.dragonBook.timeScale = -1;
 			this.dragonBook.playAnimation('open_1', 1);
 			audioMgr.playSound(SOUND_CLIPS.FLIP);
 			const centerPos = v3(0, 0, 0);
 			this.dragonBook.node.setPosition(centerPos);
+			this.btnSetting.node.setSiblingIndex(15 + 1);
 		});
 	}
 	public showSettingToMain() {
 		this.dragonBook.timeScale = -1;
 		this.dragonBook.playAnimation('open_1', 1);
 		audioMgr.playSound(SOUND_CLIPS.FLIP);
+		this.scheduleOnce(() => {
+			this.dragonBook.node.setSiblingIndex(15);
+			this.btnSetting.node.setSiblingIndex(15 + 1);
+			tween(this.btnSetting.node)
+				.to(0.5, {
+					position: v3(this._srcSettingPos.x, this._srcSettingPos.y, 0),
+				})
+				.start();
+		}, 0.3);
 	}
 
 	onBtnClickToSetting() {
