@@ -102,6 +102,8 @@ export class KlotskiBlock extends Component {
 		this._isPlaying = v;
 	}
 
+	public bWin: boolean = false;
+
 	@property(Sprite)
 	spBlock: Sprite;
 
@@ -200,7 +202,9 @@ export class KlotskiBlock extends Component {
 
 	private _refreshUsualAnimation() {
 		if (this.isPlaying) return;
+		if (this.bWin) return;
 		this.scheduleOnce(() => {
+			if (this.bWin) return;
 			this.dragonBlock.playAnimation('usual', 1);
 			this.isPlaying = true;
 		}, randomRangeInt(2, 20));

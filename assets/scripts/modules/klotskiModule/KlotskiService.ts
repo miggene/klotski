@@ -374,8 +374,10 @@ export function moveBlock(
 	callbackFun: Function,
 	boardState: number[][],
 	blockObj: { [key: string]: Node },
+	updateMoveStep: Function,
 	winCb?: Function
 ) {
+	updateMoveStep();
 	let newX = block.getPosition().x;
 	let newY = block.getPosition().y;
 	let curAction = action.move[step];
@@ -458,7 +460,15 @@ export function moveBlock(
 		step += count;
 		if (step < action.move.length) {
 			//one step not finish move again
-			moveBlock(block, action, step, callbackFun, boardState, blockObj);
+			moveBlock(
+				block,
+				action,
+				step,
+				callbackFun,
+				boardState,
+				blockObj,
+				updateMoveStep
+			);
 		} else {
 			//finish one step move
 			// audioPlayWoodHit();

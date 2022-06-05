@@ -125,6 +125,17 @@ export class KlotskiView extends Component {
 	}
 	public set curBoardStep(v: number) {
 		this._curBoardStep = v;
+		// console.log('this.levelData :>> ', this.levelData);
+		// const leftStep = this.levelData.mini - v;
+		// this.lblMoveStep.string = `${leftStep >= 0 ? leftStep : 0}`;
+	}
+
+	private _moveStep: number = 0;
+	public get moveStep() {
+		return this._moveStep;
+	}
+	public set moveStep(v: number) {
+		this._moveStep = v;
 		console.log('this.levelData :>> ', this.levelData);
 		const leftStep = this.levelData.mini - v;
 		this.lblMoveStep.string = `${leftStep >= 0 ? leftStep : 0}`;
@@ -320,6 +331,7 @@ export class KlotskiView extends Component {
 		this.level = level;
 		this.board = board;
 		this.curBoardStep = 0;
+		this.moveStep = 0;
 		this._createBoard(board);
 		this.scheduleOnce(() => {
 			audioMgr.playSound(SOUND_CLIPS.FOOD_ENTER);
@@ -799,31 +811,36 @@ export class KlotskiView extends Component {
 			this._moveNext.bind(this),
 			this._boardState,
 			this._blockObj,
+			this.updateMoveStep.bind(this),
 			this._winCb.bind(this)
 		);
 	}
 
-	_moveLast(stepInfo: number[]) {
-		const maxStep = stepInfo.length;
-		// if (this.curBoardStep >= maxStep) return;
-		while (this.curBoardStep < maxStep) {
-			this.curBoardStep++;
-			const posInfo = stepInfo2PosInfo(this._stepInfo, this.curBoardStep);
-			const curBlock = this._blockObj[posInfo.id];
-			const style = curBlock.getComponent(KlotskiBlock).style;
-			setBoardState(this._boardState, posInfo.startX, posInfo.startY, style, 0);
-			setBoardState(
-				this._boardState,
-				posInfo.endX,
-				posInfo.endY,
-				style,
-				posInfo.id
-			);
-			curBlock.getComponent(KlotskiBlock).row = posInfo.endY;
-			curBlock.getComponent(KlotskiBlock).col = posInfo.endX;
-			const [x, y] = getBlockPositionByStyle(posInfo.endY, posInfo.endX, style);
-			curBlock.setPosition(x, y);
-		}
+	// private _moveLast(stepInfo: number[]) {
+	// 	const maxStep = stepInfo.length;
+	// 	// if (this.curBoardStep >= maxStep) return;
+	// 	while (this.curBoardStep < maxStep) {
+	// 		this.curBoardStep++;
+	// 		const posInfo = stepInfo2PosInfo(this._stepInfo, this.curBoardStep);
+	// 		const curBlock = this._blockObj[posInfo.id];
+	// 		const style = curBlock.getComponent(KlotskiBlock).style;
+	// 		setBoardState(this._boardState, posInfo.startX, posInfo.startY, style, 0);
+	// 		setBoardState(
+	// 			this._boardState,
+	// 			posInfo.endX,
+	// 			posInfo.endY,
+	// 			style,
+	// 			posInfo.id
+	// 		);
+	// 		curBlock.getComponent(KlotskiBlock).row = posInfo.endY;
+	// 		curBlock.getComponent(KlotskiBlock).col = posInfo.endX;
+	// 		const [x, y] = getBlockPositionByStyle(posInfo.endY, posInfo.endX, style);
+	// 		curBlock.setPosition(x, y);
+	// 	}
+	// }
+
+	public updateMoveStep() {
+		++this.moveStep;
 	}
 
 	private _winCb(block: Node) {
@@ -836,6 +853,7 @@ export class KlotskiView extends Component {
 				block
 					.getComponent(KlotskiBlock)
 					.dragonBlock.playAnimation('victory', 0);
+				block.getComponent(KlotskiBlock).bWin = true;
 				block.getComponent(KlotskiBlock).isPlaying = true;
 				const { blockName } = block.getComponent(KlotskiBlock);
 				winMgr.openWin(WIN_ID.OVER).then((ndWin: Node) => {
@@ -849,6 +867,10 @@ export class KlotskiView extends Component {
 			})
 			.start();
 	}
+
+	// public updateCurBoardStep() {
+	// 	this.curBoardStep++;
+	// }
 
 	onBtnClickToRetry() {
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
