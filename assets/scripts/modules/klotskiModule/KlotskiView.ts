@@ -139,6 +139,13 @@ export class KlotskiView extends Component {
 		console.log('this.levelData :>> ', this.levelData);
 		const leftStep = this.levelData.mini - v;
 		this.lblMoveStep.string = `${leftStep >= 0 ? leftStep : 0}`;
+
+		if (!this._bInTip && leftStep <= 0) {
+			this.scheduleOnce(() => {
+				if (this._bWin) return;
+				this._fail();
+			}, 1);
+		}
 	}
 
 	private _levelData: ILevelData;
@@ -238,6 +245,9 @@ export class KlotskiView extends Component {
 
 	private _fingerPos: Vec3;
 
+	private _bInTip = false;
+	private _bWin = false;
+
 	onLoad() {
 		this._initBoardState();
 		this.gridLayer.destroyAllChildren();
@@ -268,7 +278,7 @@ export class KlotskiView extends Component {
 
 	start() {
 		this._initBg();
-		this.schedule(this._updateUsedTime, 1);
+		// this.schedule(this._updateUsedTime, 1);
 		this.scheduleOnce(() => {
 			const parentWidth =
 				this.dragonStick.node.parent.getComponent(UITransform).width;
@@ -332,6 +342,7 @@ export class KlotskiView extends Component {
 		this.board = board;
 		this.curBoardStep = 0;
 		this.moveStep = 0;
+		this.usedTime = 0;
 		this._createBoard(board);
 		this.scheduleOnce(() => {
 			audioMgr.playSound(SOUND_CLIPS.FOOD_ENTER);
@@ -732,6 +743,7 @@ export class KlotskiView extends Component {
 	}
 
 	onBtnClickToTip(e: EventTouch) {
+		this._bInTip = true;
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		const klotskiSolver = new KlotskiSolver(
 			boardState2BoardString(this._boardState, this._blockObj)
@@ -844,6 +856,7 @@ export class KlotskiView extends Component {
 	}
 
 	private _winCb(block: Node) {
+		this._bWin = true;
 		this.unschedule(this._updateUsedTime);
 		tween(block)
 			.delay(0.5)
@@ -892,9 +905,13 @@ export class KlotskiView extends Component {
 
 	onBtnClickToHome() {
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+		const mainScript = this.node.parent.parent.getComponent(Main);
+		mainScript.showMain();
+
+		this.drgTips.node.active = false;
 		this._playKnifeForkAnimationOut(() => {
-			const mainScript = this.node.parent.parent.getComponent(Main);
-			mainScript.showMain();
+			// const mainScript = this.node.parent.parent.getComponent(Main);
+			// mainScript.showMain();
 			this.node.destroy();
 		});
 		this.gridLayer.children.forEach((child) =>
@@ -914,22 +931,6 @@ export class KlotskiView extends Component {
 
 		this.drgDog.node.active = false;
 		this.drgCat.node.active = false;
-	}
-
-	private _refreshUsualAnimation() {
-		const num = randomRangeInt(1, 3);
-		const len = Object.keys(this._blockObj).length;
-		let idList: number[] = Array(len)
-			.fill(0)
-			.map((v, index) => index + 1);
-		const id1 = randomRangeInt(1, len + 1);
-		if (this._targetId === id1) return;
-
-		if (this._blockObj[id1].getComponent(KlotskiBlock).isPlaying) return;
-		this._blockObj[id1]
-			.getComponent(KlotskiBlock)
-			.dragonBlock.playAnimation('usual', 1);
-		this._blockObj[id1].getComponent(KlotskiBlock).isPlaying = true;
 	}
 
 	private _getRandomBasePos() {
@@ -1103,6 +1104,15 @@ export class KlotskiView extends Component {
 		if (this.level === 1 && this._fingerPos) {
 			this.finger.show(this._fingerPos);
 		}
+
+		this.schedule(this._updateUsedTime, 1);
+	}
+
+	private _fail() {
+		this.unschedule(this._updateUsedTime);
+		winMgr.openWin(WIN_ID.OVER).then((ndWin: Node) => {
+			ndWin.getComponent(OverView).fail();
+		});
 	}
 }
 

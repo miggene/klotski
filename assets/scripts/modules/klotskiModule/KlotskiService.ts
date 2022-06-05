@@ -377,7 +377,7 @@ export function moveBlock(
 	updateMoveStep: Function,
 	winCb?: Function
 ) {
-	updateMoveStep();
+	// updateMoveStep();
 	let newX = block.getPosition().x;
 	let newY = block.getPosition().y;
 	let curAction = action.move[step];
@@ -487,6 +487,7 @@ export function moveBlock(
 		}
 	});
 	audioMgr.playSound(SOUND_CLIPS.SLIDE);
+	updateMoveStep();
 	tween(block)
 		.then(moveAct)
 		.call(() => {
