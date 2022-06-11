@@ -41,7 +41,7 @@ import KlotskiSolver from '../../libs/klotskiLibs/KlotskiSolver';
 import { Main } from '../../Main';
 import { ILevelData } from '../levelsModule/ILevelsModule';
 import { OverView } from '../overModule/OverView';
-import { KlotskiBlock } from './components/KlotskiBlock';
+import { BurnStatus, KlotskiBlock } from './components/KlotskiBlock';
 import { Finger } from './Finger';
 import { IBlock } from './IKlotskiModule';
 import {
@@ -247,6 +247,7 @@ export class KlotskiView extends Component {
 
 	private _bInTip = false;
 	private _bWin = false;
+	private _tarBlock: Node;
 
 	onLoad() {
 		this._initBoardState();
@@ -431,6 +432,7 @@ export class KlotskiView extends Component {
 				ndBlock.setPosition(x, y + 1000);
 				if (tarData.style === 4) {
 					this._fingerPos = v3(x, y, 0);
+					this._tarBlock = ndBlock;
 				}
 				const size = getBlockContentSizeByStyle(style);
 				ndBlock.getComponent(UITransform).setContentSize(size[0], size[1]);
@@ -740,6 +742,14 @@ export class KlotskiView extends Component {
 
 	private _updateUsedTime() {
 		this.usedTime++;
+
+		if (this.usedTime > 10 && this.usedTime <= 30) {
+			// t1
+			this._tarBlock.getComponent(KlotskiBlock).burnStatus = BurnStatus.T1;
+		} else if (this._usedTime > 30 && this._usedTime <= 60) {
+			// m1
+			this._tarBlock.getComponent(KlotskiBlock).burnStatus = BurnStatus.M1;
+		}
 	}
 
 	onBtnClickToTip(e: EventTouch) {
@@ -1108,10 +1118,11 @@ export class KlotskiView extends Component {
 		this.schedule(this._updateUsedTime, 1);
 	}
 
-	private _fail() {
+	private _fail(curLevel: number = this.level) {
 		this.unschedule(this._updateUsedTime);
+		this._tarBlock.getComponent(KlotskiBlock).burnStatus = BurnStatus.Black;
 		winMgr.openWin(WIN_ID.OVER).then((ndWin: Node) => {
-			ndWin.getComponent(OverView).fail();
+			ndWin.getComponent(OverView).fail(curLevel);
 		});
 	}
 }

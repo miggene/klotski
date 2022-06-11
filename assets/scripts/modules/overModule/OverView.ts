@@ -80,6 +80,7 @@ export class OverView extends Component {
 	}
 
 	private _blockName: string;
+	private _bFail: boolean = false;
 
 	@property(Node)
 	winTip: Node;
@@ -228,6 +229,9 @@ export class OverView extends Component {
 	public async onBtnClickToNext() {
 		audioMgr.playBgMusic();
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+
+		if (this._bFail) return;
+
 		winMgr.clearWin();
 		const levelsData = await dataMgr.getlevelsDataCache();
 		// this.level++;
@@ -274,7 +278,9 @@ export class OverView extends Component {
 		}
 	}
 
-	public fail() {
+	public fail(curLevel: number) {
+		this._bFail = true;
+		this.level = curLevel;
 		this.node.getChildByName('mask').active = true;
 		audioMgr.stopBgMusic();
 		audioMgr.playSound(SOUND_CLIPS.FAIL);
