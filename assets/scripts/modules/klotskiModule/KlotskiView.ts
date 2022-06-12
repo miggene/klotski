@@ -758,7 +758,7 @@ export class KlotskiView extends Component {
 		if (this.usedTime > 10 && this.usedTime <= 30) {
 			// t1
 			this._tarBlock.getComponent(KlotskiBlock).burnStatus = BurnStatus.T1;
-		} else if (this._usedTime > 30 && this._usedTime <= 60) {
+		} else if (this._usedTime > 30) {
 			// m1
 			this._tarBlock.getComponent(KlotskiBlock).burnStatus = BurnStatus.M1;
 		}
