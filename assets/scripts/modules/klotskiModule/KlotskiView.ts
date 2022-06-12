@@ -1140,6 +1140,7 @@ export class KlotskiView extends Component {
 	}
 
 	private _showContinue() {
+		audioMgr.playSound(SOUND_CLIPS.CLICK_FOOD);
 		this.continueLayer.active = true;
 		this.unschedule(this._updateUsedTime);
 
