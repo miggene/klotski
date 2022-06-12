@@ -1,1 +1,1 @@
-{"name":"fail","height":1024,"SubTexture":[{"name":"vvvvv/b","x":1,"height":746,"y":1,"width":985},{"name":"vvvvv/w","x":1,"frameWidth":235,"height":239,"y":749,"frameHeight":254,"frameX":0,"frameY":-15,"width":235},{"name":"vvvvv/gas","x":238,"height":61,"y":749,"width":71}],"imagePath":"fail_tex.png","width":1024}
+{"name":"fail","height":1024,"SubTexture":[{"name":"vvvvv/b","x":1,"height":746,"y":1,"width":985},{"name":"vvvvv/gas","x":1,"height":61,"y":749,"width":71}],"imagePath":"fail_tex.png","width":1024}

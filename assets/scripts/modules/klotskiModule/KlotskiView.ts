@@ -1121,8 +1121,9 @@ export class KlotskiView extends Component {
 	private _fail(curLevel: number = this.level) {
 		this.unschedule(this._updateUsedTime);
 		this._tarBlock.getComponent(KlotskiBlock).burnStatus = BurnStatus.Black;
+		const blockName = this._tarBlock.getComponent(KlotskiBlock).blockName;
 		winMgr.openWin(WIN_ID.OVER).then((ndWin: Node) => {
-			ndWin.getComponent(OverView).fail(curLevel);
+			ndWin.getComponent(OverView).fail(curLevel, blockName);
 		});
 	}
 }

@@ -86,5 +86,9 @@
 	{
 		"blockName": "toast",
 		"style": 4
+	},
+	{
+		"blockName": "FriedEggs",
+		"style": 4
 	}
 ]

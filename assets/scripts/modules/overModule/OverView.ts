@@ -17,6 +17,7 @@ import {
 	UIOpacity,
 	tween,
 	Label,
+	Sprite,
 } from 'cc';
 import { audioMgr, SOUND_CLIPS } from '../../AudioMgr';
 import { dataMgr } from '../../common/mgrs/DataMgr';
@@ -108,6 +109,9 @@ export class OverView extends Component {
 
 	@property(dragonBones.ArmatureDisplay)
 	drgPaper: dragonBones.ArmatureDisplay;
+
+	@property(Sprite)
+	spFailedFood: Sprite;
 
 	onLoad() {
 		this.drgFail.node.active = false;
@@ -278,7 +282,7 @@ export class OverView extends Component {
 		}
 	}
 
-	public fail(curLevel: number) {
+	public async fail(curLevel: number, blockName: string) {
 		this._bFail = true;
 		this.level = curLevel;
 		this.node.getChildByName('mask').active = true;
@@ -292,6 +296,10 @@ export class OverView extends Component {
 			this
 		);
 		this.drgFail.playAnimation('on', 1);
+
+		this.spFailedFood.spriteFrame = await resMgr.loadSprite(
+			`foods/failedFoods/${blockName}`
+		);
 	}
 
 	private _failEventHandler(event) {
