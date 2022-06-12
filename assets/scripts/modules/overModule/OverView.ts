@@ -110,9 +110,6 @@ export class OverView extends Component {
 	@property(dragonBones.ArmatureDisplay)
 	drgPaper: dragonBones.ArmatureDisplay;
 
-	@property(Sprite)
-	spFailedFood: Sprite;
-
 	onLoad() {
 		this.drgFail.node.active = false;
 		this.drgEnd.node.active = false;
@@ -297,9 +294,9 @@ export class OverView extends Component {
 		);
 		this.drgFail.playAnimation('on', 1);
 
-		this.spFailedFood.spriteFrame = await resMgr.loadSprite(
-			`foods/failedFoods/${blockName}`
-		);
+		const slot = this.drgFail.armature().getSlot('w');
+		const index = ['zongzi', 'FriedEggs', 'chips', 'toast'].indexOf(blockName);
+		slot.displayIndex = index >= 0 ? index : 0;
 	}
 
 	private _failEventHandler(event) {

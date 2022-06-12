@@ -143,7 +143,8 @@ export class KlotskiView extends Component {
 		if (!this._bInTip && leftStep <= 0) {
 			this.scheduleOnce(() => {
 				if (this._bWin) return;
-				this._fail();
+				// this._fail();
+				this._showContinue();
 			}, 1);
 		}
 	}
@@ -237,11 +238,14 @@ export class KlotskiView extends Component {
 	tipperLayer: Node;
 	@property(dragonBones.ArmatureDisplay)
 	drgTipper: dragonBones.ArmatureDisplay;
-	@property(Sprite)
-	spTipper: Sprite;
+	// @property(Sprite)
+	// spTipper: Sprite;
 
 	@property(Finger)
 	finger: Finger;
+
+	@property(Node)
+	continueLayer: Node;
 
 	private _fingerPos: Vec3;
 
@@ -266,6 +270,8 @@ export class KlotskiView extends Component {
 
 		this.tipperLayer.active = true;
 		this.tipperLayer.getChildByName('mask').active = false;
+
+		this.continueLayer.active = false;
 	}
 
 	onEnable() {
@@ -352,6 +358,11 @@ export class KlotskiView extends Component {
 		this.scheduleOnce(() => {
 			this.tipperLayer.getChildByName('mask').active = true;
 			this.drgTipper.playAnimation('in', 1);
+			const slot = this.drgTipper.armature().getSlot('x');
+			const index = ['zongzi', 'chips', 'toast', 'FriedEggs'].indexOf(
+				this._tarBlock.getComponent(KlotskiBlock).blockName
+			);
+			slot.displayIndex = index >= 0 ? index : 0;
 		}, 3);
 	}
 
@@ -412,11 +423,11 @@ export class KlotskiView extends Component {
 		// const tarData = (data as IBlock[]).find((v) => v.style === style);
 		const filterData = (data as IBlock[]).filter((v) => v.style === style);
 		const tarData = filterData[randomRangeInt(0, filterData.length)];
-		if (tarData.style === 4) {
-			const { blockName } = tarData;
-			const path = `foods/tipperFoods/${blockName}`;
-			this.spTipper.spriteFrame = await resMgr.loadSprite(path);
-		}
+		// if (tarData.style === 4) {
+		// 	const { blockName } = tarData;
+		// 	const path = `foods/tipperFoods/${blockName}`;
+		// 	this.spTipper.spriteFrame = await resMgr.loadSprite(path);
+		// }
 		resMgr
 			.loadPrefab(FOOD_PATH)
 			.then((prefab) => {
@@ -522,6 +533,7 @@ export class KlotskiView extends Component {
 	}
 
 	_tchS(e: EventTouch) {
+		if (this.lblMoveStep.string === '0') return;
 		if (this.level === 1 && this.finger.node.active) {
 			this.finger.node.active = !this.finger.node.active;
 		}
@@ -1125,6 +1137,33 @@ export class KlotskiView extends Component {
 		winMgr.openWin(WIN_ID.OVER).then((ndWin: Node) => {
 			ndWin.getComponent(OverView).fail(curLevel, blockName);
 		});
+	}
+
+	private _showContinue() {
+		this.continueLayer.active = true;
+		this.unschedule(this._updateUsedTime);
+
+		const btnOkNode = this.continueLayer.getChildByName('btnOkNode');
+		btnOkNode.setScale(v3(1, 1, 0));
+		tween(btnOkNode)
+			.repeatForever(
+				tween(btnOkNode)
+					.to(0.5, { scale: v3(1.2, 1.2, 0) })
+					.to(0.5, { scale: v3(1, 1, 0) })
+			)
+			.start();
+	}
+
+	onBtnClickToOk() {
+		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+		this.moveStep = this.levelData.mini - 3;
+		this.continueLayer.active = false;
+		this.schedule(this._updateUsedTime, 1);
+	}
+	onBtnClickToCancel() {
+		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+		this.continueLayer.active = false;
+		this._fail();
 	}
 }
 
