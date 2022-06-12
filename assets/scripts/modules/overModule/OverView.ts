@@ -228,10 +228,9 @@ export class OverView extends Component {
 		}
 	}
 	public async onBtnClickToNext() {
+		if (this._bFail) return;
 		audioMgr.playBgMusic();
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
-
-		if (this._bFail) return;
 
 		winMgr.clearWin();
 		const levelsData = await dataMgr.getlevelsDataCache();
