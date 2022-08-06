@@ -22,15 +22,10 @@ import {
 	UITransform,
 	Sprite,
 	dragonBones,
-	bezierByTime,
 	randomRange,
 	TweenEasing,
-	View,
 	random,
-	director,
 	UIOpacity,
-	UITransformComponent,
-	resources,
 } from 'cc';
 import { audioMgr, SOUND_CLIPS } from '../../AudioMgr';
 import { resMgr } from '../../common/mgrs/ResMgr';
