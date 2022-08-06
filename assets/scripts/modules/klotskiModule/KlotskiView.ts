@@ -22,15 +22,10 @@ import {
 	UITransform,
 	Sprite,
 	dragonBones,
-	bezierByTime,
 	randomRange,
 	TweenEasing,
-	View,
 	random,
-	director,
 	UIOpacity,
-	UITransformComponent,
-	resources,
 } from 'cc';
 import { audioMgr, SOUND_CLIPS } from '../../AudioMgr';
 import { resMgr } from '../../common/mgrs/ResMgr';
@@ -41,7 +36,7 @@ import KlotskiSolver from '../../libs/klotskiLibs/KlotskiSolver';
 import { Main } from '../../Main';
 import { ILevelData } from '../levelsModule/ILevelsModule';
 import { OverView } from '../overModule/OverView';
-import { KlotskiBlock } from './components/KlotskiBlock';
+import { BurnStatus, KlotskiBlock } from './components/KlotskiBlock';
 import { Finger } from './Finger';
 import { IBlock } from './IKlotskiModule';
 import {
@@ -94,14 +89,14 @@ export class KlotskiView extends Component {
 		this.lblLevelIndex.string = `${v}`;
 	}
 
-	private _moveStep: number;
-	public get moveStep(): number {
-		return this._moveStep;
-	}
-	public set moveStep(v: number) {
-		this._moveStep = v;
-		this.lblMoveStep.string = `${v}`;
-	}
+	// private _moveStep: number;
+	// public get moveStep(): number {
+	// 	return this._moveStep;
+	// }
+	// public set moveStep(v: number) {
+	// 	this._moveStep = v;
+	// 	this.lblMoveStep.string = `${v}`;
+	// }
 
 	private _usedTime: number = 0;
 	public get usedTime(): number {
@@ -125,7 +120,28 @@ export class KlotskiView extends Component {
 	}
 	public set curBoardStep(v: number) {
 		this._curBoardStep = v;
-		this.lblMoveStep.string = `${v}`;
+		// console.log('this.levelData :>> ', this.levelData);
+		// const leftStep = this.levelData.mini - v;
+		// this.lblMoveStep.string = `${leftStep >= 0 ? leftStep : 0}`;
+	}
+
+	private _moveStep: number = 0;
+	public get moveStep() {
+		return this._moveStep;
+	}
+	public set moveStep(v: number) {
+		this._moveStep = v;
+		console.log('this.levelData :>> ', this.levelData);
+		const leftStep = this.levelData.mini - v;
+		this.lblMoveStep.string = `${leftStep >= 0 ? leftStep : 0}`;
+
+		if (!this._bInTip && leftStep <= 0) {
+			this.scheduleOnce(() => {
+				if (this._bWin) return;
+				// this._fail();
+				this._showContinue();
+			}, 1);
+		}
 	}
 
 	private _levelData: ILevelData;
@@ -217,13 +233,20 @@ export class KlotskiView extends Component {
 	tipperLayer: Node;
 	@property(dragonBones.ArmatureDisplay)
 	drgTipper: dragonBones.ArmatureDisplay;
-	@property(Sprite)
-	spTipper: Sprite;
+	// @property(Sprite)
+	// spTipper: Sprite;
 
 	@property(Finger)
 	finger: Finger;
 
+	@property(Node)
+	continueLayer: Node;
+
 	private _fingerPos: Vec3;
+
+	private _bInTip = false;
+	private _bWin = false;
+	private _tarBlock: Node;
 
 	onLoad() {
 		this._initBoardState();
@@ -242,6 +265,8 @@ export class KlotskiView extends Component {
 
 		this.tipperLayer.active = true;
 		this.tipperLayer.getChildByName('mask').active = false;
+
+		this.continueLayer.active = false;
 	}
 
 	onEnable() {
@@ -255,7 +280,7 @@ export class KlotskiView extends Component {
 
 	start() {
 		this._initBg();
-		this.schedule(this._updateUsedTime, 1);
+		// this.schedule(this._updateUsedTime, 1);
 		this.scheduleOnce(() => {
 			const parentWidth =
 				this.dragonStick.node.parent.getComponent(UITransform).width;
@@ -318,6 +343,8 @@ export class KlotskiView extends Component {
 		this.level = level;
 		this.board = board;
 		this.curBoardStep = 0;
+		this.moveStep = 0;
+		this.usedTime = 0;
 		this._createBoard(board);
 		this.scheduleOnce(() => {
 			audioMgr.playSound(SOUND_CLIPS.FOOD_ENTER);
@@ -326,6 +353,11 @@ export class KlotskiView extends Component {
 		this.scheduleOnce(() => {
 			this.tipperLayer.getChildByName('mask').active = true;
 			this.drgTipper.playAnimation('in', 1);
+			const slot = this.drgTipper.armature().getSlot('x');
+			const index = ['zongzi', 'chips', 'toast', 'FriedEggs'].indexOf(
+				this._tarBlock.getComponent(KlotskiBlock).blockName
+			);
+			slot.displayIndex = index >= 0 ? index : 0;
 		}, 3);
 	}
 
@@ -386,12 +418,11 @@ export class KlotskiView extends Component {
 		// const tarData = (data as IBlock[]).find((v) => v.style === style);
 		const filterData = (data as IBlock[]).filter((v) => v.style === style);
 		const tarData = filterData[randomRangeInt(0, filterData.length)];
-		if (tarData.style === 4) {
-			const { blockName } = tarData;
-			const path = `foods/tipperFoods/${blockName}`;
-
-			this.spTipper.spriteFrame = await resMgr.loadSprite(path);
-		}
+		// if (tarData.style === 4) {
+		// 	const { blockName } = tarData;
+		// 	const path = `foods/tipperFoods/${blockName}`;
+		// 	this.spTipper.spriteFrame = await resMgr.loadSprite(path);
+		// }
 		resMgr
 			.loadPrefab(FOOD_PATH)
 			.then((prefab) => {
@@ -407,6 +438,7 @@ export class KlotskiView extends Component {
 				ndBlock.setPosition(x, y + 1000);
 				if (tarData.style === 4) {
 					this._fingerPos = v3(x, y, 0);
+					this._tarBlock = ndBlock;
 				}
 				const size = getBlockContentSizeByStyle(style);
 				ndBlock.getComponent(UITransform).setContentSize(size[0], size[1]);
@@ -496,6 +528,7 @@ export class KlotskiView extends Component {
 	}
 
 	_tchS(e: EventTouch) {
+		if (this.lblMoveStep.string === '0') return;
 		if (this.level === 1 && this.finger.node.active) {
 			this.finger.node.active = !this.finger.node.active;
 		}
@@ -716,9 +749,18 @@ export class KlotskiView extends Component {
 
 	private _updateUsedTime() {
 		this.usedTime++;
+
+		if (this.usedTime > 10 && this.usedTime <= 30) {
+			// t1
+			this._tarBlock.getComponent(KlotskiBlock).burnStatus = BurnStatus.T1;
+		} else if (this._usedTime > 30) {
+			// m1
+			this._tarBlock.getComponent(KlotskiBlock).burnStatus = BurnStatus.M1;
+		}
 	}
 
 	onBtnClickToTip(e: EventTouch) {
+		this._bInTip = true;
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		const klotskiSolver = new KlotskiSolver(
 			boardState2BoardString(this._boardState, this._blockObj)
@@ -798,34 +840,40 @@ export class KlotskiView extends Component {
 			this._moveNext.bind(this),
 			this._boardState,
 			this._blockObj,
+			this.updateMoveStep.bind(this),
 			this._winCb.bind(this)
 		);
 	}
 
-	_moveLast(stepInfo: number[]) {
-		const maxStep = stepInfo.length;
-		// if (this.curBoardStep >= maxStep) return;
-		while (this.curBoardStep < maxStep) {
-			this.curBoardStep++;
-			const posInfo = stepInfo2PosInfo(this._stepInfo, this.curBoardStep);
-			const curBlock = this._blockObj[posInfo.id];
-			const style = curBlock.getComponent(KlotskiBlock).style;
-			setBoardState(this._boardState, posInfo.startX, posInfo.startY, style, 0);
-			setBoardState(
-				this._boardState,
-				posInfo.endX,
-				posInfo.endY,
-				style,
-				posInfo.id
-			);
-			curBlock.getComponent(KlotskiBlock).row = posInfo.endY;
-			curBlock.getComponent(KlotskiBlock).col = posInfo.endX;
-			const [x, y] = getBlockPositionByStyle(posInfo.endY, posInfo.endX, style);
-			curBlock.setPosition(x, y);
-		}
+	// private _moveLast(stepInfo: number[]) {
+	// 	const maxStep = stepInfo.length;
+	// 	// if (this.curBoardStep >= maxStep) return;
+	// 	while (this.curBoardStep < maxStep) {
+	// 		this.curBoardStep++;
+	// 		const posInfo = stepInfo2PosInfo(this._stepInfo, this.curBoardStep);
+	// 		const curBlock = this._blockObj[posInfo.id];
+	// 		const style = curBlock.getComponent(KlotskiBlock).style;
+	// 		setBoardState(this._boardState, posInfo.startX, posInfo.startY, style, 0);
+	// 		setBoardState(
+	// 			this._boardState,
+	// 			posInfo.endX,
+	// 			posInfo.endY,
+	// 			style,
+	// 			posInfo.id
+	// 		);
+	// 		curBlock.getComponent(KlotskiBlock).row = posInfo.endY;
+	// 		curBlock.getComponent(KlotskiBlock).col = posInfo.endX;
+	// 		const [x, y] = getBlockPositionByStyle(posInfo.endY, posInfo.endX, style);
+	// 		curBlock.setPosition(x, y);
+	// 	}
+	// }
+
+	public updateMoveStep() {
+		++this.moveStep;
 	}
 
 	private _winCb(block: Node) {
+		this._bWin = true;
 		this.unschedule(this._updateUsedTime);
 		tween(block)
 			.delay(0.5)
@@ -835,6 +883,7 @@ export class KlotskiView extends Component {
 				block
 					.getComponent(KlotskiBlock)
 					.dragonBlock.playAnimation('victory', 0);
+				block.getComponent(KlotskiBlock).bWin = true;
 				block.getComponent(KlotskiBlock).isPlaying = true;
 				const { blockName } = block.getComponent(KlotskiBlock);
 				winMgr.openWin(WIN_ID.OVER).then((ndWin: Node) => {
@@ -848,6 +897,10 @@ export class KlotskiView extends Component {
 			})
 			.start();
 	}
+
+	// public updateCurBoardStep() {
+	// 	this.curBoardStep++;
+	// }
 
 	onBtnClickToRetry() {
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
@@ -869,9 +922,13 @@ export class KlotskiView extends Component {
 
 	onBtnClickToHome() {
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+		const mainScript = this.node.parent.parent.getComponent(Main);
+		mainScript.showMain();
+
+		this.drgTips.node.active = false;
 		this._playKnifeForkAnimationOut(() => {
-			const mainScript = this.node.parent.parent.getComponent(Main);
-			mainScript.showMain();
+			// const mainScript = this.node.parent.parent.getComponent(Main);
+			// mainScript.showMain();
 			this.node.destroy();
 		});
 		this.gridLayer.children.forEach((child) =>
@@ -888,22 +945,9 @@ export class KlotskiView extends Component {
 		this.dragonOven.playAnimation('disappear', 1);
 		this.dragonStick.timeScale = -1;
 		this.dragonStick.playAnimation('B', 1);
-	}
 
-	private _refreshUsualAnimation() {
-		const num = randomRangeInt(1, 3);
-		const len = Object.keys(this._blockObj).length;
-		let idList: number[] = Array(len)
-			.fill(0)
-			.map((v, index) => index + 1);
-		const id1 = randomRangeInt(1, len + 1);
-		if (this._targetId === id1) return;
-
-		if (this._blockObj[id1].getComponent(KlotskiBlock).isPlaying) return;
-		this._blockObj[id1]
-			.getComponent(KlotskiBlock)
-			.dragonBlock.playAnimation('usual', 1);
-		this._blockObj[id1].getComponent(KlotskiBlock).isPlaying = true;
+		this.drgDog.node.active = false;
+		this.drgCat.node.active = false;
 	}
 
 	private _getRandomBasePos() {
@@ -1077,6 +1121,45 @@ export class KlotskiView extends Component {
 		if (this.level === 1 && this._fingerPos) {
 			this.finger.show(this._fingerPos);
 		}
+
+		this.schedule(this._updateUsedTime, 1);
+	}
+
+	private _fail(curLevel: number = this.level) {
+		this.unschedule(this._updateUsedTime);
+		this._tarBlock.getComponent(KlotskiBlock).burnStatus = BurnStatus.Black;
+		const blockName = this._tarBlock.getComponent(KlotskiBlock).blockName;
+		winMgr.openWin(WIN_ID.OVER).then((ndWin: Node) => {
+			ndWin.getComponent(OverView).fail(curLevel, blockName);
+		});
+	}
+
+	private _showContinue() {
+		audioMgr.playSound(SOUND_CLIPS.CLICK_FOOD);
+		this.continueLayer.active = true;
+		this.unschedule(this._updateUsedTime);
+
+		const btnOkNode = this.continueLayer.getChildByName('btnOkNode');
+		btnOkNode.setScale(v3(1, 1, 0));
+		tween(btnOkNode)
+			.repeatForever(
+				tween(btnOkNode)
+					.to(0.5, { scale: v3(1.2, 1.2, 0) })
+					.to(0.5, { scale: v3(1, 1, 0) })
+			)
+			.start();
+	}
+
+	onBtnClickToOk() {
+		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+		this.moveStep = this.levelData.mini - 3;
+		this.continueLayer.active = false;
+		this.schedule(this._updateUsedTime, 1);
+	}
+	onBtnClickToCancel() {
+		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+		this.continueLayer.active = false;
+		this._fail();
 	}
 }
 

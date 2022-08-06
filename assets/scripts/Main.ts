@@ -116,7 +116,6 @@ export class Main extends Component {
 	private _srcRankPos: Vec3;
 	private _srcDinnerPos: Vec3;
 
-	private _srcCookGirlPos: Vec3;
 	private _animFromSetting = false;
 
 	private _randGrilAnimName: string;
@@ -172,7 +171,10 @@ export class Main extends Component {
 		this._srcRankPos = this.btnRank.node.getPosition();
 		this._srcSettingPos = this.btnSetting.node.getPosition();
 		this._srcDinnerPos = this.btnDinner.node.getPosition();
-		this._srcCookGirlPos = this.spCookGirl.node.getPosition();
+		// this._srcCookGirlPos = this.spCookGirl.node.getPosition();
+
+		const { y } = this.drgGirl.node.getPosition();
+		this.drgGirl.node.setPosition(35, y);
 	}
 
 	onEnable() {
@@ -293,11 +295,6 @@ export class Main extends Component {
 				tween(this.drgRight.node)
 					.to(1.5, { position: this._srcRightPos }, { easing: 'sineOutIn' })
 					.start();
-				// tween(this.spCookGirl.node)
-				// 	.to(0.5, {
-				// 		position: this._srcCookGirlPos,
-				// 	})
-				// 	.start();
 			}
 		}
 	}
@@ -396,12 +393,6 @@ export class Main extends Component {
 				this._createBook();
 			})
 			.start();
-
-		// tween(this.spCookGirl.node)
-		// 	.to(0.5, {
-		// 		position: v3(this._srcCookGirlPos.x, 2000, this._srcCookGirlPos.z),
-		// 	})
-		// 	.start();
 	}
 
 	private _refreshLevelIndex(book: Node, index: number, delateShow: boolean) {
@@ -452,9 +443,12 @@ export class Main extends Component {
 	}
 
 	private _playBookNext(cb?: Function) {
-		const bookNode = this.node.getChildByName(
-			`dragonBook_${this.curIndex - 1}`
-		);
+		let bookNode = this.node.getChildByName(`dragonBook_${this.curIndex - 1}`);
+		if (bookNode == null) {
+			bookNode = instantiate(this.prefBook);
+			bookNode.name = `dragonBook_${this.curIndex - 1}`;
+			this.node.addChild(bookNode);
+		}
 		bookNode.setSiblingIndex(FRONT);
 		const dragonBook = bookNode.getComponent(dragonBones.ArmatureDisplay);
 		dragonBook.once(
@@ -509,7 +503,7 @@ export class Main extends Component {
 		this.dragonBook.node.setPosition(centerPos);
 		this.dragonBook.playAnimation('appear', 1);
 		const { y } = this.drgGirl.node.getPosition();
-		this.drgGirl.node.setPosition(0, y + 50);
+		this.drgGirl.node.setPosition(35, y + 50);
 		this.drgLeft.node.active = true;
 		this.drgLeft.playAnimation('usual', 0);
 		this.drgRight.node.active = true;
@@ -521,6 +515,8 @@ export class Main extends Component {
 		const centerPos = v3(0, 0, 0);
 		this.dragonBook.node.setPosition(centerPos);
 		this.dragonBook.playAnimation('appear', 1);
+		const { y } = this.drgGirl.node.getPosition();
+		this.drgGirl.node.setPosition(35, y + 50);
 	}
 	public showLevelToMain() {
 		this.btnNext.node.active = false;
@@ -576,7 +572,7 @@ export class Main extends Component {
 
 	public adjustGirl() {
 		const { x, y } = this.drgGirl.node.getPosition();
-		this.drgGirl.node.setPosition(x + 20, y - 50);
+		this.drgGirl.node.setPosition(x, y - 50);
 	}
 
 	public showGirlAnimations() {

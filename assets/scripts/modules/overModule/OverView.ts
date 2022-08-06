@@ -17,6 +17,7 @@ import {
 	UIOpacity,
 	tween,
 	Label,
+	Sprite,
 } from 'cc';
 import { audioMgr, SOUND_CLIPS } from '../../AudioMgr';
 import { dataMgr } from '../../common/mgrs/DataMgr';
@@ -80,6 +81,7 @@ export class OverView extends Component {
 	}
 
 	private _blockName: string;
+	private _bFail: boolean = false;
 
 	@property(Node)
 	winTip: Node;
@@ -100,16 +102,22 @@ export class OverView extends Component {
 	// @property(Label)
 	// lblTime: Label;
 
-	// @property(dragonBones.ArmatureDisplay)
-	// drgRope: dragonBones.ArmatureDisplay;
+	@property(dragonBones.ArmatureDisplay)
+	drgFail: dragonBones.ArmatureDisplay;
+	@property(dragonBones.ArmatureDisplay)
+	drgGas: dragonBones.ArmatureDisplay;
+
+	@property(dragonBones.ArmatureDisplay)
+	drgPaper: dragonBones.ArmatureDisplay;
+
+	onLoad() {
+		this.drgFail.node.active = false;
+		this.drgEnd.node.active = false;
+		this.drgGas.node.active = false;
+	}
+
 	start() {
 		// [3]
-		audioMgr.playSound(SOUND_CLIPS.WIN);
-		this.schedule(this._createWinTip, 2, macro.REPEAT_FOREVER, 1);
-		this.scheduleOnce(() => {
-			this.drgBB.playAnimation('apper', 1);
-			this.bestTime = this._bestTime;
-		}, 2);
 	}
 
 	// update (deltaTime: number) {
@@ -146,6 +154,14 @@ export class OverView extends Component {
 		blockName: string;
 	}) {
 		console.log('2');
+		audioMgr.playSound(SOUND_CLIPS.WIN);
+		this.schedule(this._createWinTip, 2, macro.REPEAT_FOREVER, 1);
+		this.scheduleOnce(() => {
+			this.drgBB.playAnimation('apper', 1);
+			this.bestTime = this._bestTime;
+		}, 2);
+		this.drgEnd.node.active = true;
+		this.drgEnd.playAnimation('end', 1);
 
 		const { moveStep, time, curLevel, blockName } = props;
 		this.level = curLevel;
@@ -179,6 +195,7 @@ export class OverView extends Component {
 	}
 
 	onBtnClickToHome() {
+		audioMgr.playBgMusic();
 		winMgr.clearWin();
 		const mainScript = director
 			.getScene()
@@ -187,6 +204,7 @@ export class OverView extends Component {
 		mainScript.showMain();
 	}
 	onBtnClickToLevels() {
+		audioMgr.playBgMusic();
 		winMgr.clearWin();
 		const mainScript = director
 			.getScene()
@@ -195,6 +213,7 @@ export class OverView extends Component {
 		mainScript.showLevel();
 	}
 	public async onBtnClickToRetry() {
+		audioMgr.playBgMusic();
 		winMgr.clearWin();
 		const levelsData = await dataMgr.getlevelsDataCache();
 		const data = levelsData[this.level - 1];
@@ -209,7 +228,10 @@ export class OverView extends Component {
 		}
 	}
 	public async onBtnClickToNext() {
+		if (this._bFail) return;
+		audioMgr.playBgMusic();
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+
 		winMgr.clearWin();
 		const levelsData = await dataMgr.getlevelsDataCache();
 		// this.level++;
@@ -225,10 +247,12 @@ export class OverView extends Component {
 		}
 	}
 	onBtnClickToShare() {
+		// audioMgr.playBgMusic();
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		console.log('share');
 	}
 	onBtnClickToDinner() {
+		// audioMgr.playBgMusic();
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		console.log('dinner');
 	}
@@ -251,6 +275,33 @@ export class OverView extends Component {
 	_bbAnimEventHandler(event) {
 		if (event.animationState.name === 'apper') {
 			this.drgBB.playAnimation('standby', 0);
+		}
+	}
+
+	public async fail(curLevel: number, blockName: string) {
+		this._bFail = true;
+		this.level = curLevel;
+		this.node.getChildByName('mask').active = true;
+		audioMgr.stopBgMusic();
+		audioMgr.playSound(SOUND_CLIPS.FAIL);
+		this.drgPaper.node.active = false;
+		this.drgFail.node.active = true;
+		this.drgFail.once(
+			dragonBones.EventObject.COMPLETE,
+			this._failEventHandler,
+			this
+		);
+		this.drgFail.playAnimation('on', 1);
+
+		const slot = this.drgFail.armature().getSlot('w');
+		const index = ['zongzi', 'FriedEggs', 'chips', 'toast'].indexOf(blockName);
+		slot.displayIndex = index >= 0 ? index : 0;
+	}
+
+	private _failEventHandler(event) {
+		if (event.animationState.name === 'on') {
+			this.drgGas.node.active = true;
+			this.drgGas.playAnimation('gas', 0);
 		}
 	}
 }

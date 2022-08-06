@@ -885,7 +885,7 @@
     "_prefab": null,
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 34.536,
+      "x": 36.526,
       "y": 569.22,
       "z": 0
     },
@@ -3914,8 +3914,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 476,
-      "height": 953
+      "width": 707.76,
+      "height": 952.99
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",

@@ -26,6 +26,13 @@ import {
 import { G_BOARD_X } from '../klotskiServices/KlotskiSettings';
 const { ccclass, property } = _decorator;
 
+export const enum BurnStatus {
+	Normal,
+	T1,
+	M1,
+	Black,
+}
+
 @ccclass('KlotskiBlock')
 export class KlotskiBlock extends Component {
 	private _blockName: string;
@@ -100,6 +107,24 @@ export class KlotskiBlock extends Component {
 	}
 	public set isPlaying(v: boolean) {
 		this._isPlaying = v;
+	}
+
+	public bWin: boolean = false;
+	// public burnStatus: BurnStatus = BurnStatus.Normal;
+
+	private _burnStatus: BurnStatus = BurnStatus.Normal;
+	public get burnStatus(): BurnStatus {
+		return this._burnStatus;
+	}
+	public set burnStatus(v: BurnStatus) {
+		this._burnStatus = v;
+		if (v === BurnStatus.T1) {
+			this.dragonBlock.playAnimation('turnred1', 1);
+		} else if (v === BurnStatus.M1) {
+			this.dragonBlock.playAnimation('morered1', 1);
+		} else if (v === BurnStatus.Black) {
+			this.dragonBlock.playAnimation('black', 0);
+		}
 	}
 
 	@property(Sprite)
@@ -179,14 +204,18 @@ export class KlotskiBlock extends Component {
 			if (
 				['up', 'down', 'left', 'right'].indexOf(event.animationState.name) >
 					-1 &&
-				this.dragonBlock.timeScale === -1
+				this.dragonBlock.timeScale === -1 &&
+				this.burnStatus === BurnStatus.Normal
 			) {
 				this.dragonBlock.timeScale = 1;
 				this.dragonBlock.playAnimation('usual', 1);
 				return;
 			}
 
-			if (event.animationState.name === 'shake') {
+			if (
+				event.animationState.name === 'shake' &&
+				this.burnStatus === BurnStatus.Normal
+			) {
 				this.dragonBlock.playAnimation('usual', 1);
 				this.isPlaying = false;
 				return;
@@ -194,14 +223,35 @@ export class KlotskiBlock extends Component {
 			if (event.animationState.name === 'usual') {
 				this.isPlaying = false;
 				// if(this.dragonBlock.name)
+				return;
+			}
+			if (event.animationState.name === 'turnred1') {
+				this.dragonBlock.playAnimation('turnred2', 0);
+				return;
+			}
+			if (event.animationState.name === 'morered1') {
+				this.dragonBlock.playAnimation('morered2', 0);
+				return;
 			}
 		}
 	}
 
 	private _refreshUsualAnimation() {
 		if (this.isPlaying) return;
+		if (this.bWin) return;
+		if (this.burnStatus === BurnStatus.T1) {
+			// this.dragonBlock.playAnimation('turnred1', 1);
+			this.unschedule(this._refreshUsualAnimation);
+		}
+		if (this.burnStatus === BurnStatus.M1) {
+			this.unschedule(this._refreshUsualAnimation);
+		}
 		this.scheduleOnce(() => {
-			this.dragonBlock.playAnimation('usual', 1);
+			if (this.bWin) return;
+			if (this.burnStatus === BurnStatus.Normal) {
+				this.dragonBlock.playAnimation('usual', 1);
+			}
+			// this.dragonBlock.playAnimation('usual', 1);
 			this.isPlaying = true;
 		}, randomRangeInt(2, 20));
 	}

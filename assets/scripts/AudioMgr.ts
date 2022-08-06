@@ -9,6 +9,7 @@ export const SOUND_CLIPS = {
 	SLIDE: 'sounds/slide',
 	THANKS: 'sounds/thanks',
 	WIN: 'sounds/win',
+	FAIL: 'sounds/fail',
 };
 
 class AudioMgr {
