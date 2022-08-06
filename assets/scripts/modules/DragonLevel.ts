@@ -17,7 +17,6 @@ import { winMgr } from '../common/mgrs/WinMgr';
 import { database } from '../Database';
 import { Main } from '../Main';
 import { KlotskiView } from './klotskiModule/KlotskiView';
-import { LevelItem } from './levelsModule/components/LevelItem';
 import { ILevelData } from './levelsModule/ILevelsModule';
 import { Level_Per_Page } from './levelsModule/ILevelsModuleCfg';
 const { ccclass, property } = _decorator;

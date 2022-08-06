@@ -11,9 +11,9 @@ import { resMgr } from './ResMgr';
  * @Description:
  * @FilePath: /klotski/assets/scripts/common/mgrs/DataMgr.ts
  */
-const DELIMITER = '_';
-const LEVELS_DATA_PATH = 'datas/hrd_answers_straight';
-// const PREFIX_LS = `${Projectrc.projectName}${DELIMITER}`;
+
+// const LEVELS_DATA_PATH = 'datas/hrd_answers_straight';
+const LEVELS_DATA_PATH = 'datas/hrd_levels';
 
 const UNLOCK_MAX_INDEX = 'unlockMaxIndex';
 // const CURRENT_LEVEL_INDEX = 'curLevelIndex';
@@ -52,7 +52,7 @@ class DataMgr {
 		this._curLevelIndex = v;
 	}
 
-	//当前已解琐的最大关卡
+	// 当前已解琐的最大关卡;
 	// private _unlockMaxIndex: number;
 	// public get unlockMaxIndex(): number {
 	// 	return this._unlockMaxIndex;

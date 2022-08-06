@@ -208,10 +208,6 @@ export class KlotskiView extends Component {
 	@property(dragonBones.ArmatureDisplay)
 	dragonOven: dragonBones.ArmatureDisplay;
 
-	// @property(Sprite)
-	// spDog: Sprite;
-	// @property(Sprite)
-	// spCat: Sprite;
 	@property(Node)
 	layout: Node;
 	@property(Node)

@@ -31,7 +31,7 @@ import { dataMgr } from './common/mgrs/DataMgr';
 import { ILevelData } from './modules/levelsModule/ILevelsModule';
 import { Level_Per_Page } from './modules/levelsModule/ILevelsModuleCfg';
 import { resMgr } from './common/mgrs/ResMgr';
-import { LevelItem } from './modules/levelsModule/components/LevelItem';
+
 import { DragonLevel } from './modules/DragonLevel';
 import { database } from './Database';
 import { audioMgr, SOUND_CLIPS } from './AudioMgr';
@@ -393,23 +393,6 @@ export class Main extends Component {
 				this._createBook();
 			})
 			.start();
-	}
-
-	private _refreshLevelIndex(book: Node, index: number, delateShow: boolean) {
-		this.curIndex = index;
-		const [start, end] = [0, 1].map((v) => (v + index) * Level_Per_Page);
-		const list = this.levelsData.slice(start, end);
-		const container = book.getChildByName('container');
-		for (let i = 0; i < list.length; ++i) {
-			const levelItemNode = container.getChildByName(`LevelItem${i}`);
-			if (delateShow) {
-				tween(levelItemNode.getComponent(UIOpacity))
-					.to(2, { opacity: 255 })
-					.start();
-			}
-			levelItemNode.active = true;
-			levelItemNode!.getComponent(LevelItem).initProps(list[i]);
-		}
 	}
 
 	private _createBook(bAnti: boolean = false) {
