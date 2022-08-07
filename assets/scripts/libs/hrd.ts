@@ -31,6 +31,7 @@ export interface IGameState {
 			step: number;
 			blockIdx: number;
 			dirIdx: number;
+			state: IState;
 		}[];
 		time: number | null;
 	};
@@ -75,7 +76,6 @@ export default class Hrd {
 		}
 		return board;
 	}
-
 	get blocks() {
 		return this._state.blocks;
 	}
@@ -472,6 +472,7 @@ export default class Hrd {
 					step: state.step,
 					blockIdx: state.move.blockIdx,
 					dirIdx: state.move.dirIdx,
+					state,
 				};
 				this._gameState.result.moves.unshift(move);
 			}
@@ -489,24 +490,32 @@ export function solve(options: IHrdOptions) {
 }
 
 export function mergeSteps(
-	moves: { blockIdx: number; dirIdx: number; step: number }[]
+	moves: { blockIdx: number; dirIdx: number; step: number; state: IState }[]
 ) {
-	const result: { blockIdx: number; dirIdx: number; count: number }[] = [];
+	const result: {
+		blockIdx: number;
+		dirIdx: number;
+		count: number;
+		state: IState;
+	}[] = [];
 	result[0] = {
 		blockIdx: moves[0].blockIdx,
 		dirIdx: moves[0].dirIdx,
 		count: 1,
+		state: moves[0].state,
 	};
 	for (let i = 1; i < moves.length; ++i) {
 		const prev = result[result.length - 1];
 		const cur = moves[i];
 		if (cur.blockIdx === prev.blockIdx && cur.dirIdx === prev.dirIdx) {
 			prev.count++;
+			prev.state = cur.state;
 		} else {
 			result.push({
 				blockIdx: cur.blockIdx,
 				dirIdx: cur.dirIdx,
 				count: 1,
+				state: cur.state,
 			});
 		}
 	}
