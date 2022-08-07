@@ -11,7 +11,6 @@ import {
 	Vec3,
 } from 'cc';
 import { audioMgr, SOUND_CLIPS } from '../AudioMgr';
-import { dataMgr } from '../common/mgrs/DataMgr';
 import { WIN_ID } from '../common/mgrs/WinConfig';
 import { winMgr } from '../common/mgrs/WinMgr';
 import { database } from '../Database';

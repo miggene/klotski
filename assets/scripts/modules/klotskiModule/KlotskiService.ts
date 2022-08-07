@@ -26,19 +26,23 @@ import {
 	G_GOAL_STYLE,
 } from './klotskiServices/KlotskiSettings';
 
-export function getBlockSizeByStyle(style: number): number[] {
-	return gBlockStyle[style];
+export function getBlockSizeByStyle(style: string): number[] {
+	// return gBlockStyle[style];
+	const a = style.split(',');
+	const ret = a.map((v) => parseInt(v, 10));
+	// const ret = [...style.split(',')].map(parseInt);
+	return ret;
 }
 
-export function getBlockContentSizeByStyle(style: number): number[] {
-	const blockSize = getBlockSizeByStyle(style);
-	return [blockSize[0] * CELL_W, blockSize[1] * CELL_H];
+export function getBlockContentSizeByStyle(style: string): number[] {
+	const [h, w] = getBlockSizeByStyle(style);
+	return [w * CELL_W, h * CELL_H];
 }
 
 export function getBlockPositionByStyle(
 	row: number,
 	col: number,
-	style: number
+	style: string
 ): number[] {
 	const contentSize = getBlockContentSizeByStyle(style);
 
@@ -259,7 +263,7 @@ export function setBoardState(boardState, posX, posY, style, value) {
 export function getStepAction(
 	boardState: number[][],
 	posInfo: IPosInfo,
-	style: number,
+	style: string,
 	back: boolean,
 	reverse: boolean
 ) {
@@ -524,7 +528,7 @@ export function checkGoalState(
 		blockId = boardState[x][y];
 		if (
 			blockId == 0 ||
-			blockObj[blockId].getComponent(KlotskiBlock).style !== G_GOAL_STYLE
+			blockObj[blockId].getComponent(KlotskiBlock).style !== '2,2'
 		) {
 			return false;
 		}

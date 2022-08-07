@@ -49,11 +49,11 @@ export class KlotskiBlock extends Component {
 		// 	.catch((err) => console.error(err));
 	}
 
-	private _style: number;
-	public get style(): number {
+	private _style: string;
+	public get style(): string {
 		return this._style;
 	}
-	public set style(v: number) {
+	public set style(v: string) {
 		this._style = v;
 		const blockSize = getBlockContentSizeByStyle(v);
 		this.node
@@ -155,7 +155,13 @@ export class KlotskiBlock extends Component {
 		this.unschedule(this._refreshUsualAnimation);
 	}
 
-	public initProps(props: IBlock) {
+	public initProps(props: {
+		blockName: string;
+		blockId: number;
+		style: string;
+		row: number;
+		col: number;
+	}) {
 		const { blockId, blockName, style, row, col } = props;
 		this.blockId = blockId;
 		this.blockName = blockName;

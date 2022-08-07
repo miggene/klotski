@@ -40,7 +40,7 @@ import { audioMgr, SOUND_CLIPS } from './AudioMgr';
 // import Hrd from 'hrd-solver';
 const { ccclass, property } = _decorator;
 
-const LEVELS_DATA_PATH = 'datas/hrd_answers_straight';
+const LEVELS_DATA_PATH = 'datas/hrd_levels';
 const FRONT = 13;
 const AFTER = 5;
 @ccclass('Main')
