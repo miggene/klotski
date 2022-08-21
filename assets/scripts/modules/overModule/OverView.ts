@@ -17,7 +17,6 @@ import {
 	UIOpacity,
 	tween,
 	Label,
-	Sprite,
 } from 'cc';
 import { audioMgr, SOUND_CLIPS } from '../../AudioMgr';
 import { dataMgr } from '../../common/mgrs/DataMgr';
@@ -84,6 +83,9 @@ export class OverView extends Component {
 	private _bFail: boolean = false;
 
 	@property(Node)
+	blockLayer: Node;
+
+	@property(Node)
 	winTip: Node;
 
 	@property(dragonBones.ArmatureDisplay)
@@ -114,6 +116,8 @@ export class OverView extends Component {
 		this.drgFail.node.active = false;
 		this.drgEnd.node.active = false;
 		this.drgGas.node.active = false;
+
+		this.blockLayer.active = false;
 	}
 
 	start() {
@@ -196,6 +200,7 @@ export class OverView extends Component {
 
 	onBtnClickToHome() {
 		audioMgr.playBgMusic();
+		this.blockLayer.active = true;
 		winMgr.clearWin();
 		const mainScript = director
 			.getScene()
@@ -205,6 +210,7 @@ export class OverView extends Component {
 	}
 	onBtnClickToLevels() {
 		audioMgr.playBgMusic();
+		this.blockLayer.active = true;
 		winMgr.clearWin();
 		const mainScript = director
 			.getScene()
@@ -214,6 +220,7 @@ export class OverView extends Component {
 	}
 	public async onBtnClickToRetry() {
 		audioMgr.playBgMusic();
+		this.blockLayer.active = true;
 		winMgr.clearWin();
 		const levelsData = await dataMgr.getlevelsDataCache();
 		const data = levelsData[this.level - 1];
@@ -229,6 +236,7 @@ export class OverView extends Component {
 	}
 	public async onBtnClickToNext() {
 		if (this._bFail) return;
+		this.blockLayer.active = true;
 		audioMgr.playBgMusic();
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 

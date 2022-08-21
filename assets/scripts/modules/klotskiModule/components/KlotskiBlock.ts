@@ -17,13 +17,14 @@ import {
 	randomRangeInt,
 } from 'cc';
 import { resMgr } from '../../../common/mgrs/ResMgr';
+import { HRD_COL } from '../../../libs/hrd';
 import { IBlock } from '../IKlotskiModule';
 import { BLOCK_SPRITE_FRAME_PATH } from '../KlotskiModuleCfg';
 import {
 	getBlockContentSizeByStyle,
 	getBlockSizeByStyle,
 } from '../KlotskiService';
-import { G_BOARD_X } from '../klotskiServices/KlotskiSettings';
+
 const { ccclass, property } = _decorator;
 
 export const enum BurnStatus {
@@ -182,7 +183,7 @@ export class KlotskiBlock extends Component {
 	public updatePos(row: number, col: number) {
 		this.row = row;
 		this.col = col;
-		this.node.setSiblingIndex(row * G_BOARD_X + col);
+		this.node.setSiblingIndex(row * HRD_COL + col);
 	}
 
 	/**

@@ -51,8 +51,8 @@ const DIRECTIONS = [
 	{ x: -1, y: 0 },
 ];
 
-const HRD_ROW = 5;
-const HRD_COL = 4;
+export const HRD_ROW = 5;
+export const HRD_COL = 4;
 const ESCAPE_ROW = 3;
 const ESCAPE_COL = 1;
 const NO_LR_MIRROR_ALLOW = true;
@@ -63,14 +63,14 @@ export default class Hrd {
 	private _state: IState;
 	private _bMirror: boolean;
 	private _escapePoints: number[];
-	private readonly _row: number;
-	private readonly _col: number;
+	public readonly row: number;
+	public readonly col: number;
 	private _zobHash: { [key: string]: number[] };
 	get emptyBoard() {
 		const board: number[][] = [];
-		for (let i = 0; i < this._row; ++i) {
+		for (let i = 0; i < this.row; ++i) {
 			board[i] = [];
-			for (let j = 0; j < this._col; ++j) {
+			for (let j = 0; j < this.col; ++j) {
 				board[i][j] = 0;
 			}
 		}
@@ -105,8 +105,8 @@ export default class Hrd {
 		this._escapePoints = escapePoints || [ESCAPE_ROW, ESCAPE_COL];
 		const [row, col] = boardSize || [HRD_ROW, HRD_COL];
 
-		this._row = row;
-		this._col = col;
+		this.row = row;
+		this.col = col;
 		this._state = {
 			blocks: [],
 			board: this.emptyBoard,
@@ -172,8 +172,8 @@ export default class Hrd {
 	}
 
 	initZobristHash() {
-		for (let i = 0; i < this._row; ++i) {
-			for (let j = 0; j < this._col; ++j) {
+		for (let i = 0; i < this.row; ++i) {
+			for (let j = 0; j < this.col; ++j) {
 				const key = `${i},${j}`;
 				this._zobHash[key] = [];
 				const len = Object.keys(this._state.types).length + 1;
@@ -194,8 +194,8 @@ export default class Hrd {
 
 	getZobristHash(state: IState) {
 		let hash = 0;
-		for (let i = 0; i < this._row; ++i) {
-			for (let j = 0; j < this._col; ++j) {
+		for (let i = 0; i < this.row; ++i) {
+			for (let j = 0; j < this.col; ++j) {
 				const key = `${i},${j}`;
 				const blockIdx = state.board[i][j] - 1;
 				const type =
@@ -208,9 +208,9 @@ export default class Hrd {
 
 	getMirrorZobristHash(state: IState) {
 		let hash = 0;
-		for (let i = 0; i < this._row; ++i) {
-			for (let j = 0; j < this._col; ++j) {
-				const mirrorKey = `${i},${this._col - j - 1}`;
+		for (let i = 0; i < this.row; ++i) {
+			for (let j = 0; j < this.col; ++j) {
+				const mirrorKey = `${i},${this.col - j - 1}`;
 				const blockIdx = state.board[i][j] - 1;
 				const type =
 					blockIdx < 0 ? 0 : this.getType(state.blocks[blockIdx].shape);
@@ -236,7 +236,7 @@ export default class Hrd {
 		const row = position[0];
 		let col = position[1];
 		const [h, w] = shape;
-		bMirror ? (col = this._col - 1 - col) : col;
+		bMirror ? (col = this.col - 1 - col) : col;
 		const dx = bMirror ? -1 : 1;
 		const type = this.getType(shape);
 		// 清理原位置
@@ -344,8 +344,8 @@ export default class Hrd {
 			for (let j = 0; j < w; ++j) {
 				const r = row + i + dir.y;
 				const c = col + j + dir.x;
-				if (r < 0 || r >= this._row) return false;
-				if (c < 0 || c >= this._col) return false;
+				if (r < 0 || r >= this.row) return false;
+				if (c < 0 || c >= this.col) return false;
 
 				const value = state.board[r][c];
 				if (value !== 0 && value !== blockIdx + 1) {

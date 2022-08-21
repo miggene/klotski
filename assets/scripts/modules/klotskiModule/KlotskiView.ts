@@ -33,7 +33,7 @@ import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
 import { deepClone, formatTime } from '../../common/utils/Helper';
 import Hrd, { IState, mergeSteps, solve } from '../../libs/hrd';
-import KlotskiSolver from '../../libs/klotskiLibs/KlotskiSolver';
+
 import { Main } from '../../Main';
 import { ILevelData } from '../levelsModule/ILevelsModule';
 import { OverView } from '../overModule/OverView';
@@ -55,7 +55,7 @@ import {
 	getBlockContentSizeByStyle,
 	getBlockPositionByStyle,
 } from './KlotskiService';
-import { G_BOARD_X, G_BOARD_Y } from './klotskiServices/KlotskiSettings';
+
 const { ccclass, property } = _decorator;
 
 @ccclass('KlotskiView')
@@ -226,7 +226,7 @@ export class KlotskiView extends Component {
 	}[] = [];
 
 	onLoad() {
-		this._initBoardState();
+		// this._initBoardState();
 		this.gridLayer.destroyAllChildren();
 
 		this.blockLayer.active = false;
@@ -343,14 +343,14 @@ export class KlotskiView extends Component {
 		}, 3);
 	}
 
-	private _initBoardState() {
-		for (let x = 0; x < G_BOARD_X; x++) {
-			this._boardState[x] = [];
-			for (let y = 0; y < G_BOARD_Y; y++) {
-				this._boardState[x][y] = -1;
-			}
-		}
-	}
+	// private _initBoardState() {
+	// 	for (let x = 0; x < G_BOARD_X; x++) {
+	// 		this._boardState[x] = [];
+	// 		for (let y = 0; y < G_BOARD_Y; y++) {
+	// 			this._boardState[x][y] = -1;
+	// 		}
+	// 	}
+	// }
 
 	private _createBoard(blocks: { shape: number[]; position: number[] }[]) {
 		blocks.forEach((v) => {
@@ -380,7 +380,7 @@ export class KlotskiView extends Component {
 			.loadPrefab(FOOD_PATH)
 			.then((prefab) => {
 				const ndBlock = instantiate(prefab as Prefab);
-				ndBlock.setSiblingIndex(row * G_BOARD_X + col);
+				ndBlock.setSiblingIndex(row * this._hrd.col + col);
 				this.gridLayer.addChild(ndBlock);
 				this._blockObj[blockId] = ndBlock;
 				ndBlock
@@ -662,7 +662,7 @@ export class KlotskiView extends Component {
 		this.board = null;
 		this._stepInfo = [];
 		this.curBoardStep = 0;
-		this._initBoardState();
+		// this._initBoardState();
 		this.initProps(this.levelData);
 		this.unschedule(this._updateUsedTime);
 		this.usedTime = 0;
@@ -673,6 +673,7 @@ export class KlotskiView extends Component {
 	}
 
 	onBtnClickToHome() {
+		this.blockLayer.active = true;
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		const mainScript = this.node.parent.parent.getComponent(Main);
 		mainScript.showMain();
