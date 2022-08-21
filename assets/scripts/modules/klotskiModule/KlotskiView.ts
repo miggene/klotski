@@ -208,6 +208,9 @@ export class KlotskiView extends Component {
 	@property(Node)
 	continueLayer: Node;
 
+	@property(Node)
+	blockLayer: Node;
+
 	private _fingerPos: Vec3;
 
 	private _bInTip = false;
@@ -225,6 +228,8 @@ export class KlotskiView extends Component {
 	onLoad() {
 		this._initBoardState();
 		this.gridLayer.destroyAllChildren();
+
+		this.blockLayer.active = false;
 
 		this._basePlatePos = this._getRandomBasePos();
 		this._baseKnifePos = this._getRandomBasePos();
@@ -313,6 +318,7 @@ export class KlotskiView extends Component {
 
 	public initProps(props: ILevelData) {
 		this.levelData = deepClone(props);
+		this.levelData.mergeSteps += 3;
 		const { level, blocks, count, mergeSteps } = props;
 		this.level = level;
 		this.curBoardStep = 0;
@@ -604,6 +610,7 @@ export class KlotskiView extends Component {
 
 	onBtnClickToTip(e: EventTouch) {
 		this._bInTip = true;
+		this.blockLayer.active = true;
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 
 		const moves = solve({ blocks: this._hrd.blocks });
@@ -641,6 +648,7 @@ export class KlotskiView extends Component {
 						curLevel: this.level,
 						blockName,
 					});
+					this.blockLayer.active = false;
 				});
 			})
 			.start();
@@ -968,6 +976,7 @@ export class KlotskiView extends Component {
 		tween(block)
 			.then(moveAct)
 			.call(() => {
+				audioMgr.playSound(SOUND_CLIPS.SLIDE);
 				++this.moveStep;
 				const ndFood = block.getChildByName('dragonBlock');
 				tween(ndFood)

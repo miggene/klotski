@@ -137,21 +137,6 @@ class DataMgr {
 		return this.levelsDataCache;
 	}
 
-	// public getLS(key: string, df: string): string {
-	// 	const prefixKey = PREFIX_LS + key;
-	// 	let ls = localStorage.getItem(prefixKey);
-	// 	if (ls === null) {
-	// 		ls = df;
-	// 		localStorage.setItem(prefixKey, df);
-	// 	}
-	// 	return ls;
-	// }
-
-	// public setLS(key: string, value: string) {
-	// 	const prefixKey = PREFIX_LS + key;
-	// 	localStorage.setItem(prefixKey, value);
-	// }
-
 	public getLastBestTimeByLevel(
 		level: number,
 		defaultBestTime = `${24 * 3600}`
@@ -162,11 +147,6 @@ class DataMgr {
 			return parseInt(defaultBestTime, 10);
 		}
 		return parseInt(bestTime, 10);
-
-		// const curTime = parseInt(defaultBestTime, 10);
-		// const curBestTime = Math.min(lastBestTime, curTime);
-		// localStorage.setItem(`${BEST_TIME_PREFIX}${level}`, `${curBestTime}`);
-		// return `${curBestTime}`;
 	}
 
 	public setBestTimeByLevel(level: number, bestTime: number) {
