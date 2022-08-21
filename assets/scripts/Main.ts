@@ -110,6 +110,38 @@ export class Main extends Component {
 
 		this.btnNext.node.setSiblingIndex(100);
 		this.btnPrev.node.setSiblingIndex(100);
+
+		if (this.btnNext.node.active) {
+			this.btnNext.node.setPosition(this._baseNextPos);
+			tween(this.btnNext.node).stop();
+			tween(this.btnNext.node)
+				.repeatForever(
+					tween(this.btnNext.node)
+						.to(0.5, {
+							position: v3(this._baseNextPos.x + 10, this._baseNextPos.y, 0),
+						})
+						.to(0.5, {
+							position: v3(this._baseNextPos.x, this._baseNextPos.y, 0),
+						})
+				)
+				.start();
+		}
+
+		if (this.btnPrev.node.active) {
+			this.btnPrev.node.setPosition(this._basePrevPos);
+			tween(this.btnPrev.node).stop();
+			tween(this.btnPrev.node)
+				.repeatForever(
+					tween(this.btnPrev.node)
+						.to(0.5, {
+							position: v3(this._basePrevPos.x - 10, this._basePrevPos.y, 0),
+						})
+						.to(0.5, {
+							position: v3(this._basePrevPos.x, this._basePrevPos.y, 0),
+						})
+				)
+				.start();
+		}
 	}
 
 	private _srcLeftPos: Vec3;
@@ -123,6 +155,9 @@ export class Main extends Component {
 
 	private _randGrilAnimName: string;
 
+	private _basePrevPos: Vec3;
+	private _baseNextPos: Vec3;
+
 	onLoad() {
 		// audioMgr.init(this.node.getComponent(AudioSource));
 		this.blockLayer.active = false;
@@ -134,14 +169,14 @@ export class Main extends Component {
 		database.init();
 		resMgr.loadJson(LEVELS_DATA_PATH).then((data: ILevelData[]) => {
 			this.levelsData = data;
-			console.log('database.user.curLevel :>> ', database.user.curLevel);
+			this._basePrevPos = this.btnPrev.node.getPosition().clone();
+			this._baseNextPos = this.btnNext.node.getPosition().clone();
+
 			this.curIndex = Math.floor(database.user.curLevel / Level_Per_Page);
-			console.log('this.curIndex :>> ', this.curIndex);
 			this.btnPrev.node.active = false;
 			this.btnNext.node.active = false;
 		});
-		// this.btnPrev.node.active = false;
-		// this.btnNext.node.active = false;
+
 		this._srcLeftPos = this.drgLeft.node.getPosition();
 		this._srcRightPos = this.drgRight.node.getPosition();
 
