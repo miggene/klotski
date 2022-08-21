@@ -1,11 +1,11 @@
 {
-  "ver": "1.0.23",
+  "ver": "1.0.24",
   "importer": "image",
   "imported": true,
   "uuid": "1dca6b66-0f86-4cc1-be86-e59cc321e65a",
   "files": [
-    ".png",
-    ".json"
+    ".json",
+    ".png"
   ],
   "subMetas": {
     "6c48a": {
@@ -22,9 +22,10 @@
         "magfilter": "linear",
         "mipfilter": "none",
         "anisotropy": 0,
-        "isUuid": true
+        "isUuid": true,
+        "visible": false
       },
-      "ver": "1.0.21",
+      "ver": "1.0.22",
       "imported": true,
       "files": [
         ".json"
@@ -56,9 +57,67 @@
         "packable": true,
         "isUuid": true,
         "imageUuidOrDatabaseUri": "1dca6b66-0f86-4cc1-be86-e59cc321e65a@6c48a",
-        "atlasUuid": ""
+        "atlasUuid": "",
+        "pixelsToUnit": 100,
+        "pivotX": 0.5,
+        "pivotY": 0.5,
+        "meshType": 0,
+        "vertices": {
+          "rawPosition": [
+            -152,
+            -30.5,
+            0,
+            152,
+            -30.5,
+            0,
+            -152,
+            30.5,
+            0,
+            152,
+            30.5,
+            0
+          ],
+          "indexes": [
+            0,
+            1,
+            2,
+            2,
+            1,
+            3
+          ],
+          "uv": [
+            7,
+            68,
+            311,
+            68,
+            7,
+            7,
+            311,
+            7
+          ],
+          "nuv": [
+            0.0220125786163522,
+            0.09333333333333334,
+            0.9779874213836478,
+            0.09333333333333334,
+            0.0220125786163522,
+            0.9066666666666666,
+            0.9779874213836478,
+            0.9066666666666666
+          ],
+          "minPos": [
+            -152,
+            -30.5,
+            0
+          ],
+          "maxPos": [
+            152,
+            30.5,
+            0
+          ]
+        }
       },
-      "ver": "1.0.9",
+      "ver": "1.0.11",
       "imported": true,
       "files": [
         ".json"

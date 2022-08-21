@@ -4,8 +4,8 @@
   "imported": true,
   "uuid": "e709d22c-742e-4a68-8958-6e5cb2517917",
   "files": [
-    ".plist",
-    ".json"
+    ".json",
+    ".plist"
   ],
   "subMetas": {},
   "userData": {
@@ -17,16 +17,32 @@
     "srcBlendFactor": 770,
     "dstBlendFactor": 1,
     "startColor": {
-      "_val": 4281597951
+      "_val": 4281597951,
+      "r": 255,
+      "g": 255,
+      "b": 51,
+      "a": 255
     },
     "startColorVar": {
-      "_val": 422772736
+      "_val": 422772736,
+      "r": 0,
+      "g": 0,
+      "b": 51,
+      "a": 25.5
     },
     "endColor": {
-      "_val": 1890530175
+      "_val": 1890530175,
+      "r": 127.5,
+      "g": 51,
+      "b": 175.95,
+      "a": 112.2
     },
     "endColorVar": {
-      "_val": 2575263372
+      "_val": 2575263372,
+      "r": 140.25,
+      "g": 102,
+      "b": 127.5,
+      "a": 153
     },
     "startSize": 36,
     "startSizeVar": 48,
