@@ -39,6 +39,9 @@ export class DragonLevel extends Component {
 	@property(dragonBones.ArmatureDisplay)
 	dragonStar: dragonBones.ArmatureDisplay;
 
+	@property(Node)
+	blockLayer: Node;
+
 	private _levelDataList: ILevelData[];
 	public get levelDataList(): ILevelData[] {
 		return this._levelDataList;
@@ -58,6 +61,7 @@ export class DragonLevel extends Component {
 	}
 
 	onEnable() {
+		this.blockLayer.active = false;
 		this.dragonLevel.addEventListener(
 			dragonBones.EventObject.COMPLETE,
 			this._dragonLevelListener,
@@ -181,6 +185,7 @@ export class DragonLevel extends Component {
 	}
 
 	onBtnClickToLevel(event: EventTouch) {
+		this.blockLayer.active = true;
 		const index = parseInt(event.target.name.slice(6), 10);
 		const level = this.bookIndex * Level_Per_Page + index;
 		const { maxUnlockLevel } = database.user;
@@ -197,6 +202,7 @@ export class DragonLevel extends Component {
 						this.levelDataList[level % Level_Per_Page]
 					);
 					// this.node.parent.parent.parent.parent.parent.destroy();
+					this.blockLayer.active = false;
 					this.node.destroy();
 					const mainScript = this.node.parent.getComponent(Main);
 					mainScript.hideMain();
@@ -207,9 +213,11 @@ export class DragonLevel extends Component {
 	}
 
 	onBtnClickToHome() {
+		this.blockLayer.active = true;
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		const mainScript = this.node.parent.getComponent(Main);
 		mainScript.showLevelToMain();
+		this.blockLayer.active = false;
 	}
 
 	private _dragonStarListener(event) {

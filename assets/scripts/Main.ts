@@ -81,6 +81,9 @@ export class Main extends Component {
 	@property(Node)
 	bgMask: Node;
 
+	@property(Node)
+	blockLayer: Node;
+
 	private _bOpenLevelImmediately: boolean = false;
 
 	private _lastBook: Node = null;
@@ -122,6 +125,7 @@ export class Main extends Component {
 
 	onLoad() {
 		// audioMgr.init(this.node.getComponent(AudioSource));
+		this.blockLayer.active = false;
 		const audioSource = this.node.addComponent(AudioSource);
 		audioMgr.init(audioSource);
 		audioMgr.playBgMusic();
@@ -330,7 +334,6 @@ export class Main extends Component {
 	}
 
 	private _createDragonLevel() {
-		console.log('this.curIndex :>> ', this.curIndex);
 		const [start, end] = [0, 1].map(
 			(v) => (v + this.curIndex) * Level_Per_Page
 		);
@@ -343,11 +346,12 @@ export class Main extends Component {
 			this.node.addChild(levelNode);
 		}
 		levelNode.getComponent(DragonLevel).show(this.curIndex, list);
+		this.blockLayer.active = false;
 	}
 
 	onBtnClickToLevel() {
 		console.log(`go to level`);
-
+		this.blockLayer.active = true;
 		this.btnPrev.node.active = false;
 		this.btnNext.node.active = false;
 
