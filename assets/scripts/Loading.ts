@@ -24,12 +24,11 @@ export class Loading extends Component {
 
 	start() {
 		// [3]
-		tween(this.node)
-			.delay(2)
-			.call(() => {
-				director.loadScene('Main');
-			})
-			.start();
+		console.time('loading');
+		director.preloadScene('Main', () => {
+			director.loadScene('Main');
+			console.timeEnd('loading');
+		});
 	}
 
 	// update (deltaTime: number) {

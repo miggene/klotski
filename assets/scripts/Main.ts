@@ -26,7 +26,7 @@ import {
 } from 'cc';
 
 import { winMgr } from './common/mgrs/WinMgr';
-import { WIN_ID } from './common/mgrs/WinConfig';
+
 import { dataMgr } from './common/mgrs/DataMgr';
 import { ILevelData } from './modules/levelsModule/ILevelsModule';
 import { Level_Per_Page } from './modules/levelsModule/ILevelsModuleCfg';
@@ -36,8 +36,6 @@ import { DragonLevel } from './modules/DragonLevel';
 import { database } from './Database';
 import { audioMgr, SOUND_CLIPS } from './AudioMgr';
 
-// import lodash from 'lodash-es';
-// import Hrd from 'hrd-solver';
 const { ccclass, property } = _decorator;
 
 const LEVELS_DATA_PATH = 'datas/hrd_levels';
@@ -158,62 +156,39 @@ export class Main extends Component {
 	private _basePrevPos: Vec3;
 	private _baseNextPos: Vec3;
 
-	onLoad() {
-		// audioMgr.init(this.node.getComponent(AudioSource));
+	async onLoad() {
+		console.time('onload-start');
+		console.time('main-start');
 		this.blockLayer.active = false;
+		// 预加载音频
 		const audioSource = this.node.addComponent(AudioSource);
 		audioMgr.init(audioSource);
-		audioMgr.playBgMusic();
+		// audioMgr.playBgMusic();
 		winMgr.init();
 		dataMgr.init();
 		database.init();
-		resMgr.loadJson(LEVELS_DATA_PATH).then((data: ILevelData[]) => {
-			this.levelsData = data;
-			this._basePrevPos = this.btnPrev.node.getPosition().clone();
-			this._baseNextPos = this.btnNext.node.getPosition().clone();
 
-			this.curIndex = Math.floor(database.user.curLevel / Level_Per_Page);
-			this.btnPrev.node.active = false;
-			this.btnNext.node.active = false;
-		});
+		console.timeEnd('main-start');
+		// this._srcLeftPos = this.drgLeft.node.getPosition();
+		// this._srcRightPos = this.drgRight.node.getPosition();
 
-		this._srcLeftPos = this.drgLeft.node.getPosition();
-		this._srcRightPos = this.drgRight.node.getPosition();
+		// this.dragonBook.node.active = true;
+		// this.dragonBook.playAnimation('appear', 1);
+		// this.drgGirl.playAnimation('appear', 1);
 
-		this.dragonBook.node.active = true;
-		this.dragonBook.playAnimation('appear', 1);
-		this.drgGirl.playAnimation('appear', 1);
+		// this.drgLeft.node.setPosition(
+		// 	v3(0, this._srcLeftPos.y, this._srcLeftPos.z)
+		// );
+		// this.drgRight.node.setPosition(
+		// 	v3(0, this._srcRightPos.y, this._srcRightPos.z)
+		// );
 
-		this.drgLeft.node.setPosition(
-			v3(0, this._srcLeftPos.y, this._srcLeftPos.z)
-		);
-		this.drgRight.node.setPosition(
-			v3(0, this._srcRightPos.y, this._srcRightPos.z)
-		);
+		// this._srcRankPos = this.btnRank.node.getPosition();
+		// this._srcSettingPos = this.btnSetting.node.getPosition();
+		// this._srcDinnerPos = this.btnDinner.node.getPosition();
 
-		// const leftZIndex = this.drgLeft.node.getSiblingIndex();
-		// const rightZIndex = this.drgRight.node.getSiblingIndex();
-		// console.log('leftZIndex :>> ', leftZIndex);
-		// console.log('rightZIndex :>> ', rightZIndex);
-
-		// this.drgLeft.node.getComponent(UIOpacity).opacity = 0;
-		// this.drgRight.node.getComponent(UIOpacity).opacity = 0;
-
-		// tween(this.drgLeft.node)
-		// 	.to(0, { position: v3(0, this._srcLeftPos.y, this._srcLeftPos.z) })
-		// 	.start();
-
-		// tween(this.drgRight.node)
-		// 	.to(0, { position: v3(0, this._srcRightPos.y, this._srcRightPos.z) })
-		// 	.start();
-
-		this._srcRankPos = this.btnRank.node.getPosition();
-		this._srcSettingPos = this.btnSetting.node.getPosition();
-		this._srcDinnerPos = this.btnDinner.node.getPosition();
-		// this._srcCookGirlPos = this.spCookGirl.node.getPosition();
-
-		const { y } = this.drgGirl.node.getPosition();
-		this.drgGirl.node.setPosition(35, y);
+		// const { y } = this.drgGirl.node.getPosition();
+		// this.drgGirl.node.setPosition(35, y);
 	}
 
 	onEnable() {
@@ -242,7 +217,40 @@ export class Main extends Component {
 		);
 	}
 
-	start() {}
+	async start() {
+		// 播放背景音乐
+		audioMgr.playBgMusic();
+		this.levelsData = (await resMgr.loadJson(LEVELS_DATA_PATH)) as ILevelData[];
+
+		this._basePrevPos = this.btnPrev.node.getPosition().clone();
+		this._baseNextPos = this.btnNext.node.getPosition().clone();
+
+		this.curIndex = Math.floor(database.user.curLevel / Level_Per_Page);
+		this.btnPrev.node.active = false;
+		this.btnNext.node.active = false;
+
+		this._srcLeftPos = this.drgLeft.node.getPosition();
+		this._srcRightPos = this.drgRight.node.getPosition();
+
+		this.dragonBook.node.active = true;
+		this.dragonBook.playAnimation('appear', 1);
+		this.drgGirl.playAnimation('appear', 1);
+
+		this.drgLeft.node.setPosition(
+			v3(0, this._srcLeftPos.y, this._srcLeftPos.z)
+		);
+		this.drgRight.node.setPosition(
+			v3(0, this._srcRightPos.y, this._srcRightPos.z)
+		);
+
+		this._srcRankPos = this.btnRank.node.getPosition();
+		this._srcSettingPos = this.btnSetting.node.getPosition();
+		this._srcDinnerPos = this.btnDinner.node.getPosition();
+
+		const { y } = this.drgGirl.node.getPosition();
+		this.drgGirl.node.setPosition(35, y);
+		console.timeEnd('onload-start');
+	}
 
 	private _dragonBookListener(event) {
 		if (event.animationState.name === 'appear') {
