@@ -79,6 +79,10 @@ class ResMgr {
 			);
 		});
 	}
+
+	public async preloadPrefab(path: string) {
+		resources.preload(path, Prefab);
+	}
 }
 
 export const resMgr = ResMgr.instance;

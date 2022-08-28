@@ -46,7 +46,6 @@ class WinMgr {
 				.then((prefab: Prefab) => {
 					const ndWin = instantiate(prefab);
 					this._winLayer.addChild(ndWin);
-					const size = this._winLayer.getComponent(UITransform).contentSize;
 					resolve(ndWin);
 				})
 				.catch((err) => reject(err));

@@ -90,30 +90,7 @@ class DataMgr {
 				this.levelsDataCache = data;
 			})
 			.catch((err) => console.error(err));
-		// try {
-		// 	// this.curLevelIndex = string2Number(
-		// 	// 	this.getLS(CURRENT_LEVEL_INDEX, JSON.stringify(this._curLevelIndex))
-		// 	// );
-		// 	this.unlockMaxIndex = string2Number(
-		// 		this.getLS(UNLOCK_MAX_INDEX, JSON.stringify(this._unlockMaxIndex))
-		// 	);
-		// 	this.curLevelIndex = this.unlockMaxIndex;
-		// 	this.shakeOn = string2Number(
-		// 		this.getLS(SHAKE_ON, JSON.stringify(this._shakeOn))
-		// 	);
-		// 	this.soundOn = string2Number(
-		// 		this.getLS(SOUND_ON, JSON.stringify(this._soundOn))
-		// 	);
-		// } catch (error) {
-		// 	console.error(error);
-		// }
 
-		// this.shakeOn = string2Number(
-		// this.getLS(SHAKE_ON, JSON.stringify(this._shakeOn))
-		// );
-		// this.soundOn = string2Number(
-		// this.getLS(SOUND_ON, JSON.stringify(this._soundOn))
-		// );
 		const shakeOn = localStorage.getItem(SHAKE_ON);
 		if (shakeOn) {
 			this.shakeOn = parseInt(JSON.parse(shakeOn), 10);

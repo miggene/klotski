@@ -21,8 +21,6 @@ import {
 	Vec3,
 	Sprite,
 	AudioSource,
-	macro,
-	TERRAIN_NORTH_INDEX,
 } from 'cc';
 
 import { winMgr } from './common/mgrs/WinMgr';
@@ -35,6 +33,8 @@ import { resMgr } from './common/mgrs/ResMgr';
 import { DragonLevel } from './modules/DragonLevel';
 import { database } from './Database';
 import { audioMgr, SOUND_CLIPS } from './AudioMgr';
+
+import { WIN_ID, getWinInfo } from './common/mgrs/WinConfig';
 
 const { ccclass, property } = _decorator;
 
@@ -157,8 +157,6 @@ export class Main extends Component {
 	private _baseNextPos: Vec3;
 
 	async onLoad() {
-		console.time('onload-start');
-		console.time('main-start');
 		this.blockLayer.active = false;
 		// 预加载音频
 		const audioSource = this.node.addComponent(AudioSource);
@@ -168,27 +166,9 @@ export class Main extends Component {
 		dataMgr.init();
 		database.init();
 
-		console.timeEnd('main-start');
-		// this._srcLeftPos = this.drgLeft.node.getPosition();
-		// this._srcRightPos = this.drgRight.node.getPosition();
-
-		// this.dragonBook.node.active = true;
-		// this.dragonBook.playAnimation('appear', 1);
-		// this.drgGirl.playAnimation('appear', 1);
-
-		// this.drgLeft.node.setPosition(
-		// 	v3(0, this._srcLeftPos.y, this._srcLeftPos.z)
-		// );
-		// this.drgRight.node.setPosition(
-		// 	v3(0, this._srcRightPos.y, this._srcRightPos.z)
-		// );
-
-		// this._srcRankPos = this.btnRank.node.getPosition();
-		// this._srcSettingPos = this.btnSetting.node.getPosition();
-		// this._srcDinnerPos = this.btnDinner.node.getPosition();
-
-		// const { y } = this.drgGirl.node.getPosition();
-		// this.drgGirl.node.setPosition(35, y);
+		// 预加载部分界面
+		resMgr.preloadPrefab(getWinInfo(WIN_ID.KLOTSKI).path);
+		resMgr.preloadPrefab(getWinInfo(WIN_ID.OVER).path);
 	}
 
 	onEnable() {
@@ -249,7 +229,6 @@ export class Main extends Component {
 
 		const { y } = this.drgGirl.node.getPosition();
 		this.drgGirl.node.setPosition(35, y);
-		console.timeEnd('onload-start');
 	}
 
 	private _dragonBookListener(event) {
@@ -393,7 +372,6 @@ export class Main extends Component {
 	}
 
 	onBtnClickToLevel() {
-		console.log(`go to level`);
 		this.blockLayer.active = true;
 		this.btnPrev.node.active = false;
 		this.btnNext.node.active = false;

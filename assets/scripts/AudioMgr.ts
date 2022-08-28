@@ -1,4 +1,5 @@
 import { AudioClip, AudioSource, resources } from 'cc';
+import { dataMgr } from './common/mgrs/DataMgr';
 
 export const SOUND_CLIPS = {
 	BG: 'sounds/bg',
@@ -25,6 +26,8 @@ class AudioMgr {
 	}
 
 	public playBgMusic(path: string = SOUND_CLIPS.BG) {
+		return;
+		if (!!dataMgr.soundOn === false) return;
 		if (this._audioSource.playing) return;
 		resources.load(path, AudioClip, (err, clip) => {
 			if (!err) {
@@ -39,6 +42,7 @@ class AudioMgr {
 	}
 
 	public playSound(path: string) {
+		if (!!dataMgr.soundOn === false) return;
 		resources.load(path, AudioClip, (err, clip) => {
 			if (!err) {
 				this._audioSource.playOneShot(clip);

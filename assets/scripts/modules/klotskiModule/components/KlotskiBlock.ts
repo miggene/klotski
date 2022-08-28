@@ -42,12 +42,6 @@ export class KlotskiBlock extends Component {
 	}
 	public set blockName(v: string) {
 		this._blockName = v;
-		// resMgr
-		// 	.loadSprite(`${BLOCK_SPRITE_FRAME_PATH}${v}`)
-		// 	.then((spriteFrame: SpriteFrame) => {
-		// 		this.spBlock.spriteFrame = spriteFrame;
-		// 	})
-		// 	.catch((err) => console.error(err));
 	}
 
 	private _style: string;
@@ -119,6 +113,7 @@ export class KlotskiBlock extends Component {
 	}
 	public set burnStatus(v: BurnStatus) {
 		this._burnStatus = v;
+		this.dragonBlock.timeScale = 1;
 		if (v === BurnStatus.T1) {
 			this.dragonBlock.playAnimation('turnred1', 1);
 		} else if (v === BurnStatus.M1) {

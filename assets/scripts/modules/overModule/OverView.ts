@@ -26,8 +26,7 @@ import { winMgr } from '../../common/mgrs/WinMgr';
 import { formatTime } from '../../common/utils/Helper';
 
 import { database } from '../../Database';
-import { Main } from '../../Main';
-import { KlotskiView } from '../klotskiModule/KlotskiView';
+
 const { ccclass, property } = _decorator;
 
 /**
@@ -157,7 +156,6 @@ export class OverView extends Component {
 		curLevel: number;
 		blockName: string;
 	}) {
-		console.log('2');
 		audioMgr.playSound(SOUND_CLIPS.WIN);
 		this.schedule(this._createWinTip, 2, macro.REPEAT_FOREVER, 1);
 		this.scheduleOnce(() => {
@@ -205,7 +203,7 @@ export class OverView extends Component {
 		const mainScript = director
 			.getScene()
 			.getChildByName('Canvas')
-			.getComponent(Main);
+			.getComponent('Main') as any;
 		mainScript.showMain();
 	}
 	onBtnClickToLevels() {
@@ -215,7 +213,7 @@ export class OverView extends Component {
 		const mainScript = director
 			.getScene()
 			.getChildByName('Canvas')
-			.getComponent(Main);
+			.getComponent('Main') as any;
 		mainScript.showLevel();
 	}
 	public async onBtnClickToRetry() {
@@ -225,11 +223,10 @@ export class OverView extends Component {
 		const levelsData = await dataMgr.getlevelsDataCache();
 		const data = levelsData[this.level - 1];
 		if (data) {
-			console.log(`go to level: ${this.level}`);
 			winMgr
 				.openWin(WIN_ID.KLOTSKI)
 				.then((nd: Node) => {
-					nd.getComponent(KlotskiView).initProps(data);
+					(nd.getComponent('KlotskiView') as any).initProps(data);
 				})
 				.catch((err) => console.error(err));
 		}
@@ -245,11 +242,10 @@ export class OverView extends Component {
 		// this.level++;
 		const data = levelsData[this.level];
 		if (data) {
-			console.log(`go to level: ${this.level + 1}`);
 			winMgr
 				.openWin(WIN_ID.KLOTSKI)
 				.then((nd: Node) => {
-					nd.getComponent(KlotskiView).initProps(data);
+					(nd.getComponent('KlotskiView') as any).initProps(data);
 				})
 				.catch((err) => console.error(err));
 		}
@@ -257,12 +253,10 @@ export class OverView extends Component {
 	onBtnClickToShare() {
 		// audioMgr.playBgMusic();
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
-		console.log('share');
 	}
 	onBtnClickToDinner() {
 		// audioMgr.playBgMusic();
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
-		console.log('dinner');
 	}
 
 	private _createWinTip() {

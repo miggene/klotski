@@ -1,18 +1,6 @@
 import { _decorator, Component, Node, dragonBones } from 'cc';
 const { ccclass, property } = _decorator;
 
-/**
- * Predefined variables
- * Name = DragonBook
- * DateTime = Sat Feb 05 2022 15:27:34 GMT+0800 (中国标准时间)
- * Author = COUPLESTUDIO
- * FileBasename = DragonBook.ts
- * FileBasenameNoExtension = DragonBook
- * URL = db://assets/scripts/modules/DragonBook.ts
- * ManualUrl = https://docs.cocos.com/creator/3.4/manual/zh/
- *
- */
-
 @ccclass('DragonBook')
 export class DragonBook extends Component {
 	@property(dragonBones.ArmatureDisplay)

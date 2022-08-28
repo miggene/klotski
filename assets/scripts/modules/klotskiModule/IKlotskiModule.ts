@@ -1,5 +1,3 @@
-import { Shape } from '../../libs/Klotski';
-
 /*
  * @Author: zhupengfei
  * @Date: 2021-12-12 11:17:27

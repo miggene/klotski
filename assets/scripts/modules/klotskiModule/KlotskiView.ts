@@ -34,7 +34,6 @@ import { winMgr } from '../../common/mgrs/WinMgr';
 import { deepClone, formatTime } from '../../common/utils/Helper';
 import Hrd, { IState, mergeSteps, solve } from '../../libs/hrd';
 
-import { Main } from '../../Main';
 import { ILevelData } from '../levelsModule/ILevelsModule';
 import { OverView } from '../overModule/OverView';
 import { BurnStatus, KlotskiBlock } from './components/KlotskiBlock';
@@ -226,7 +225,6 @@ export class KlotskiView extends Component {
 	}[] = [];
 
 	onLoad() {
-		// this._initBoardState();
 		this.gridLayer.destroyAllChildren();
 
 		this.blockLayer.active = false;
@@ -312,7 +310,7 @@ export class KlotskiView extends Component {
 	}
 
 	private _showRandGirlAnimations() {
-		const mainScript = this.node.parent.parent.getComponent(Main);
+		const mainScript = this.node.parent.parent.getComponent('Main') as any;
 		mainScript.showGirlAnimations();
 	}
 
@@ -616,10 +614,8 @@ export class KlotskiView extends Component {
 		const moves = solve({ blocks: this._hrd.blocks });
 		if (moves) {
 			this._results = mergeSteps(moves);
-			console.log('results :>> ', this._results);
 			this.autoMove();
 		} else {
-			console.log('无解');
 		}
 	}
 
@@ -675,13 +671,11 @@ export class KlotskiView extends Component {
 	onBtnClickToHome() {
 		this.blockLayer.active = true;
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
-		const mainScript = this.node.parent.parent.getComponent(Main);
+		const mainScript = this.node.parent.parent.getComponent('Main') as any;
 		mainScript.showMain();
 
 		this.drgTips.node.active = false;
 		this._playKnifeForkAnimationOut(() => {
-			// const mainScript = this.node.parent.parent.getComponent(Main);
-			// mainScript.showMain();
 			this.node.destroy();
 		});
 		this.gridLayer.children.forEach((child) =>
@@ -1053,7 +1047,6 @@ export class KlotskiView extends Component {
 		let dir = '';
 		const { state, dirIdx, blockIdx } = this._results.shift();
 		if (state == null) {
-			console.log('结束tip');
 			return;
 		}
 		switch (dirIdx) {
