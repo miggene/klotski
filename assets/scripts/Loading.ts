@@ -24,9 +24,9 @@ export class Loading extends Component {
 
 	start() {
 		// [3]
-		// director.preloadScene('Main', () => {
-		// 	director.loadScene('Main');
-		// });
+		director.preloadScene('Main', () => {
+			director.loadScene('Main');
+		});
 	}
 
 	// update (deltaTime: number) {

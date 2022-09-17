@@ -26,7 +26,6 @@ class AudioMgr {
 	}
 
 	public playBgMusic(path: string = SOUND_CLIPS.BG) {
-		return;
 		if (!!dataMgr.soundOn === false) return;
 		if (this._audioSource.playing) return;
 		resources.load(path, AudioClip, (err, clip) => {
