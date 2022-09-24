@@ -6,28 +6,10 @@
  * @Description:
  * @FilePath: /klotski/assets/scripts/components/Food.ts
  */
-import {
-	_decorator,
-	Component,
-	Node,
-	Sprite,
-	resources,
-	SpriteFrame,
-} from 'cc';
-import { Shape } from '../libs/Klotski';
-const { ccclass, property } = _decorator;
+import { _decorator, Component, Sprite, resources, SpriteFrame } from 'cc';
+export type Shape = [number, number];
 
-/**
- * Predefined variables
- * Name = Food
- * DateTime = Sat Dec 04 2021 11:50:42 GMT+0800 (中国标准时间)
- * Author = dailycode365
- * FileBasename = Food.ts
- * FileBasenameNoExtension = Food
- * URL = db://assets/scripts/components/Food.ts
- * ManualUrl = https://docs.cocos.com/creator/3.3/manual/zh/
- *
- */
+const { ccclass, property } = _decorator;
 
 @ccclass('Food')
 export class Food extends Component {

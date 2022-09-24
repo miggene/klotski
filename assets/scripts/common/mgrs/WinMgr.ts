@@ -7,7 +7,7 @@
  * @FilePath: /klotski/assets/scripts/common/mgrs/WinMgr.ts
  */
 import { director, instantiate, Layers, Node, Prefab, UITransform } from 'cc';
-import { WinCache } from './IMgrs';
+
 import { resMgr } from './ResMgr';
 import { getWinInfo, WIN_ID, WIN_ZINDEX } from './WinConfig';
 
@@ -26,7 +26,7 @@ class WinMgr {
 		if (!this._instance) this._instance = new WinMgr();
 		return this._instance;
 	}
-	private _winCaches: Map<WIN_ID, WinCache[]> = new Map();
+
 	public init() {
 		const canvas = director.getScene().getChildByName('Canvas');
 		this._winLayer = new Node('winLayer');
@@ -46,7 +46,6 @@ class WinMgr {
 				.then((prefab: Prefab) => {
 					const ndWin = instantiate(prefab);
 					this._winLayer.addChild(ndWin);
-					const size = this._winLayer.getComponent(UITransform).contentSize;
 					resolve(ndWin);
 				})
 				.catch((err) => reject(err));

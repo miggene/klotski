@@ -5,19 +5,15 @@ import {
 	dragonBones,
 	tween,
 	UIOpacity,
-	v3,
 	Label,
 	EventTouch,
 	Vec3,
 } from 'cc';
 import { audioMgr, SOUND_CLIPS } from '../AudioMgr';
-import { dataMgr } from '../common/mgrs/DataMgr';
 import { WIN_ID } from '../common/mgrs/WinConfig';
 import { winMgr } from '../common/mgrs/WinMgr';
 import { database } from '../Database';
-import { Main } from '../Main';
-import { KlotskiView } from './klotskiModule/KlotskiView';
-import { LevelItem } from './levelsModule/components/LevelItem';
+// import { Main } from '../Main';
 import { ILevelData } from './levelsModule/ILevelsModule';
 import { Level_Per_Page } from './levelsModule/ILevelsModuleCfg';
 const { ccclass, property } = _decorator;
@@ -41,6 +37,9 @@ export class DragonLevel extends Component {
 	@property(dragonBones.ArmatureDisplay)
 	dragonStar: dragonBones.ArmatureDisplay;
 
+	@property(Node)
+	blockLayer: Node;
+
 	private _levelDataList: ILevelData[];
 	public get levelDataList(): ILevelData[] {
 		return this._levelDataList;
@@ -60,6 +59,7 @@ export class DragonLevel extends Component {
 	}
 
 	onEnable() {
+		this.blockLayer.active = false;
 		this.dragonLevel.addEventListener(
 			dragonBones.EventObject.COMPLETE,
 			this._dragonLevelListener,
@@ -119,14 +119,10 @@ export class DragonLevel extends Component {
 	}
 
 	show(index: number, list: ILevelData[]) {
-		console.log(`show: ${index}`);
 		this.bookIndex = index;
 		this.dragonLevel.timeScale = 1;
 		this.dragonLevel.playAnimation('all_label_appear', 1);
-		// this.node.children.forEach((child, index) => {
-		// 	// child.getComponent(LevelItem).initProps(list[index]);
-		// 	tween(child.getComponent(UIOpacity)).to(1, { opacity: 255 }).start();
-		// });
+
 		this.levelDataList = list;
 		for (let i = 0, len = list.length; i < len; ++i) {
 			const data = list[i];
@@ -183,6 +179,7 @@ export class DragonLevel extends Component {
 	}
 
 	onBtnClickToLevel(event: EventTouch) {
+		this.blockLayer.active = true;
 		const index = parseInt(event.target.name.slice(6), 10);
 		const level = this.bookIndex * Level_Per_Page + index;
 		const { maxUnlockLevel } = database.user;
@@ -195,12 +192,13 @@ export class DragonLevel extends Component {
 			winMgr
 				.openWin(WIN_ID.KLOTSKI)
 				.then((nd: Node) => {
-					nd.getComponent(KlotskiView).initProps(
+					(nd.getComponent('KlotskiView') as any).initProps(
 						this.levelDataList[level % Level_Per_Page]
 					);
-					// this.node.parent.parent.parent.parent.parent.destroy();
+
+					this.blockLayer.active = false;
 					this.node.destroy();
-					const mainScript = this.node.parent.getComponent(Main);
+					const mainScript = this.node.parent.getComponent('Main') as any;
 					mainScript.hideMain();
 					mainScript.adjustGirl();
 				})
@@ -209,9 +207,11 @@ export class DragonLevel extends Component {
 	}
 
 	onBtnClickToHome() {
+		this.blockLayer.active = true;
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
-		const mainScript = this.node.parent.getComponent(Main);
+		const mainScript = this.node.parent.getComponent('Main') as any;
 		mainScript.showLevelToMain();
+		this.blockLayer.active = false;
 	}
 
 	private _dragonStarListener(event) {

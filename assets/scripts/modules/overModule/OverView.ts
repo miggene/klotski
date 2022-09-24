@@ -17,7 +17,6 @@ import {
 	UIOpacity,
 	tween,
 	Label,
-	Sprite,
 } from 'cc';
 import { audioMgr, SOUND_CLIPS } from '../../AudioMgr';
 import { dataMgr } from '../../common/mgrs/DataMgr';
@@ -27,8 +26,7 @@ import { winMgr } from '../../common/mgrs/WinMgr';
 import { formatTime } from '../../common/utils/Helper';
 
 import { database } from '../../Database';
-import { Main } from '../../Main';
-import { KlotskiView } from '../klotskiModule/KlotskiView';
+
 const { ccclass, property } = _decorator;
 
 /**
@@ -84,6 +82,9 @@ export class OverView extends Component {
 	private _bFail: boolean = false;
 
 	@property(Node)
+	blockLayer: Node;
+
+	@property(Node)
 	winTip: Node;
 
 	@property(dragonBones.ArmatureDisplay)
@@ -114,6 +115,8 @@ export class OverView extends Component {
 		this.drgFail.node.active = false;
 		this.drgEnd.node.active = false;
 		this.drgGas.node.active = false;
+
+		this.blockLayer.active = false;
 	}
 
 	start() {
@@ -153,7 +156,6 @@ export class OverView extends Component {
 		curLevel: number;
 		blockName: string;
 	}) {
-		console.log('2');
 		audioMgr.playSound(SOUND_CLIPS.WIN);
 		this.schedule(this._createWinTip, 2, macro.REPEAT_FOREVER, 1);
 		this.scheduleOnce(() => {
@@ -196,39 +198,42 @@ export class OverView extends Component {
 
 	onBtnClickToHome() {
 		audioMgr.playBgMusic();
+		this.blockLayer.active = true;
 		winMgr.clearWin();
 		const mainScript = director
 			.getScene()
 			.getChildByName('Canvas')
-			.getComponent(Main);
+			.getComponent('Main') as any;
 		mainScript.showMain();
 	}
 	onBtnClickToLevels() {
 		audioMgr.playBgMusic();
+		this.blockLayer.active = true;
 		winMgr.clearWin();
 		const mainScript = director
 			.getScene()
 			.getChildByName('Canvas')
-			.getComponent(Main);
+			.getComponent('Main') as any;
 		mainScript.showLevel();
 	}
 	public async onBtnClickToRetry() {
 		audioMgr.playBgMusic();
+		this.blockLayer.active = true;
 		winMgr.clearWin();
 		const levelsData = await dataMgr.getlevelsDataCache();
 		const data = levelsData[this.level - 1];
 		if (data) {
-			console.log(`go to level: ${this.level}`);
 			winMgr
 				.openWin(WIN_ID.KLOTSKI)
 				.then((nd: Node) => {
-					nd.getComponent(KlotskiView).initProps(data);
+					(nd.getComponent('KlotskiView') as any).initProps(data);
 				})
 				.catch((err) => console.error(err));
 		}
 	}
 	public async onBtnClickToNext() {
 		if (this._bFail) return;
+		this.blockLayer.active = true;
 		audioMgr.playBgMusic();
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 
@@ -237,11 +242,10 @@ export class OverView extends Component {
 		// this.level++;
 		const data = levelsData[this.level];
 		if (data) {
-			console.log(`go to level: ${this.level + 1}`);
 			winMgr
 				.openWin(WIN_ID.KLOTSKI)
 				.then((nd: Node) => {
-					nd.getComponent(KlotskiView).initProps(data);
+					(nd.getComponent('KlotskiView') as any).initProps(data);
 				})
 				.catch((err) => console.error(err));
 		}
@@ -249,12 +253,10 @@ export class OverView extends Component {
 	onBtnClickToShare() {
 		// audioMgr.playBgMusic();
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
-		console.log('share');
 	}
 	onBtnClickToDinner() {
 		// audioMgr.playBgMusic();
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
-		console.log('dinner');
 	}
 
 	private _createWinTip() {

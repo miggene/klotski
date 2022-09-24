@@ -14,26 +14,18 @@ export const enum WIN_ZINDEX {
 }
 
 export const enum WIN_ID {
-	START_MENU,
 	KLOTSKI,
-	LEVELS,
+
 	OVER,
 	SETTING,
 }
 
 export const WIN_INFO: { [key: number]: WinObject } = {
-	[WIN_ID.START_MENU]: {
-		path: 'prefabs/MenuPrefab',
-		zIndex: WIN_ZINDEX.WINDOW,
-	},
 	[WIN_ID.KLOTSKI]: {
 		path: 'prefabs/KlotskiPrefab',
 		zIndex: WIN_ZINDEX.WINDOW,
 	},
-	[WIN_ID.LEVELS]: {
-		path: 'prefabs/LevelsPrefab',
-		zIndex: WIN_ZINDEX.WINDOW,
-	},
+
 	[WIN_ID.OVER]: {
 		path: 'prefabs/OverPrefab',
 		zIndex: WIN_ZINDEX.WINDOW,

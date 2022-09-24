@@ -11,9 +11,9 @@ import { resMgr } from './ResMgr';
  * @Description:
  * @FilePath: /klotski/assets/scripts/common/mgrs/DataMgr.ts
  */
-const DELIMITER = '_';
-const LEVELS_DATA_PATH = 'datas/hrd_answers_straight';
-// const PREFIX_LS = `${Projectrc.projectName}${DELIMITER}`;
+
+// const LEVELS_DATA_PATH = 'datas/hrd_answers_straight';
+const LEVELS_DATA_PATH = 'datas/hrd_levels';
 
 const UNLOCK_MAX_INDEX = 'unlockMaxIndex';
 // const CURRENT_LEVEL_INDEX = 'curLevelIndex';
@@ -52,7 +52,7 @@ class DataMgr {
 		this._curLevelIndex = v;
 	}
 
-	//当前已解琐的最大关卡
+	// 当前已解琐的最大关卡;
 	// private _unlockMaxIndex: number;
 	// public get unlockMaxIndex(): number {
 	// 	return this._unlockMaxIndex;
@@ -90,30 +90,7 @@ class DataMgr {
 				this.levelsDataCache = data;
 			})
 			.catch((err) => console.error(err));
-		// try {
-		// 	// this.curLevelIndex = string2Number(
-		// 	// 	this.getLS(CURRENT_LEVEL_INDEX, JSON.stringify(this._curLevelIndex))
-		// 	// );
-		// 	this.unlockMaxIndex = string2Number(
-		// 		this.getLS(UNLOCK_MAX_INDEX, JSON.stringify(this._unlockMaxIndex))
-		// 	);
-		// 	this.curLevelIndex = this.unlockMaxIndex;
-		// 	this.shakeOn = string2Number(
-		// 		this.getLS(SHAKE_ON, JSON.stringify(this._shakeOn))
-		// 	);
-		// 	this.soundOn = string2Number(
-		// 		this.getLS(SOUND_ON, JSON.stringify(this._soundOn))
-		// 	);
-		// } catch (error) {
-		// 	console.error(error);
-		// }
 
-		// this.shakeOn = string2Number(
-		// this.getLS(SHAKE_ON, JSON.stringify(this._shakeOn))
-		// );
-		// this.soundOn = string2Number(
-		// this.getLS(SOUND_ON, JSON.stringify(this._soundOn))
-		// );
 		const shakeOn = localStorage.getItem(SHAKE_ON);
 		if (shakeOn) {
 			this.shakeOn = parseInt(JSON.parse(shakeOn), 10);
@@ -137,21 +114,6 @@ class DataMgr {
 		return this.levelsDataCache;
 	}
 
-	// public getLS(key: string, df: string): string {
-	// 	const prefixKey = PREFIX_LS + key;
-	// 	let ls = localStorage.getItem(prefixKey);
-	// 	if (ls === null) {
-	// 		ls = df;
-	// 		localStorage.setItem(prefixKey, df);
-	// 	}
-	// 	return ls;
-	// }
-
-	// public setLS(key: string, value: string) {
-	// 	const prefixKey = PREFIX_LS + key;
-	// 	localStorage.setItem(prefixKey, value);
-	// }
-
 	public getLastBestTimeByLevel(
 		level: number,
 		defaultBestTime = `${24 * 3600}`
@@ -162,11 +124,6 @@ class DataMgr {
 			return parseInt(defaultBestTime, 10);
 		}
 		return parseInt(bestTime, 10);
-
-		// const curTime = parseInt(defaultBestTime, 10);
-		// const curBestTime = Math.min(lastBestTime, curTime);
-		// localStorage.setItem(`${BEST_TIME_PREFIX}${level}`, `${curBestTime}`);
-		// return `${curBestTime}`;
 	}
 
 	public setBestTimeByLevel(level: number, bestTime: number) {

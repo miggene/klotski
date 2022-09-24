@@ -32,42 +32,29 @@ import { resMgr } from '../../common/mgrs/ResMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
 import { deepClone, formatTime } from '../../common/utils/Helper';
-import KlotskiSolver from '../../libs/klotskiLibs/KlotskiSolver';
-import { Main } from '../../Main';
+import Hrd, { IState, mergeSteps, solve } from '../../libs/hrd';
+
 import { ILevelData } from '../levelsModule/ILevelsModule';
 import { OverView } from '../overModule/OverView';
 import { BurnStatus, KlotskiBlock } from './components/KlotskiBlock';
 import { Finger } from './Finger';
-import { IBlock } from './IKlotskiModule';
 import {
+	BLOCK_CELL_SIZE,
 	BOARD_H,
 	BOARD_W,
 	CELL_H,
 	CELL_W,
 	FOOD_PATH,
 	HRD_FOODS_JSON_PATH,
+	ONE_STEP_MOVE_TIME,
 	TOTAL_H,
 	TOTAL_W,
 } from './KlotskiModuleCfg';
 import {
-	boardState2BoardString,
 	getBlockContentSizeByStyle,
 	getBlockPositionByStyle,
-	getMoveInfo,
-	getStepAction,
-	key2Board,
-	moveBlock,
-	setBoardState,
-	setStepInfo,
-	stepInfo2PosInfo,
 } from './KlotskiService';
-import {
-	gBlockBelongTo,
-	gBlockStyle,
-	G_BOARD_X,
-	G_BOARD_Y,
-	G_VOID_CHAR,
-} from './klotskiServices/KlotskiSettings';
+
 const { ccclass, property } = _decorator;
 
 @ccclass('KlotskiView')
@@ -88,16 +75,6 @@ export class KlotskiView extends Component {
 		this._level = v;
 		this.lblLevelIndex.string = `${v}`;
 	}
-
-	// private _moveStep: number;
-	// public get moveStep(): number {
-	// 	return this._moveStep;
-	// }
-	// public set moveStep(v: number) {
-	// 	this._moveStep = v;
-	// 	this.lblMoveStep.string = `${v}`;
-	// }
-
 	private _usedTime: number = 0;
 	public get usedTime(): number {
 		return this._usedTime;
@@ -106,9 +83,6 @@ export class KlotskiView extends Component {
 		this._usedTime = v;
 		this.lblUsedTime.string = formatTime(v);
 	}
-
-	// private _boardState: number[][];
-
 	private _boardState: number[][] = [];
 	private _blockObj: { [key: string]: Node } = {};
 
@@ -120,9 +94,6 @@ export class KlotskiView extends Component {
 	}
 	public set curBoardStep(v: number) {
 		this._curBoardStep = v;
-		// console.log('this.levelData :>> ', this.levelData);
-		// const leftStep = this.levelData.mini - v;
-		// this.lblMoveStep.string = `${leftStep >= 0 ? leftStep : 0}`;
 	}
 
 	private _moveStep: number = 0;
@@ -131,14 +102,12 @@ export class KlotskiView extends Component {
 	}
 	public set moveStep(v: number) {
 		this._moveStep = v;
-		console.log('this.levelData :>> ', this.levelData);
-		const leftStep = this.levelData.mini - v;
+		const leftStep = this.levelData.mergeSteps - v;
 		this.lblMoveStep.string = `${leftStep >= 0 ? leftStep : 0}`;
 
 		if (!this._bInTip && leftStep <= 0) {
 			this.scheduleOnce(() => {
 				if (this._bWin) return;
-				// this._fail();
 				this._showContinue();
 			}, 1);
 		}
@@ -201,17 +170,13 @@ export class KlotskiView extends Component {
 	dragonStick: dragonBones.ArmatureDisplay;
 	@property(dragonBones.ArmatureDisplay)
 	dragonTable: dragonBones.ArmatureDisplay;
-	@property(dragonBones.ArmatureDisplay)
-	dragonTower: dragonBones.ArmatureDisplay;
-	@property(dragonBones.ArmatureDisplay)
-	dragonGlass: dragonBones.ArmatureDisplay;
+	// @property(dragonBones.ArmatureDisplay)
+	// dragonTower: dragonBones.ArmatureDisplay;
+	// @property(dragonBones.ArmatureDisplay)
+	// dragonGlass: dragonBones.ArmatureDisplay;
 	@property(dragonBones.ArmatureDisplay)
 	dragonOven: dragonBones.ArmatureDisplay;
 
-	// @property(Sprite)
-	// spDog: Sprite;
-	// @property(Sprite)
-	// spCat: Sprite;
 	@property(Node)
 	layout: Node;
 	@property(Node)
@@ -242,15 +207,27 @@ export class KlotskiView extends Component {
 	@property(Node)
 	continueLayer: Node;
 
+	@property(Node)
+	blockLayer: Node;
+
 	private _fingerPos: Vec3;
 
 	private _bInTip = false;
 	private _bWin = false;
 	private _tarBlock: Node;
 
+	private _hrd: Hrd;
+	private _results: {
+		blockIdx: number;
+		count: number;
+		state: IState;
+		dirIdx: number;
+	}[] = [];
+
 	onLoad() {
-		this._initBoardState();
 		this.gridLayer.destroyAllChildren();
+
+		this.blockLayer.active = false;
 
 		this._basePlatePos = this._getRandomBasePos();
 		this._baseKnifePos = this._getRandomBasePos();
@@ -299,11 +276,11 @@ export class KlotskiView extends Component {
 			this._tableAnimEventHandler,
 			this
 		);
-		this.dragonTower.addEventListener(
-			dragonBones.EventObject.COMPLETE,
-			this._towerAnimEventHandler,
-			this
-		);
+		// this.dragonTower.addEventListener(
+		// 	dragonBones.EventObject.COMPLETE,
+		// 	this._towerAnimEventHandler,
+		// 	this
+		// );
 		this.drgCat.addEventListener(
 			dragonBones.EventObject.COMPLETE,
 			this._catAnimEventHandler,
@@ -333,23 +310,26 @@ export class KlotskiView extends Component {
 	}
 
 	private _showRandGirlAnimations() {
-		const mainScript = this.node.parent.parent.getComponent(Main);
+		const mainScript = this.node.parent.parent.getComponent('Main') as any;
 		mainScript.showGirlAnimations();
 	}
 
 	public initProps(props: ILevelData) {
 		this.levelData = deepClone(props);
-		const { level, board } = props;
+		this.levelData.mergeSteps += 3;
+		const { level, blocks, count, mergeSteps } = props;
 		this.level = level;
-		this.board = board;
 		this.curBoardStep = 0;
 		this.moveStep = 0;
 		this.usedTime = 0;
-		this._createBoard(board);
+
+		this._hrd = new Hrd({ blocks });
+
+		this._createBoard(this._hrd.blocks);
+
 		this.scheduleOnce(() => {
 			audioMgr.playSound(SOUND_CLIPS.FOOD_ENTER);
 		}, 2);
-
 		this.scheduleOnce(() => {
 			this.tipperLayer.getChildByName('mask').active = true;
 			this.drgTipper.playAnimation('in', 1);
@@ -361,50 +341,23 @@ export class KlotskiView extends Component {
 		}, 3);
 	}
 
-	private _initBoardState() {
-		for (let x = 0; x < G_BOARD_X; x++) {
-			this._boardState[x] = [];
-			for (let y = 0; y < G_BOARD_Y; y++) {
-				this._boardState[x][y] = -1;
-			}
-		}
-	}
+	// private _initBoardState() {
+	// 	for (let x = 0; x < G_BOARD_X; x++) {
+	// 		this._boardState[x] = [];
+	// 		for (let y = 0; y < G_BOARD_Y; y++) {
+	// 			this._boardState[x][y] = -1;
+	// 		}
+	// 	}
+	// }
 
-	private _createBoard(boardString: string) {
-		let blockId = 1; //blockObj[0] : for empty (don't use)
-		let i = 0;
-		// let VOID_CHAR = '?;
-		for (let row = 0; row < G_BOARD_Y; row++) {
-			for (let col = 0; col < G_BOARD_X; col++) {
-				if (this._boardState[col][row] >= 0) {
-					i++;
-					continue;
-				}
-				let style =
-					gBlockBelongTo[
-						boardString.charCodeAt(i++) - G_VOID_CHAR.charCodeAt(0)
-					];
+	private _createBoard(blocks: { shape: number[]; position: number[] }[]) {
+		blocks.forEach((v) => {
+			const style = v.shape.toString();
+			const [row, col] = v.position;
+			const blockId = this._hrd.board[row][col];
+			this._createBlock(blockId, col, row, style);
+		});
 
-				//don't create block for empty
-				if (style) this._createBlock(blockId, col, row, style);
-				// this._blockObj[blockId] = createBlock(
-				// 	blockId,
-				// 	x,
-				// 	y,
-				// 	style,
-				// 	playMode == 1 ? 1 : 0
-				// );
-
-				let sizeX = gBlockStyle[style][0];
-				let sizeY = gBlockStyle[style][1];
-				for (let c = 0; c < sizeX; c++) {
-					for (let r = 0; r < sizeY; r++) {
-						this._boardState[col + c][row + r] = style ? blockId : 0; //empty id = 0;
-					}
-				}
-				if (style) blockId++;
-			}
-		}
 		this.gridLayer.getComponent(UITransform).setContentSize(TOTAL_W, TOTAL_H);
 	}
 
@@ -412,31 +365,29 @@ export class KlotskiView extends Component {
 		blockId: number,
 		col: number,
 		row: number,
-		style: number
+		style: string
 	) {
 		const data = await resMgr.loadJson(HRD_FOODS_JSON_PATH);
-		// const tarData = (data as IBlock[]).find((v) => v.style === style);
-		const filterData = (data as IBlock[]).filter((v) => v.style === style);
+
+		const filterData = (data as { blockName: string; style: string }[]).filter(
+			(v) => v.style === style
+		);
 		const tarData = filterData[randomRangeInt(0, filterData.length)];
-		// if (tarData.style === 4) {
-		// 	const { blockName } = tarData;
-		// 	const path = `foods/tipperFoods/${blockName}`;
-		// 	this.spTipper.spriteFrame = await resMgr.loadSprite(path);
-		// }
+
 		resMgr
 			.loadPrefab(FOOD_PATH)
 			.then((prefab) => {
 				const ndBlock = instantiate(prefab as Prefab);
-				ndBlock.setSiblingIndex(row * G_BOARD_X + col);
+				ndBlock.setSiblingIndex(row * this._hrd.col + col);
 				this.gridLayer.addChild(ndBlock);
 				this._blockObj[blockId] = ndBlock;
 				ndBlock
 					.getComponent(KlotskiBlock)
 					.initProps({ ...tarData, blockId, row, col });
 				const [x, y] = getBlockPositionByStyle(row, col, style);
-				// ndBlock.setPosition(x, y);
+
 				ndBlock.setPosition(x, y + 1000);
-				if (tarData.style === 4) {
+				if (tarData.style === '2,2') {
 					this._fingerPos = v3(x, y, 0);
 					this._tarBlock = ndBlock;
 				}
@@ -475,11 +426,11 @@ export class KlotskiView extends Component {
 			this._tableAnimEventHandler,
 			this
 		);
-		this.dragonTower.removeEventListener(
-			dragonBones.EventObject.COMPLETE,
-			this._towerAnimEventHandler,
-			this
-		);
+		// this.dragonTower.removeEventListener(
+		// 	dragonBones.EventObject.COMPLETE,
+		// 	this._towerAnimEventHandler,
+		// 	this
+		// );
 		this.drgCat.removeEventListener(
 			dragonBones.EventObject.COMPLETE,
 			this._catAnimEventHandler,
@@ -571,180 +522,76 @@ export class KlotskiView extends Component {
 				.convertToNodeSpaceAR(v3(wp.x, wp.y, 0));
 			const offX = lp.x - this._tchStartPos.x;
 			const offY = lp.y - this._tchStartPos.y;
-			let minX = col - 1;
-			while (minX >= 0) {
-				let bPass = true;
-				for (let i = row; i < row + sizeY; ++i) {
-					if (this._boardState[minX][i] !== 0) {
-						bPass = false;
-						break;
-					}
-				}
-				if (bPass) --minX;
-				else {
-					++minX;
-					break;
-				}
-			}
-			minX = Math.max(minX, 0);
-			let maxX = col + sizeX;
-			while (maxX < G_BOARD_X) {
-				let bPass = true;
-				for (let i = row; i < row + sizeY; ++i) {
-					if (this._boardState[maxX][i] !== 0) {
-						bPass = false;
-						break;
-					}
-				}
-				if (bPass) ++maxX;
-				else {
-					--maxX;
-					break;
-				}
-			}
-			maxX = Math.min(maxX, G_BOARD_X - 1) - sizeX + 1;
-
-			let minY = row - 1;
-			while (minY >= 0) {
-				let bPass = true;
-				for (let i = col; i < col + sizeX; ++i) {
-					if (this._boardState[i][minY] !== 0) {
-						bPass = false;
-						break;
-					}
-				}
-				if (bPass) --minY;
-				else {
-					++minY;
-					break;
-				}
-			}
-			minY = Math.max(0, minY);
-
-			let maxY = row + sizeY;
-			while (maxY < G_BOARD_Y) {
-				let bPass = true;
-				for (let i = col; i < col + sizeX; ++i) {
-					if (this._boardState[i][maxY] !== 0) {
-						bPass = false;
-						break;
-					}
-				}
-				if (bPass) ++maxY;
-				else {
-					--maxY;
-					break;
-				}
-			}
-			maxY = Math.min(maxY, G_BOARD_Y - 1) - sizeY + 1;
-
-			let bLeft = minX < col;
-			let bRight = maxX > col;
-			let bUp = minY < row;
-			let bDown = maxY > row;
-
-			//左右移动
+			let newState: IState = null;
 			if (Math.abs(offX) > Math.abs(offY)) {
-				// 向左
-				if (offX < 0 && bLeft) {
-					setStepInfo(
-						this._stepInfo,
-						this.curBoardStep,
-						blockId,
-						col,
-						row,
-						minX,
-						row,
-						true,
-						true
-					);
-					this._moveNext();
+				if (offX < 0) {
+					//向左移动
+					newState = this.moveBlockByDir(tchedBlock, blockId, 'left');
+				}
+				if (offX > 0) {
+					// 向右移动;
+					newState = this.moveBlockByDir(tchedBlock, blockId, 'right');
+				}
+				if (newState == null) {
 					tchedBlock
 						.getComponent(KlotskiBlock)
-						.dragonBlock.playAnimation('left', 1);
+						.dragonBlock.playAnimation('shake', 1);
 					tchedBlock.getComponent(KlotskiBlock).isPlaying = true;
-					this.targetId = null;
-					return;
 				}
-				// 向右
-				if (offX >= 0 && bRight) {
-					setStepInfo(
-						this._stepInfo,
-						this.curBoardStep,
-						blockId,
-						col,
-						row,
-						maxX,
-						row,
-						true,
-						true
-					);
-					this._moveNext();
+			}
+			if (Math.abs(offX) < Math.abs(offY)) {
+				let dir = '';
+				if (offY < 0) {
+					//向下移动
+					newState = this.moveBlockByDir(tchedBlock, blockId, 'down');
+				}
+				if (offY > 0) {
+					// 向上移动;
+					newState = this.moveBlockByDir(tchedBlock, blockId, 'up');
+				}
+				if (newState == null) {
 					tchedBlock
 						.getComponent(KlotskiBlock)
-						.dragonBlock.playAnimation('right', 1);
+						.dragonBlock.playAnimation('shake', 1);
 					tchedBlock.getComponent(KlotskiBlock).isPlaying = true;
-
-					this.targetId = null;
-					return;
 				}
-				tchedBlock
-					.getComponent(KlotskiBlock)
-					.dragonBlock.playAnimation('shake', 1);
-				tchedBlock.getComponent(KlotskiBlock).isPlaying = true;
-				return;
 			}
-			//上下移动
-			// 向上
-			if (offY > 0 && bUp) {
-				setStepInfo(
-					this._stepInfo,
-					this.curBoardStep,
-					blockId,
-					col,
-					row,
-					col,
-					minY,
-					true,
-					true
-				);
-				this._moveNext();
-				tchedBlock
-					.getComponent(KlotskiBlock)
-					.dragonBlock.playAnimation('up', 1);
-				tchedBlock.getComponent(KlotskiBlock).isPlaying = true;
-				// this.targetId = null;
-				return;
-			}
-			// 向右
-			if (offY <= 0 && bDown) {
-				setStepInfo(
-					this._stepInfo,
-					this.curBoardStep,
-					blockId,
-					col,
-					row,
-					col,
-					maxY,
-					true,
-					true
-				);
-				this._moveNext();
-				tchedBlock
-					.getComponent(KlotskiBlock)
-					.dragonBlock.playAnimation('down', 1);
-				tchedBlock.getComponent(KlotskiBlock).isPlaying = true;
-				// this.targetId = null;
-				return;
-			}
-			tchedBlock
-				.getComponent(KlotskiBlock)
-				.dragonBlock.playAnimation('shake', 1);
-			tchedBlock.getComponent(KlotskiBlock).isPlaying = true;
 		}
 	}
 	_tchC(e: EventTouch) {
 		this._tchE(e);
+	}
+
+	private _moveToNewState(state: IState, blockId: number, dir: number) {
+		let nextState = this._hrd.moveBlockToNewState(state, blockId - 1, dir);
+		let newState: IState = null;
+		while (nextState) {
+			newState = nextState;
+			nextState = this._hrd.moveBlockToNewState(nextState, blockId - 1, dir);
+		}
+		return newState;
+	}
+
+	private _getSlide(oriState: IState, newState: IState, blockId: number) {
+		const [or, oc] = this._getRowCol(oriState, blockId);
+		const [nr, nc] = this._getRowCol(newState, blockId);
+		if (or === -1 || oc === -1 || nr === -1 || nc === -1) {
+			throw new Error('slide error');
+		}
+		return [nr - or, nc - oc];
+	}
+
+	private _getRowCol(state: IState, blockId: number) {
+		const { board } = state;
+		for (let i = 0; i < board.length; ++i) {
+			for (let j = 0; j < board[i].length; ++j) {
+				const id = board[i][j];
+				if (blockId === id) {
+					return [i, j];
+				}
+			}
+		}
+		return [-1, -1];
 	}
 
 	private _updateUsedTime() {
@@ -761,112 +608,16 @@ export class KlotskiView extends Component {
 
 	onBtnClickToTip(e: EventTouch) {
 		this._bInTip = true;
+		this.blockLayer.active = true;
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
-		const klotskiSolver = new KlotskiSolver(
-			boardState2BoardString(this._boardState, this._blockObj)
-		);
-		const answers: {
-			exploreCount: number;
-			elapsedTime: number;
-			boardList: number[];
-		} = klotskiSolver.find();
-		const { boardList } = answers;
-		const maxMove = boardList.length - 1;
-		if (maxMove <= 0) return;
-		let tmpBoardState: number[][] = [];
-		for (let x = 0; x < G_BOARD_X; ++x) {
-			tmpBoardState[x] = this._boardState[x].slice();
+
+		const moves = solve({ blocks: this._hrd.blocks });
+		if (moves) {
+			this._results = mergeSteps(moves);
+			this.autoMove();
+		} else {
 		}
-
-		for (let i = 1; i <= maxMove; ++i) {
-			const moveInfo = getMoveInfo(
-				key2Board(answers.boardList[i - 1]),
-				key2Board(answers.boardList[i])
-			);
-			const blockId = tmpBoardState[moveInfo.startX][moveInfo.startY];
-			const style = this._blockObj[blockId].getComponent(KlotskiBlock).style;
-			setStepInfo(
-				this._stepInfo,
-				this.curBoardStep,
-				blockId,
-				moveInfo.startX,
-				moveInfo.startY,
-				moveInfo.endX,
-				moveInfo.endY,
-				true,
-				i !== 1
-			);
-			setBoardState(tmpBoardState, moveInfo.startX, moveInfo.startY, style, 0);
-			setBoardState(
-				tmpBoardState,
-				moveInfo.endX,
-				moveInfo.endY,
-				style,
-				blockId
-			);
-		}
-		this._moveNext();
-		// this._moveLast(this._stepInfo.slice());
 	}
-
-	private _moveNext() {
-		const maxStep = this._stepInfo.length;
-		if (this.curBoardStep >= maxStep) return;
-		this.curBoardStep++;
-		const posInfo = stepInfo2PosInfo(this._stepInfo, this.curBoardStep);
-		const curBlock = this._blockObj[posInfo.id];
-
-		const style = curBlock.getComponent(KlotskiBlock).style;
-		const actions = getStepAction(
-			this._boardState,
-			posInfo,
-			style,
-			false,
-			false
-		);
-		setBoardState(this._boardState, posInfo.startX, posInfo.startY, style, 0);
-		setBoardState(
-			this._boardState,
-			posInfo.endX,
-			posInfo.endY,
-			style,
-			posInfo.id
-		);
-		curBlock.getComponent(KlotskiBlock).updatePos(posInfo.endY, posInfo.endX);
-		moveBlock(
-			curBlock,
-			actions,
-			0,
-			this._moveNext.bind(this),
-			this._boardState,
-			this._blockObj,
-			this.updateMoveStep.bind(this),
-			this._winCb.bind(this)
-		);
-	}
-
-	// private _moveLast(stepInfo: number[]) {
-	// 	const maxStep = stepInfo.length;
-	// 	// if (this.curBoardStep >= maxStep) return;
-	// 	while (this.curBoardStep < maxStep) {
-	// 		this.curBoardStep++;
-	// 		const posInfo = stepInfo2PosInfo(this._stepInfo, this.curBoardStep);
-	// 		const curBlock = this._blockObj[posInfo.id];
-	// 		const style = curBlock.getComponent(KlotskiBlock).style;
-	// 		setBoardState(this._boardState, posInfo.startX, posInfo.startY, style, 0);
-	// 		setBoardState(
-	// 			this._boardState,
-	// 			posInfo.endX,
-	// 			posInfo.endY,
-	// 			style,
-	// 			posInfo.id
-	// 		);
-	// 		curBlock.getComponent(KlotskiBlock).row = posInfo.endY;
-	// 		curBlock.getComponent(KlotskiBlock).col = posInfo.endX;
-	// 		const [x, y] = getBlockPositionByStyle(posInfo.endY, posInfo.endX, style);
-	// 		curBlock.setPosition(x, y);
-	// 	}
-	// }
 
 	public updateMoveStep() {
 		++this.moveStep;
@@ -893,14 +644,11 @@ export class KlotskiView extends Component {
 						curLevel: this.level,
 						blockName,
 					});
+					this.blockLayer.active = false;
 				});
 			})
 			.start();
 	}
-
-	// public updateCurBoardStep() {
-	// 	this.curBoardStep++;
-	// }
 
 	onBtnClickToRetry() {
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
@@ -910,7 +658,7 @@ export class KlotskiView extends Component {
 		this.board = null;
 		this._stepInfo = [];
 		this.curBoardStep = 0;
-		this._initBoardState();
+		// this._initBoardState();
 		this.initProps(this.levelData);
 		this.unschedule(this._updateUsedTime);
 		this.usedTime = 0;
@@ -921,14 +669,13 @@ export class KlotskiView extends Component {
 	}
 
 	onBtnClickToHome() {
+		this.blockLayer.active = true;
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
-		const mainScript = this.node.parent.parent.getComponent(Main);
+		const mainScript = this.node.parent.parent.getComponent('Main') as any;
 		mainScript.showMain();
 
 		this.drgTips.node.active = false;
 		this._playKnifeForkAnimationOut(() => {
-			// const mainScript = this.node.parent.parent.getComponent(Main);
-			// mainScript.showMain();
 			this.node.destroy();
 		});
 		this.gridLayer.children.forEach((child) =>
@@ -939,8 +686,8 @@ export class KlotskiView extends Component {
 		this.gridBgLayer.children.forEach((child) =>
 			tween(child.getComponent(UIOpacity)).to(1, { opacity: 0 }).start()
 		);
-		this.dragonGlass.playAnimation('disappear', 1);
-		this.dragonTower.playAnimation('disappear', 1);
+		// this.dragonGlass.playAnimation('disappear', 1);
+		// this.dragonTower.playAnimation('disappear', 1);
 		this.dragonTable.playAnimation('disappear', 1);
 		this.dragonOven.playAnimation('disappear', 1);
 		this.dragonStick.timeScale = -1;
@@ -1023,9 +770,9 @@ export class KlotskiView extends Component {
 	}) {
 		if (event.type === dragonBones.EventObject.COMPLETE) {
 			if (event.animationState.name === 'appear') {
-				this.dragonTower.node.active = true;
-				this.dragonTower.playAnimation('appear', 1);
-				this.dragonGlass.playAnimation('appear', 1);
+				// this.dragonTower.node.active = true;
+				// this.dragonTower.playAnimation('appear', 1);
+				// this.dragonGlass.playAnimation('appear', 1);
 				this.lblMoveStep.node.getComponent(UIOpacity).opacity = 255;
 				this.lblUsedTime.node.getComponent(UIOpacity).opacity = 255;
 				this.drgCat.playAnimation('appear', 1);
@@ -1048,7 +795,7 @@ export class KlotskiView extends Component {
 				this._playKnifeForkAnimationIn();
 			}
 			if (event.animationState.name === 'disappear') {
-				this.dragonTower.node.active = false;
+				// this.dragonTower.node.active = false;
 			}
 		}
 	}
@@ -1152,7 +899,7 @@ export class KlotskiView extends Component {
 
 	onBtnClickToOk() {
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
-		this.moveStep = this.levelData.mini - 3;
+		this.moveStep = this.levelData.mergeSteps - 3;
 		this.continueLayer.active = false;
 		this.schedule(this._updateUsedTime, 1);
 	}
@@ -1160,6 +907,166 @@ export class KlotskiView extends Component {
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
 		this.continueLayer.active = false;
 		this._fail();
+	}
+
+	slideBlock(
+		block: Node,
+		dir: string,
+		movedX: number,
+		movedY: number,
+		movedT: number
+	) {
+		const scaleTime = 0.08;
+		let scaleMin = v3(1, 1);
+		let scaleNormal = v3(1, 1);
+		let scaleMax = v3(1, 1);
+
+		let anchorPoint = v2(0.5, 0.5);
+		let offY = 0;
+		let offX = 0;
+		let animationName = '';
+		const contentSize = block
+			.getChildByName('spBlock')
+			.getComponent(UITransform).contentSize;
+
+		switch (dir) {
+			case 'up':
+				scaleMin = v3(1, 0.7);
+				scaleMax = v3(1, 1.3);
+				anchorPoint = v2(0.5, 1);
+				offY = contentSize.height / 2;
+				animationName = dir;
+				break;
+			case 'down':
+				scaleMin = v3(1, 0.7);
+				scaleMax = v3(1, 1.3);
+				anchorPoint = v2(0.5, 0);
+				offY = -contentSize.height / 2;
+				animationName = dir;
+				break;
+			case 'left':
+				scaleMin = v3(0.7, 1);
+				scaleMax = v3(1.3, 1);
+				anchorPoint = v2(0, 0.5);
+				offX = -contentSize.width / 2;
+				animationName = dir;
+				break;
+			case 'right':
+				scaleMin = v3(0.7, 1);
+				scaleMax = v3(1.3, 1);
+				anchorPoint = v2(1, 0.5);
+				offX = contentSize.width / 2;
+				animationName = dir;
+				break;
+			default:
+				console.error('moveBlock(): design error !');
+				return;
+		}
+		const moveAct = tween().by(movedT, { position: v3(movedX, movedY) });
+		const scaleAct = tween()
+			.to(scaleTime, { scale: scaleMin }) //缩小
+			.to(scaleTime, { scale: scaleNormal }) //正常大小
+			.to(scaleTime, { scale: scaleMax }) //放大
+			.to(scaleTime, { scale: scaleNormal }); //正常大小
+		tween(block)
+			.then(moveAct)
+			.call(() => {
+				audioMgr.playSound(SOUND_CLIPS.SLIDE);
+				++this.moveStep;
+				const ndFood = block.getChildByName('dragonBlock');
+				tween(ndFood)
+					.then(scaleAct)
+					.call(() => {
+						const dragonBlock = block
+							.getChildByName('dragonBlock')
+							.getComponent(dragonBones.ArmatureDisplay);
+						dragonBlock.timeScale = -1;
+						dragonBlock.playAnimation(animationName, 1);
+						if (this._hrd.isEscaped(this._hrd.state)) {
+							this._winCb(block);
+						} else {
+							if (this._bInTip) {
+								this.autoMove();
+							}
+						}
+					})
+					.start();
+			})
+			.start();
+	}
+
+	moveBlockByDir(tchedBlock: Node, blockId: number, dir: string) {
+		let newState: IState = null;
+		switch (dir) {
+			case 'left':
+				newState = this._moveToNewState(this._hrd.state, blockId, 3);
+				break;
+			case 'right':
+				newState = this._moveToNewState(this._hrd.state, blockId, 1);
+				break;
+			case 'down':
+				newState = this._moveToNewState(this._hrd.state, blockId, 0);
+				break;
+			case 'up':
+				newState = this._moveToNewState(this._hrd.state, blockId, 2);
+				break;
+			default:
+				break;
+		}
+		if (newState) {
+			this.updateNewState(newState, blockId, dir);
+		}
+		return newState;
+	}
+
+	updateNewState(state: IState, blockId: number, dir: string) {
+		const [movedR, movedC] = this._getSlide(this._hrd.state, state, blockId);
+		this._hrd.state = state;
+		const tchedBlock = this._blockObj[blockId];
+		if (dir === 'left' || dir === 'right') {
+			this.slideBlock(
+				tchedBlock,
+				dir,
+				movedC * BLOCK_CELL_SIZE,
+				0,
+				Math.abs(movedC) * ONE_STEP_MOVE_TIME
+			);
+		}
+		if (dir === 'up' || dir === 'down') {
+			this.slideBlock(
+				tchedBlock,
+				dir,
+				0,
+				-movedR * BLOCK_CELL_SIZE,
+				Math.abs(movedR) * ONE_STEP_MOVE_TIME
+			);
+		}
+	}
+
+	autoMove() {
+		let dir = '';
+		const { state, dirIdx, blockIdx } = this._results.shift();
+		if (state == null) {
+			return;
+		}
+		switch (dirIdx) {
+			case 0:
+				dir = 'down';
+				break;
+			case 1:
+				dir = 'right';
+				break;
+			case 2:
+				dir = 'up';
+				break;
+			case 3:
+				dir = 'left';
+				break;
+
+			default:
+				break;
+		}
+		this.updateNewState(state, blockIdx + 1, dir);
 	}
 }
 

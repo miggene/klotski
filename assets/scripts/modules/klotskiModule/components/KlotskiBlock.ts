@@ -17,13 +17,14 @@ import {
 	randomRangeInt,
 } from 'cc';
 import { resMgr } from '../../../common/mgrs/ResMgr';
+import { HRD_COL } from '../../../libs/hrd';
 import { IBlock } from '../IKlotskiModule';
 import { BLOCK_SPRITE_FRAME_PATH } from '../KlotskiModuleCfg';
 import {
 	getBlockContentSizeByStyle,
 	getBlockSizeByStyle,
 } from '../KlotskiService';
-import { G_BOARD_X } from '../klotskiServices/KlotskiSettings';
+
 const { ccclass, property } = _decorator;
 
 export const enum BurnStatus {
@@ -41,19 +42,13 @@ export class KlotskiBlock extends Component {
 	}
 	public set blockName(v: string) {
 		this._blockName = v;
-		// resMgr
-		// 	.loadSprite(`${BLOCK_SPRITE_FRAME_PATH}${v}`)
-		// 	.then((spriteFrame: SpriteFrame) => {
-		// 		this.spBlock.spriteFrame = spriteFrame;
-		// 	})
-		// 	.catch((err) => console.error(err));
 	}
 
-	private _style: number;
-	public get style(): number {
+	private _style: string;
+	public get style(): string {
 		return this._style;
 	}
-	public set style(v: number) {
+	public set style(v: string) {
 		this._style = v;
 		const blockSize = getBlockContentSizeByStyle(v);
 		this.node
@@ -118,6 +113,7 @@ export class KlotskiBlock extends Component {
 	}
 	public set burnStatus(v: BurnStatus) {
 		this._burnStatus = v;
+		this.dragonBlock.timeScale = 1;
 		if (v === BurnStatus.T1) {
 			this.dragonBlock.playAnimation('turnred1', 1);
 		} else if (v === BurnStatus.M1) {
@@ -155,7 +151,13 @@ export class KlotskiBlock extends Component {
 		this.unschedule(this._refreshUsualAnimation);
 	}
 
-	public initProps(props: IBlock) {
+	public initProps(props: {
+		blockName: string;
+		blockId: number;
+		style: string;
+		row: number;
+		col: number;
+	}) {
 		const { blockId, blockName, style, row, col } = props;
 		this.blockId = blockId;
 		this.blockName = blockName;
@@ -176,7 +178,7 @@ export class KlotskiBlock extends Component {
 	public updatePos(row: number, col: number) {
 		this.row = row;
 		this.col = col;
-		this.node.setSiblingIndex(row * G_BOARD_X + col);
+		this.node.setSiblingIndex(row * HRD_COL + col);
 	}
 
 	/**

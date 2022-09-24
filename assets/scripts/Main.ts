@@ -21,26 +21,24 @@ import {
 	Vec3,
 	Sprite,
 	AudioSource,
-	macro,
-	TERRAIN_NORTH_INDEX,
 } from 'cc';
 
 import { winMgr } from './common/mgrs/WinMgr';
-import { WIN_ID } from './common/mgrs/WinConfig';
+
 import { dataMgr } from './common/mgrs/DataMgr';
 import { ILevelData } from './modules/levelsModule/ILevelsModule';
 import { Level_Per_Page } from './modules/levelsModule/ILevelsModuleCfg';
 import { resMgr } from './common/mgrs/ResMgr';
-import { LevelItem } from './modules/levelsModule/components/LevelItem';
+
 import { DragonLevel } from './modules/DragonLevel';
 import { database } from './Database';
 import { audioMgr, SOUND_CLIPS } from './AudioMgr';
 
-// import lodash from 'lodash-es';
-// import Hrd from 'hrd-solver';
+import { WIN_ID, getWinInfo } from './common/mgrs/WinConfig';
+
 const { ccclass, property } = _decorator;
 
-const LEVELS_DATA_PATH = 'datas/hrd_answers_straight';
+const LEVELS_DATA_PATH = 'datas/hrd_levels';
 const FRONT = 13;
 const AFTER = 5;
 @ccclass('Main')
@@ -81,6 +79,9 @@ export class Main extends Component {
 	@property(Node)
 	bgMask: Node;
 
+	@property(Node)
+	blockLayer: Node;
+
 	private _bOpenLevelImmediately: boolean = false;
 
 	private _lastBook: Node = null;
@@ -107,6 +108,38 @@ export class Main extends Component {
 
 		this.btnNext.node.setSiblingIndex(100);
 		this.btnPrev.node.setSiblingIndex(100);
+
+		if (this.btnNext.node.active) {
+			this.btnNext.node.setPosition(this._baseNextPos);
+			tween(this.btnNext.node).stop();
+			tween(this.btnNext.node)
+				.repeatForever(
+					tween(this.btnNext.node)
+						.to(0.5, {
+							position: v3(this._baseNextPos.x + 10, this._baseNextPos.y, 0),
+						})
+						.to(0.5, {
+							position: v3(this._baseNextPos.x, this._baseNextPos.y, 0),
+						})
+				)
+				.start();
+		}
+
+		if (this.btnPrev.node.active) {
+			this.btnPrev.node.setPosition(this._basePrevPos);
+			tween(this.btnPrev.node).stop();
+			tween(this.btnPrev.node)
+				.repeatForever(
+					tween(this.btnPrev.node)
+						.to(0.5, {
+							position: v3(this._basePrevPos.x - 10, this._basePrevPos.y, 0),
+						})
+						.to(0.5, {
+							position: v3(this._basePrevPos.x, this._basePrevPos.y, 0),
+						})
+				)
+				.start();
+		}
 	}
 
 	private _srcLeftPos: Vec3;
@@ -120,61 +153,22 @@ export class Main extends Component {
 
 	private _randGrilAnimName: string;
 
-	onLoad() {
-		// audioMgr.init(this.node.getComponent(AudioSource));
+	private _basePrevPos: Vec3;
+	private _baseNextPos: Vec3;
+
+	async onLoad() {
+		this.blockLayer.active = false;
+		// 预加载音频
 		const audioSource = this.node.addComponent(AudioSource);
 		audioMgr.init(audioSource);
-		audioMgr.playBgMusic();
+		// audioMgr.playBgMusic();
 		winMgr.init();
 		dataMgr.init();
 		database.init();
-		resMgr.loadJson(LEVELS_DATA_PATH).then((data: ILevelData[]) => {
-			this.levelsData = data;
-			console.log('database.user.curLevel :>> ', database.user.curLevel);
-			this.curIndex = Math.floor(database.user.curLevel / Level_Per_Page);
-			console.log('this.curIndex :>> ', this.curIndex);
-			this.btnPrev.node.active = false;
-			this.btnNext.node.active = false;
-		});
-		// this.btnPrev.node.active = false;
-		// this.btnNext.node.active = false;
-		this._srcLeftPos = this.drgLeft.node.getPosition();
-		this._srcRightPos = this.drgRight.node.getPosition();
 
-		this.dragonBook.node.active = true;
-		this.dragonBook.playAnimation('appear', 1);
-		this.drgGirl.playAnimation('appear', 1);
-
-		this.drgLeft.node.setPosition(
-			v3(0, this._srcLeftPos.y, this._srcLeftPos.z)
-		);
-		this.drgRight.node.setPosition(
-			v3(0, this._srcRightPos.y, this._srcRightPos.z)
-		);
-
-		// const leftZIndex = this.drgLeft.node.getSiblingIndex();
-		// const rightZIndex = this.drgRight.node.getSiblingIndex();
-		// console.log('leftZIndex :>> ', leftZIndex);
-		// console.log('rightZIndex :>> ', rightZIndex);
-
-		// this.drgLeft.node.getComponent(UIOpacity).opacity = 0;
-		// this.drgRight.node.getComponent(UIOpacity).opacity = 0;
-
-		// tween(this.drgLeft.node)
-		// 	.to(0, { position: v3(0, this._srcLeftPos.y, this._srcLeftPos.z) })
-		// 	.start();
-
-		// tween(this.drgRight.node)
-		// 	.to(0, { position: v3(0, this._srcRightPos.y, this._srcRightPos.z) })
-		// 	.start();
-
-		this._srcRankPos = this.btnRank.node.getPosition();
-		this._srcSettingPos = this.btnSetting.node.getPosition();
-		this._srcDinnerPos = this.btnDinner.node.getPosition();
-		// this._srcCookGirlPos = this.spCookGirl.node.getPosition();
-
-		const { y } = this.drgGirl.node.getPosition();
-		this.drgGirl.node.setPosition(35, y);
+		// 预加载部分界面
+		resMgr.preloadPrefab(getWinInfo(WIN_ID.KLOTSKI).path);
+		resMgr.preloadPrefab(getWinInfo(WIN_ID.OVER).path);
 	}
 
 	onEnable() {
@@ -203,7 +197,39 @@ export class Main extends Component {
 		);
 	}
 
-	start() {}
+	async start() {
+		// 播放背景音乐
+		audioMgr.playBgMusic();
+		this.levelsData = (await resMgr.loadJson(LEVELS_DATA_PATH)) as ILevelData[];
+
+		this._basePrevPos = this.btnPrev.node.getPosition().clone();
+		this._baseNextPos = this.btnNext.node.getPosition().clone();
+
+		this.curIndex = Math.floor(database.user.curLevel / Level_Per_Page);
+		this.btnPrev.node.active = false;
+		this.btnNext.node.active = false;
+
+		this._srcLeftPos = this.drgLeft.node.getPosition();
+		this._srcRightPos = this.drgRight.node.getPosition();
+
+		this.dragonBook.node.active = true;
+		this.dragonBook.playAnimation('appear', 1);
+		this.drgGirl.playAnimation('appear', 1);
+
+		this.drgLeft.node.setPosition(
+			v3(0, this._srcLeftPos.y, this._srcLeftPos.z)
+		);
+		this.drgRight.node.setPosition(
+			v3(0, this._srcRightPos.y, this._srcRightPos.z)
+		);
+
+		this._srcRankPos = this.btnRank.node.getPosition();
+		this._srcSettingPos = this.btnSetting.node.getPosition();
+		this._srcDinnerPos = this.btnDinner.node.getPosition();
+
+		const { y } = this.drgGirl.node.getPosition();
+		this.drgGirl.node.setPosition(35, y);
+	}
 
 	private _dragonBookListener(event) {
 		if (event.animationState.name === 'appear') {
@@ -330,7 +356,6 @@ export class Main extends Component {
 	}
 
 	private _createDragonLevel() {
-		console.log('this.curIndex :>> ', this.curIndex);
 		const [start, end] = [0, 1].map(
 			(v) => (v + this.curIndex) * Level_Per_Page
 		);
@@ -343,11 +368,11 @@ export class Main extends Component {
 			this.node.addChild(levelNode);
 		}
 		levelNode.getComponent(DragonLevel).show(this.curIndex, list);
+		this.blockLayer.active = false;
 	}
 
 	onBtnClickToLevel() {
-		console.log(`go to level`);
-
+		this.blockLayer.active = true;
 		this.btnPrev.node.active = false;
 		this.btnNext.node.active = false;
 
@@ -393,23 +418,6 @@ export class Main extends Component {
 				this._createBook();
 			})
 			.start();
-	}
-
-	private _refreshLevelIndex(book: Node, index: number, delateShow: boolean) {
-		this.curIndex = index;
-		const [start, end] = [0, 1].map((v) => (v + index) * Level_Per_Page);
-		const list = this.levelsData.slice(start, end);
-		const container = book.getChildByName('container');
-		for (let i = 0; i < list.length; ++i) {
-			const levelItemNode = container.getChildByName(`LevelItem${i}`);
-			if (delateShow) {
-				tween(levelItemNode.getComponent(UIOpacity))
-					.to(2, { opacity: 255 })
-					.start();
-			}
-			levelItemNode.active = true;
-			levelItemNode!.getComponent(LevelItem).initProps(list[i]);
-		}
 	}
 
 	private _createBook(bAnti: boolean = false) {
