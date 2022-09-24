@@ -170,10 +170,10 @@ export class KlotskiView extends Component {
 	dragonStick: dragonBones.ArmatureDisplay;
 	@property(dragonBones.ArmatureDisplay)
 	dragonTable: dragonBones.ArmatureDisplay;
-	@property(dragonBones.ArmatureDisplay)
-	dragonTower: dragonBones.ArmatureDisplay;
-	@property(dragonBones.ArmatureDisplay)
-	dragonGlass: dragonBones.ArmatureDisplay;
+	// @property(dragonBones.ArmatureDisplay)
+	// dragonTower: dragonBones.ArmatureDisplay;
+	// @property(dragonBones.ArmatureDisplay)
+	// dragonGlass: dragonBones.ArmatureDisplay;
 	@property(dragonBones.ArmatureDisplay)
 	dragonOven: dragonBones.ArmatureDisplay;
 
@@ -276,11 +276,11 @@ export class KlotskiView extends Component {
 			this._tableAnimEventHandler,
 			this
 		);
-		this.dragonTower.addEventListener(
-			dragonBones.EventObject.COMPLETE,
-			this._towerAnimEventHandler,
-			this
-		);
+		// this.dragonTower.addEventListener(
+		// 	dragonBones.EventObject.COMPLETE,
+		// 	this._towerAnimEventHandler,
+		// 	this
+		// );
 		this.drgCat.addEventListener(
 			dragonBones.EventObject.COMPLETE,
 			this._catAnimEventHandler,
@@ -426,11 +426,11 @@ export class KlotskiView extends Component {
 			this._tableAnimEventHandler,
 			this
 		);
-		this.dragonTower.removeEventListener(
-			dragonBones.EventObject.COMPLETE,
-			this._towerAnimEventHandler,
-			this
-		);
+		// this.dragonTower.removeEventListener(
+		// 	dragonBones.EventObject.COMPLETE,
+		// 	this._towerAnimEventHandler,
+		// 	this
+		// );
 		this.drgCat.removeEventListener(
 			dragonBones.EventObject.COMPLETE,
 			this._catAnimEventHandler,
@@ -686,8 +686,8 @@ export class KlotskiView extends Component {
 		this.gridBgLayer.children.forEach((child) =>
 			tween(child.getComponent(UIOpacity)).to(1, { opacity: 0 }).start()
 		);
-		this.dragonGlass.playAnimation('disappear', 1);
-		this.dragonTower.playAnimation('disappear', 1);
+		// this.dragonGlass.playAnimation('disappear', 1);
+		// this.dragonTower.playAnimation('disappear', 1);
 		this.dragonTable.playAnimation('disappear', 1);
 		this.dragonOven.playAnimation('disappear', 1);
 		this.dragonStick.timeScale = -1;
@@ -770,9 +770,9 @@ export class KlotskiView extends Component {
 	}) {
 		if (event.type === dragonBones.EventObject.COMPLETE) {
 			if (event.animationState.name === 'appear') {
-				this.dragonTower.node.active = true;
-				this.dragonTower.playAnimation('appear', 1);
-				this.dragonGlass.playAnimation('appear', 1);
+				// this.dragonTower.node.active = true;
+				// this.dragonTower.playAnimation('appear', 1);
+				// this.dragonGlass.playAnimation('appear', 1);
 				this.lblMoveStep.node.getComponent(UIOpacity).opacity = 255;
 				this.lblUsedTime.node.getComponent(UIOpacity).opacity = 255;
 				this.drgCat.playAnimation('appear', 1);
@@ -795,7 +795,7 @@ export class KlotskiView extends Component {
 				this._playKnifeForkAnimationIn();
 			}
 			if (event.animationState.name === 'disappear') {
-				this.dragonTower.node.active = false;
+				// this.dragonTower.node.active = false;
 			}
 		}
 	}
