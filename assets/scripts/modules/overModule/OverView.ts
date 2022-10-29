@@ -178,8 +178,12 @@ export class OverView extends Component {
 			database.user.setState({ maxUnlockLevel });
 		}
 		const path = `dragonBones/${this._blockName}`;
-		const dragonBonesAsset = await resMgr.loadDragonAsset(path);
-		const dragonBonesAtlasAsset = await resMgr.loadDragonAtlasAsset(path);
+		const bundle = await resMgr.loadBundle('foodBundle');
+		const dragonBonesAsset = await resMgr.loadDragonAsset(path, bundle);
+		const dragonBonesAtlasAsset = await resMgr.loadDragonAtlasAsset(
+			path,
+			bundle
+		);
 		this.drgFood.dragonAsset = dragonBonesAsset;
 		this.drgFood.dragonAtlasAsset = dragonBonesAtlasAsset;
 		this.drgFood.armatureName = 'Armature';

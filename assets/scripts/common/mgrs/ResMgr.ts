@@ -8,6 +8,8 @@
  */
 
 import {
+	AssetManager,
+	assetManager,
 	dragonBones,
 	JsonAsset,
 	Prefab,
@@ -54,9 +56,21 @@ class ResMgr {
 		});
 	}
 
-	public async loadDragonAsset(path: string) {
+	public async loadBundle(bundleName: string) {
+		return new Promise<AssetManager.Bundle>((resolve, reject) => {
+			assetManager.loadBundle(bundleName, null, (err, bundle) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(bundle);
+				}
+			});
+		});
+	}
+
+	public async loadDragonAsset(path: string, bundle: AssetManager.Bundle) {
 		return new Promise<dragonBones.DragonBonesAsset>((resolve, reject) => {
-			resources.load(
+			bundle.load(
 				`${path}_ske`,
 				dragonBones.DragonBonesAsset,
 				(err, dragonBonesAsset: dragonBones.DragonBonesAsset) => {
@@ -67,9 +81,9 @@ class ResMgr {
 		});
 	}
 
-	public async loadDragonAtlasAsset(path: string) {
+	public async loadDragonAtlasAsset(path: string, bundle: AssetManager.Bundle) {
 		return new Promise<dragonBones.DragonBonesAtlasAsset>((resolve, reject) => {
-			resources.load(
+			bundle.load(
 				`${path}_tex`,
 				dragonBones.DragonBonesAtlasAsset,
 				(err, dragonBonesAtlasAsset: dragonBones.DragonBonesAtlasAsset) => {

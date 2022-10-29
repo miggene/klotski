@@ -187,8 +187,13 @@ export class KlotskiBlock extends Component {
 	public async loadDragons() {
 		const path = `dragonBones/${this.blockName}`;
 		try {
-			const dragonBonesAsset = await resMgr.loadDragonAsset(path);
-			const dragonBonesAtlasAsset = await resMgr.loadDragonAtlasAsset(path);
+			const bundle = await resMgr.loadBundle('foodBundle');
+
+			const dragonBonesAsset = await resMgr.loadDragonAsset(path, bundle);
+			const dragonBonesAtlasAsset = await resMgr.loadDragonAtlasAsset(
+				path,
+				bundle
+			);
 			this.dragonBlock.dragonAsset = dragonBonesAsset;
 			this.dragonBlock.dragonAtlasAsset = dragonBonesAtlasAsset;
 			this.dragonBlock.armatureName = 'Armature';
