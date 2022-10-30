@@ -21,6 +21,11 @@ import {
 	Vec3,
 	Sprite,
 	AudioSource,
+	sys,
+	size,
+	view,
+	screen,
+	director,
 } from 'cc';
 
 import { winMgr } from './common/mgrs/WinMgr';
@@ -34,7 +39,8 @@ import { DragonLevel } from './modules/DragonLevel';
 import { database } from './Database';
 import { audioMgr, SOUND_CLIPS } from './AudioMgr';
 
-import { WIN_ID, getWinInfo } from './common/mgrs/WinConfig';
+import { WIN_ID, getWinInfo, WIN_ZINDEX } from './common/mgrs/WinConfig';
+import WXAuthorize from './common/mgrs/WXAuthorize';
 
 const { ccclass, property } = _decorator;
 
@@ -81,6 +87,11 @@ export class Main extends Component {
 
 	@property(Node)
 	blockLayer: Node;
+
+	@property(Node)
+	btnStart: Node;
+
+	private _btnAuthorize: any;
 
 	private _bOpenLevelImmediately: boolean = false;
 
@@ -156,7 +167,11 @@ export class Main extends Component {
 	private _basePrevPos: Vec3;
 	private _baseNextPos: Vec3;
 
-	async onLoad() {
+	onLoad() {
+		if (sys.platform === sys.Platform.WECHAT_GAME) {
+			console.log('on load auth');
+			this._createAuthorizeBtn(this.btnStart);
+		}
 		this.blockLayer.active = false;
 		// 预加载音频
 		const audioSource = this.node.addComponent(AudioSource);
@@ -372,6 +387,29 @@ export class Main extends Component {
 	}
 
 	onBtnClickToLevel() {
+		// if (sys.platform === sys.Platform.WECHAT_GAME) {
+		// 	let button = wx.createUserInfoButton({
+		// 		type: 'text',
+		// 		text: '',
+		// 		style: {
+		// 			left: 10,
+		// 			top: 76,
+		// 			width: 200,
+		// 			height: 40,
+		// 			lineHeight: 40,
+		// 			// backgroundColor: '#ff0000',
+		// 			color: '#ffffff',
+		// 			textAlign: 'center',
+		// 			fontSize: 16,
+		// 			borderRadius: 4,
+		// 		},
+		// 	});
+		// 	button.onTap((res) => {
+		// 		console.log(res);
+		// 	});
+		// }
+		// return;
+
 		this.blockLayer.active = true;
 		this.btnPrev.node.active = false;
 		this.btnNext.node.active = false;
@@ -527,6 +565,12 @@ export class Main extends Component {
 		this.drgGirl.node.setPosition(35, y + 50);
 	}
 	public showLevelToMain() {
+		if (
+			!WXAuthorize.wxIsAuthorized &&
+			sys.platform === sys.Platform.WECHAT_GAME
+		) {
+			this._btnAuthorize && this._btnAuthorize.show();
+		}
 		this.btnNext.node.active = false;
 		this.btnPrev.node.active = false;
 
@@ -547,6 +591,13 @@ export class Main extends Component {
 		});
 	}
 	public showSettingToMain() {
+		if (
+			!WXAuthorize.wxIsAuthorized &&
+			sys.platform === sys.Platform.WECHAT_GAME
+		) {
+			this._btnAuthorize && this._btnAuthorize.show();
+		}
+
 		this.dragonBook.timeScale = -1;
 		this.dragonBook.playAnimation('open_1', 1);
 		audioMgr.playSound(SOUND_CLIPS.FLIP);
@@ -596,6 +647,64 @@ export class Main extends Component {
 		this._randGrilAnimName = ['blink', 'daze', 'shock'][rand];
 		this.drgGirl.timeScale = 1;
 		this.drgGirl.playAnimation(this._randGrilAnimName, 1);
+	}
+
+	private _createAuthorizeBtn(btnNode: Node) {
+		const visibleSize = view.getVisibleSizeInPixel();
+		const leftPercent =
+			(btnNode.getPosition().x +
+				visibleSize.width / 2 -
+				btnNode.getComponent(UITransform).width / 2) /
+			visibleSize.width;
+
+		const topPercent =
+			(visibleSize.height / 2 -
+				(btnNode.getPosition().y +
+					btnNode.getComponent(UITransform).height / 2)) /
+			visibleSize.height;
+		const sysWXInfo = wx.getSystemInfoSync();
+		const left = leftPercent * sysWXInfo.screenWidth;
+		const top = topPercent * sysWXInfo.screenHeight;
+		const width =
+			(btnNode.getComponent(UITransform).width / visibleSize.width) *
+			sysWXInfo.screenWidth;
+		const height =
+			(btnNode.getComponent(UITransform).height / visibleSize.height) *
+			sysWXInfo.screenHeight;
+
+		this._btnAuthorize = wx.createUserInfoButton({
+			type: 'text',
+			text: '',
+			style: {
+				left: left,
+				top: top,
+				width: width,
+				height: height,
+				lineHeight: 0,
+				// backgroundColor: '#ff0000',
+				// color: '#ffffff',
+				textAlign: 'center',
+				fontSize: 16,
+				borderRadius: 4,
+			},
+		});
+		this._btnAuthorize.onTap((uinfo) => {
+			console.log('onTap uinfo: ', uinfo);
+			if (uinfo.userInfo) {
+				console.log('wxLogin auth success');
+				// wx.showToast({ title: '授权成功' });
+				WXAuthorize.wxUserInfo = uinfo.userInfo;
+				WXAuthorize.wxIsAuthorized = true;
+				this.onBtnClickToLevel();
+			} else {
+				console.log('wxLogin auth fail');
+				WXAuthorize.wxUserInfo = null;
+				WXAuthorize.wxIsAuthorized = false;
+				this.onBtnClickToLevel();
+				// wx.showToast({ title: '授权失败' });
+			}
+			this._btnAuthorize.hide();
+		});
 	}
 }
 

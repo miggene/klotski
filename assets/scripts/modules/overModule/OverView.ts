@@ -158,10 +158,10 @@ export class OverView extends Component {
 	}) {
 		audioMgr.playSound(SOUND_CLIPS.WIN);
 		this.schedule(this._createWinTip, 2, macro.REPEAT_FOREVER, 1);
-		this.scheduleOnce(() => {
-			this.drgBB.playAnimation('apper', 1);
-			this.bestTime = this._bestTime;
-		}, 2);
+		// this.scheduleOnce(() => {
+		// 	this.drgBB.playAnimation('apper', 1);
+		// 	this.bestTime = this._bestTime;
+		// }, 2);
 		this.drgEnd.node.active = true;
 		this.drgEnd.playAnimation('end', 1);
 
@@ -169,7 +169,7 @@ export class OverView extends Component {
 		this.level = curLevel;
 		// this.moveStep = moveStep;
 
-		this._bestTime = this._updateBestTime(curLevel, time);
+		// this._bestTime = this._updateBestTime(curLevel, time);
 
 		this.time = time;
 		this._blockName = blockName;

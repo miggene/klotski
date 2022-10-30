@@ -3710,7 +3710,7 @@
         "__id__": 104
       }
     ],
-    "_active": false,
+    "_active": true,
     "_components": [
       {
         "__id__": 108
@@ -6075,6 +6075,9 @@
     },
     "blockLayer": {
       "__id__": 164
+    },
+    "btnStart": {
+      "__id__": 104
     },
     "_id": "8ayTizTfNBk40+ZHZn4oqL"
   },

@@ -26,11 +26,17 @@ import {
 	TweenEasing,
 	random,
 	UIOpacity,
+	sys,
+	assetManager,
+	ImageAsset,
+	SpriteFrame,
+	Texture2D,
 } from 'cc';
 import { audioMgr, SOUND_CLIPS } from '../../AudioMgr';
 import { resMgr } from '../../common/mgrs/ResMgr';
 import { WIN_ID } from '../../common/mgrs/WinConfig';
 import { winMgr } from '../../common/mgrs/WinMgr';
+import WXAuthorize from '../../common/mgrs/WXAuthorize';
 import { deepClone, formatTime } from '../../common/utils/Helper';
 import Hrd, { IState, mergeSteps, solve } from '../../libs/hrd';
 
@@ -210,6 +216,9 @@ export class KlotskiView extends Component {
 	@property(Node)
 	blockLayer: Node;
 
+	@property(Sprite)
+	spHead: Sprite;
+
 	private _fingerPos: Vec3;
 
 	private _bInTip = false;
@@ -244,6 +253,29 @@ export class KlotskiView extends Component {
 		this.tipperLayer.getChildByName('mask').active = false;
 
 		this.continueLayer.active = false;
+
+		if (
+			sys.platform === sys.Platform.WECHAT_GAME &&
+			WXAuthorize.wxIsAuthorized
+		) {
+			const wxUserInfo = WXAuthorize.wxUserInfo;
+			console.log('wxUserInfo :>> ', wxUserInfo);
+			assetManager.loadRemote(
+				wxUserInfo.avatarUrl,
+				{ ext: '.png' },
+				(err, imageAsset: ImageAsset) => {
+					if (err) {
+						console.log('err :>> ', err);
+						return;
+					}
+					const spriteFrame = new SpriteFrame();
+					const texture = new Texture2D();
+					texture.image = imageAsset;
+					spriteFrame.texture = texture;
+					this.spHead.spriteFrame = spriteFrame;
+				}
+			);
+		}
 	}
 
 	onEnable() {
