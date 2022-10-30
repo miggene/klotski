@@ -175,7 +175,7 @@ export class OverView extends Component {
 		this._blockName = blockName;
 		if (this.level > database.user.maxUnlockLevel) {
 			const maxUnlockLevel = database.user.maxUnlockLevel + 1;
-			database.user.setState({ maxUnlockLevel });
+			database.setState({ maxUnlockLevel });
 		}
 		const path = `dragonBones/${this._blockName}`;
 		const bundle = await resMgr.loadBundle('foodBundle');
@@ -190,7 +190,7 @@ export class OverView extends Component {
 		this.drgFood.playAnimation('victory', 0);
 		this.drgFood.node.getComponent(UIOpacity).opacity = 0;
 		const nextLevelIndex = this.level;
-		database.user.setState({ curLevel: nextLevelIndex });
+		database.setState({ curLevel: nextLevelIndex });
 		tween(this.drgFood.node.getComponent(UIOpacity))
 			.delay(0.3)
 			.to(0.1, { opacity: 255 })

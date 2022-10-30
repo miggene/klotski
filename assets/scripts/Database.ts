@@ -1,49 +1,24 @@
 import { project } from './common/config/Projectrc';
 
-type State = { [key: string]: any };
+const UserSchema = {
+	curLevel: 0,
+	maxUnlockLevel: 0,
+	projectKey: 'hrd_user_schema',
+};
 
-class Schema {
-	constructor(public key: string) {}
-	public get projectKey(): string {
-		return `${project.name}_${this.key}`;
-	}
-	public setState(state: State) {
-		for (const key in state) {
-			if (Object.prototype.hasOwnProperty.call(state, key)) {
-				const element = state[key];
-				if (!this[key] || this[key] !== element) {
-					this[key] = element;
-				}
-			}
-		}
-		localStorage.setItem(this.projectKey, JSON.stringify(this));
-	}
-}
-
-class UserSchema extends Schema {
-	curLevel: number = 0;
-	maxUnlockLevel: number = 0;
-}
-
-class UserSettingSchema extends Schema {
-	soundOn: number = 1;
-	shakeOn: number = 1;
-}
+// const UserSettingSchema = {
+// 	soundOn: 1,
+// 	shakeOn: 1,
+// 	projectKey: 'hrd_user_setting_schema',
+// };
 
 class Database {
 	// public user: UserSchema;
-	private _user: UserSchema;
-	public get user(): UserSchema {
-		return this._user;
-	}
-	public set user(v: UserSchema) {
-		this._user = v;
-	}
-	public userSetting: UserSettingSchema;
+	public user: { [key: string]: any };
 
 	constructor() {
-		this.user = new UserSchema('user');
-		this.userSetting = new UserSettingSchema('userSetting');
+		this.user = JSON.parse(JSON.stringify(UserSchema));
+		// this.userSetting = JSON.parse(JSON.stringify(UserSettingSchema));
 	}
 	private static _instance: Database;
 	public static get instance(): Database {
@@ -53,23 +28,34 @@ class Database {
 
 	public init() {
 		this.initLocalStorage(this.user);
-		this.initLocalStorage(this.userSetting);
 	}
 
-	public initLocalStorage<T extends Schema>(initValue: T) {
+	public initLocalStorage(initValue: { [key: string]: any }) {
+		console.log('initValue :>> ', initValue);
 		const projectKey = initValue.projectKey;
 		const ls = localStorage.getItem(projectKey);
-		if (ls !== null) {
+		console.log('ls :>> ', ls);
+		if (ls) {
 			const parseObj = JSON.parse(ls);
-			for (const key in parseObj) {
-				if (Object.prototype.hasOwnProperty.call(parseObj, key)) {
-					const element = parseObj[key];
-					initValue[key] = element;
-				}
-			}
+			this.user = parseObj;
 		} else {
 			localStorage.setItem(projectKey, JSON.stringify(initValue));
 		}
+	}
+
+	public setState(state: { [key: string]: any }) {
+		for (const key in state) {
+			if (Object.prototype.hasOwnProperty.call(state, key)) {
+				const element = state[key];
+				if (key in this.user) {
+					this.user[key] = element;
+				}
+				// if (!this[key] || this[key] !== element) {
+				// 	this[key] = element;
+				// }
+			}
+		}
+		localStorage.setItem(this.user.projectKey, JSON.stringify(this.user));
 	}
 }
 
