@@ -91,7 +91,7 @@ export class Main extends Component {
 	@property(Node)
 	btnStart: Node;
 
-	private _btnAuthorize: any;
+	// private _btnAuthorize: any;
 
 	private _bOpenLevelImmediately: boolean = false;
 
@@ -168,10 +168,10 @@ export class Main extends Component {
 	private _baseNextPos: Vec3;
 
 	onLoad() {
-		if (sys.platform === sys.Platform.WECHAT_GAME) {
-			console.log('on load auth');
-			this._createAuthorizeBtn(this.btnStart);
-		}
+		// if (sys.platform === sys.Platform.WECHAT_GAME) {
+		// 	console.log('on load auth');
+		// 	this._createAuthorizeBtn(this.btnStart);
+		// }
 		this.blockLayer.active = false;
 		// 预加载音频
 		const audioSource = this.node.addComponent(AudioSource);
@@ -565,12 +565,12 @@ export class Main extends Component {
 		this.drgGirl.node.setPosition(35, y + 50);
 	}
 	public showLevelToMain() {
-		if (
-			!WXAuthorize.wxIsAuthorized &&
-			sys.platform === sys.Platform.WECHAT_GAME
-		) {
-			this._btnAuthorize && this._btnAuthorize.show();
-		}
+		// if (
+		// 	!WXAuthorize.wxIsAuthorized &&
+		// 	sys.platform === sys.Platform.WECHAT_GAME
+		// ) {
+		// 	this._btnAuthorize && this._btnAuthorize.show();
+		// }
 		this.btnNext.node.active = false;
 		this.btnPrev.node.active = false;
 
@@ -591,12 +591,12 @@ export class Main extends Component {
 		});
 	}
 	public showSettingToMain() {
-		if (
-			!WXAuthorize.wxIsAuthorized &&
-			sys.platform === sys.Platform.WECHAT_GAME
-		) {
-			this._btnAuthorize && this._btnAuthorize.show();
-		}
+		// if (
+		// 	!WXAuthorize.wxIsAuthorized &&
+		// 	sys.platform === sys.Platform.WECHAT_GAME
+		// ) {
+		// 	this._btnAuthorize && this._btnAuthorize.show();
+		// }
 
 		this.dragonBook.timeScale = -1;
 		this.dragonBook.playAnimation('open_1', 1);
@@ -649,63 +649,63 @@ export class Main extends Component {
 		this.drgGirl.playAnimation(this._randGrilAnimName, 1);
 	}
 
-	private _createAuthorizeBtn(btnNode: Node) {
-		const visibleSize = view.getVisibleSizeInPixel();
-		const leftPercent =
-			(btnNode.getPosition().x +
-				visibleSize.width / 2 -
-				btnNode.getComponent(UITransform).width / 2) /
-			visibleSize.width;
+	// private _createAuthorizeBtn(btnNode: Node) {
+	// 	const visibleSize = view.getVisibleSizeInPixel();
+	// 	const leftPercent =
+	// 		(btnNode.getPosition().x +
+	// 			visibleSize.width / 2 -
+	// 			btnNode.getComponent(UITransform).width / 2) /
+	// 		visibleSize.width;
 
-		const topPercent =
-			(visibleSize.height / 2 -
-				(btnNode.getPosition().y +
-					btnNode.getComponent(UITransform).height / 2)) /
-			visibleSize.height;
-		const sysWXInfo = wx.getSystemInfoSync();
-		const left = leftPercent * sysWXInfo.screenWidth;
-		const top = topPercent * sysWXInfo.screenHeight;
-		const width =
-			(btnNode.getComponent(UITransform).width / visibleSize.width) *
-			sysWXInfo.screenWidth;
-		const height =
-			(btnNode.getComponent(UITransform).height / visibleSize.height) *
-			sysWXInfo.screenHeight;
+	// 	const topPercent =
+	// 		(visibleSize.height / 2 -
+	// 			(btnNode.getPosition().y +
+	// 				btnNode.getComponent(UITransform).height / 2)) /
+	// 		visibleSize.height;
+	// 	const sysWXInfo = wx.getSystemInfoSync();
+	// 	const left = leftPercent * sysWXInfo.screenWidth;
+	// 	const top = topPercent * sysWXInfo.screenHeight;
+	// 	const width =
+	// 		(btnNode.getComponent(UITransform).width / visibleSize.width) *
+	// 		sysWXInfo.screenWidth;
+	// 	const height =
+	// 		(btnNode.getComponent(UITransform).height / visibleSize.height) *
+	// 		sysWXInfo.screenHeight;
 
-		this._btnAuthorize = wx.createUserInfoButton({
-			type: 'text',
-			text: '',
-			style: {
-				left: left,
-				top: top,
-				width: width,
-				height: height,
-				lineHeight: 0,
-				// backgroundColor: '#ff0000',
-				// color: '#ffffff',
-				textAlign: 'center',
-				fontSize: 16,
-				borderRadius: 4,
-			},
-		});
-		this._btnAuthorize.onTap((uinfo) => {
-			console.log('onTap uinfo: ', uinfo);
-			if (uinfo.userInfo) {
-				console.log('wxLogin auth success');
-				// wx.showToast({ title: '授权成功' });
-				WXAuthorize.wxUserInfo = uinfo.userInfo;
-				WXAuthorize.wxIsAuthorized = true;
-				this.onBtnClickToLevel();
-			} else {
-				console.log('wxLogin auth fail');
-				WXAuthorize.wxUserInfo = null;
-				WXAuthorize.wxIsAuthorized = false;
-				this.onBtnClickToLevel();
-				// wx.showToast({ title: '授权失败' });
-			}
-			this._btnAuthorize.hide();
-		});
-	}
+	// 	this._btnAuthorize = wx.createUserInfoButton({
+	// 		type: 'text',
+	// 		text: '',
+	// 		style: {
+	// 			left: left,
+	// 			top: top,
+	// 			width: width,
+	// 			height: height,
+	// 			lineHeight: 0,
+	// 			// backgroundColor: '#ff0000',
+	// 			// color: '#ffffff',
+	// 			textAlign: 'center',
+	// 			fontSize: 16,
+	// 			borderRadius: 4,
+	// 		},
+	// 	});
+	// 	this._btnAuthorize.onTap((uinfo) => {
+	// 		console.log('onTap uinfo: ', uinfo);
+	// 		if (uinfo.userInfo) {
+	// 			console.log('wxLogin auth success');
+	// 			// wx.showToast({ title: '授权成功' });
+	// 			WXAuthorize.wxUserInfo = uinfo.userInfo;
+	// 			WXAuthorize.wxIsAuthorized = true;
+	// 			this.onBtnClickToLevel();
+	// 		} else {
+	// 			console.log('wxLogin auth fail');
+	// 			WXAuthorize.wxUserInfo = null;
+	// 			WXAuthorize.wxIsAuthorized = false;
+	// 			this.onBtnClickToLevel();
+	// 			// wx.showToast({ title: '授权失败' });
+	// 		}
+	// 		this._btnAuthorize.hide();
+	// 	});
+	// }
 }
 
 /**

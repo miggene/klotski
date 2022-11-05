@@ -254,28 +254,28 @@ export class KlotskiView extends Component {
 
 		this.continueLayer.active = false;
 
-		if (
-			sys.platform === sys.Platform.WECHAT_GAME &&
-			WXAuthorize.wxIsAuthorized
-		) {
-			const wxUserInfo = WXAuthorize.wxUserInfo;
-			console.log('wxUserInfo :>> ', wxUserInfo);
-			assetManager.loadRemote(
-				wxUserInfo.avatarUrl,
-				{ ext: '.png' },
-				(err, imageAsset: ImageAsset) => {
-					if (err) {
-						console.log('err :>> ', err);
-						return;
-					}
-					const spriteFrame = new SpriteFrame();
-					const texture = new Texture2D();
-					texture.image = imageAsset;
-					spriteFrame.texture = texture;
-					this.spHead.spriteFrame = spriteFrame;
-				}
-			);
-		}
+		// if (
+		// 	sys.platform === sys.Platform.WECHAT_GAME &&
+		// 	WXAuthorize.wxIsAuthorized
+		// ) {
+		// 	const wxUserInfo = WXAuthorize.wxUserInfo;
+		// 	console.log('wxUserInfo :>> ', wxUserInfo);
+		// 	assetManager.loadRemote(
+		// 		wxUserInfo.avatarUrl,
+		// 		{ ext: '.png' },
+		// 		(err, imageAsset: ImageAsset) => {
+		// 			if (err) {
+		// 				console.log('err :>> ', err);
+		// 				return;
+		// 			}
+		// 			const spriteFrame = new SpriteFrame();
+		// 			const texture = new Texture2D();
+		// 			texture.image = imageAsset;
+		// 			spriteFrame.texture = texture;
+		// 			this.spHead.spriteFrame = spriteFrame;
+		// 		}
+		// 	);
+		// }
 	}
 
 	onEnable() {
