@@ -43,12 +43,12 @@ export class SettingView extends Component {
 		return this._shakeOn;
 	}
 	public set shakeOn(v: number) {
-		if (this._shakeOn !== v) {
-			this._shakeOn = v;
-			dataMgr.shakeOn = v;
-			this.dgShake.timeScale = v === 1 ? 4 : -4;
-			this.dgShake.playAnimation('newAnimation', 1);
-		}
+		// if (this._shakeOn !== v) {
+		// 	this._shakeOn = v;
+		// 	dataMgr.shakeOn = v;
+		// 	this.dgShake.timeScale = v === 1 ? 4 : -4;
+		// 	this.dgShake.playAnimation('newAnimation', 1);
+		// }
 	}
 
 	@property(Sprite)
@@ -60,8 +60,8 @@ export class SettingView extends Component {
 	@property(SpriteFrame)
 	spSoundList: SpriteFrame[] = []; //0关，1开
 
-	@property(dragonBones.ArmatureDisplay)
-	dgShake: dragonBones.ArmatureDisplay;
+	// @property(dragonBones.ArmatureDisplay)
+	// dgShake: dragonBones.ArmatureDisplay;
 
 	@property(dragonBones.ArmatureDisplay)
 	dgSound: dragonBones.ArmatureDisplay;

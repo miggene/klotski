@@ -2238,7 +2238,7 @@
       "__id__": 33
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 62
@@ -2343,7 +2343,7 @@
       "__id__": 33
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 65
@@ -3061,7 +3061,7 @@
       "__id__": 33
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 85
@@ -3277,7 +3277,7 @@
       "__id__": 33
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 91
@@ -3690,9 +3690,6 @@
         "__expectedType__": "cc.SpriteFrame"
       }
     ],
-    "dgShake": {
-      "__id__": 92
-    },
     "dgSound": {
       "__id__": 97
     },

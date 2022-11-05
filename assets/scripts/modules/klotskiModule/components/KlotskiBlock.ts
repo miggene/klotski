@@ -119,7 +119,7 @@ export class KlotskiBlock extends Component {
 		} else if (v === BurnStatus.M1) {
 			this.dragonBlock.playAnimation('morered1', 1);
 		} else if (v === BurnStatus.Black) {
-			this.dragonBlock.playAnimation('black', 0);
+			// this.dragonBlock.playAnimatio/n('black', 0);
 		}
 	}
 
