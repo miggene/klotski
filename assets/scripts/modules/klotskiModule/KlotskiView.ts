@@ -874,7 +874,7 @@ export class KlotskiView extends Component {
 	private _showCatDogWin() {
 		this.blackMask.active = true;
 		tween(this.layout)
-			.to(1, { position: v3(0, -150, 0) }, { easing: 'sineOutIn' })
+			.to(1, { position: v3(0, -150, 0) })
 			.start();
 	}
 

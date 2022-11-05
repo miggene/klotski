@@ -154,11 +154,11 @@
         "__id__": 429
       },
       {
-        "__id__": 471
+        "__id__": 469
       }
     ],
     "_prefab": {
-      "__id__": 473
+      "__id__": 471
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -4021,7 +4021,7 @@
       "__id__": 1
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 203
@@ -4174,7 +4174,7 @@
       "__id__": 1
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 211
@@ -8953,12 +8953,6 @@
       },
       {
         "__id__": 468
-      },
-      {
-        "__id__": 469
-      },
-      {
-        "__id__": 470
       }
     ],
     "_id": ""
@@ -9221,20 +9215,6 @@
   },
   {
     "__type__": "dragonBones.ArmatureDisplay.DragonBoneSocket",
-    "path": "root/ALL/CC/label/label12/clip22/paper12/title12",
-    "target": {
-      "__id__": 202
-    }
-  },
-  {
-    "__type__": "dragonBones.ArmatureDisplay.DragonBoneSocket",
-    "path": "root/ALL/CC/label/label12/clip22/paper12/z12",
-    "target": {
-      "__id__": 210
-    }
-  },
-  {
-    "__type__": "dragonBones.ArmatureDisplay.DragonBoneSocket",
     "path": "root/ALL/CC/label/label13/clip23/paper13/title13",
     "target": {
       "__id__": 194
@@ -9256,7 +9236,7 @@
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 472
+      "__id__": 470
     },
     "dragonLevel": {
       "__id__": 429
