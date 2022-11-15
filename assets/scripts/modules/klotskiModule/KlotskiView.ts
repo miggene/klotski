@@ -631,14 +631,52 @@ export class KlotskiView extends Component {
 
 		if (this.usedTime > 10 && this.usedTime <= 30) {
 			// t1
-			this._tarBlock.getComponent(KlotskiBlock).burnStatus = BurnStatus.T1;
+			// this._tarBlock.getComponent(KlotskiBlock).burnStatus = BurnStatus.T1;
 		} else if (this._usedTime > 30) {
 			// m1
-			this._tarBlock.getComponent(KlotskiBlock).burnStatus = BurnStatus.M1;
+			// this._tarBlock.getComponent(KlotskiBlock).burnStatus = BurnStatus.M1;
 		}
 	}
 
 	onBtnClickToTip(e: EventTouch) {
+		if (sys.platform === sys.Platform.WECHAT_GAME) {
+			const imageUrls = [
+				'https://mmocgame.qpic.cn/wechatgame/OiaWyWebic4whhte7MdictnICvw2NdKrmQIwSTnHEpHjpb9WoHOT5KWZvVnbyiaT9YD7/0',
+				'https://mmocgame.qpic.cn/wechatgame/OiaWyWebic4wjWXkXNK8UXVa9XrcJczDQicoxjpWPx7DK8DfKotyvzgf1MNAXRjIfFq/0',
+				'https://mmocgame.qpic.cn/wechatgame/OiaWyWebic4whvRKG1ZkzhncGnQBgS4aqvuibepAhnQNeShQYEx7qqrTNlVwn0tHChm/0',
+				'https://mmocgame.qpic.cn/wechatgame/OiaWyWebic4whiaeddCqbUb3Qz5yUcKiaTte5OTvdiaCnjicLy2ZB0Akm74YibXQzStH4ey/0',
+			];
+			const imageUrlIds = [
+				'potGBePZS0SX6U5ebhmQqQ==',
+				'Hemmm1jzTQW2pSHMwLXJKg==',
+				'QcbKUi0eRGW5MHg7CUYMrg==',
+				'wFlejsEcT1uCJtJS6gG6Ww==',
+			];
+			const idx = randomRangeInt(0, 4);
+			const imageUrlId = imageUrlIds[idx];
+			const imageUrl = imageUrls[idx];
+			wx.shareAppMessage({
+				imageUrl,
+				imageUrlId,
+			});
+
+			const randomTime = randomRangeInt(3, 5);
+
+			this.scheduleOnce(() => {
+				this._bInTip = true;
+				this.blockLayer.active = true;
+				audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+
+				const moves = solve({ blocks: this._hrd.blocks });
+				if (moves) {
+					this._results = mergeSteps(moves);
+					this.autoMove();
+				} else {
+				}
+			}, randomTime);
+			return;
+		}
+
 		this._bInTip = true;
 		this.blockLayer.active = true;
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
@@ -874,7 +912,7 @@ export class KlotskiView extends Component {
 	private _showCatDogWin() {
 		this.blackMask.active = true;
 		tween(this.layout)
-			.to(1, { position: v3(0, -150, 0) }, { easing: 'sineOutIn' })
+			.to(1, { position: v3(0, -150, 0) })
 			.start();
 	}
 
@@ -931,6 +969,36 @@ export class KlotskiView extends Component {
 
 	onBtnClickToOk() {
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+		if (sys.platform === sys.Platform.WECHAT_GAME) {
+			const imageUrls = [
+				'https://mmocgame.qpic.cn/wechatgame/OiaWyWebic4whhte7MdictnICvw2NdKrmQIwSTnHEpHjpb9WoHOT5KWZvVnbyiaT9YD7/0',
+				'https://mmocgame.qpic.cn/wechatgame/OiaWyWebic4wjWXkXNK8UXVa9XrcJczDQicoxjpWPx7DK8DfKotyvzgf1MNAXRjIfFq/0',
+				'https://mmocgame.qpic.cn/wechatgame/OiaWyWebic4whvRKG1ZkzhncGnQBgS4aqvuibepAhnQNeShQYEx7qqrTNlVwn0tHChm/0',
+				'https://mmocgame.qpic.cn/wechatgame/OiaWyWebic4whiaeddCqbUb3Qz5yUcKiaTte5OTvdiaCnjicLy2ZB0Akm74YibXQzStH4ey/0',
+			];
+			const imageUrlIds = [
+				'potGBePZS0SX6U5ebhmQqQ==',
+				'Hemmm1jzTQW2pSHMwLXJKg==',
+				'QcbKUi0eRGW5MHg7CUYMrg==',
+				'wFlejsEcT1uCJtJS6gG6Ww==',
+			];
+			const idx = randomRangeInt(0, 4);
+			const imageUrlId = imageUrlIds[idx];
+			const imageUrl = imageUrls[idx];
+			wx.shareAppMessage({
+				imageUrl,
+				imageUrlId,
+			});
+
+			const randomTime = randomRangeInt(2, 4);
+			this.scheduleOnce(() => {
+				this.moveStep = this.levelData.mergeSteps - 3;
+				this.continueLayer.active = false;
+				this.schedule(this._updateUsedTime, 1);
+			}, randomTime);
+			return;
+		}
+
 		this.moveStep = this.levelData.mergeSteps - 3;
 		this.continueLayer.active = false;
 		this.schedule(this._updateUsedTime, 1);
