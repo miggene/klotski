@@ -168,10 +168,6 @@ export class Main extends Component {
 	private _baseNextPos: Vec3;
 
 	onLoad() {
-		// if (sys.platform === sys.Platform.WECHAT_GAME) {
-		// 	console.log('on load auth');
-		// 	this._createAuthorizeBtn(this.btnStart);
-		// }
 		this.blockLayer.active = false;
 		// 预加载音频
 		const audioSource = this.node.addComponent(AudioSource);
@@ -187,6 +183,54 @@ export class Main extends Component {
 	}
 
 	onEnable() {
+		if (sys.platform === sys.Platform.WECHAT_GAME) {
+			console.log('on load auth');
+			wx.showShareMenu({
+				withShareTicket: true,
+				menus: ['shareAppMessage', 'shareTimeline'],
+				success: (res) => {
+					console.log('sucess');
+					console.log('res :>> ', res);
+				},
+				fail: (res) => {
+					console.log('fail');
+					console.log('res :>> ', res);
+				},
+				complete: (res) => {
+					console.log('complete');
+					console.log('res :>> ', res);
+				},
+			});
+			wx.onShareTimeline(
+				(res: {
+					title: string;
+					imageUrl: string;
+					imageUrlId: string;
+					imagePreviewUrl: string;
+					imagePreviewUrlId: string;
+					query: string;
+					path: string;
+				}) => {
+					console.log('分享成功-右上角');
+					console.log('res :>> ', res);
+				}
+			);
+			wx.onShareAppMessage(
+				(res: {
+					title: string;
+					imageUrl: string;
+					query: string;
+					imageUrlId: string;
+					promise: Promise<any>;
+					toCurrentGroup: boolean;
+					path: string;
+				}) => {
+					console.log('share success');
+					console.log('res :>> ', res);
+				}
+			);
+		}
+
 		this.dragonBook.addEventListener(
 			dragonBones.EventObject.COMPLETE,
 			this._dragonBookListener,

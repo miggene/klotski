@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, tween, director } from 'cc';
+import { _decorator, Component, Node, tween, director, sys } from 'cc';
 const { ccclass, property } = _decorator;
 
 /**
