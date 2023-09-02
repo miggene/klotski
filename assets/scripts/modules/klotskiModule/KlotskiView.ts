@@ -60,6 +60,7 @@ import {
 	getBlockContentSizeByStyle,
 	getBlockPositionByStyle,
 } from './KlotskiService';
+import WXMgr from '../../WXMgr';
 
 const { ccclass, property } = _decorator;
 
@@ -639,44 +640,76 @@ export class KlotskiView extends Component {
 	}
 
 	onBtnClickToTip(e: EventTouch) {
+		console.log('totip');
 		if (sys.platform === sys.Platform.WECHAT_GAME) {
-			const imageUrls = [
-				'https://mmocgame.qpic.cn/wechatgame/OiaWyWebic4whhte7MdictnICvw2NdKrmQIwSTnHEpHjpb9WoHOT5KWZvVnbyiaT9YD7/0',
-				'https://mmocgame.qpic.cn/wechatgame/OiaWyWebic4wjWXkXNK8UXVa9XrcJczDQicoxjpWPx7DK8DfKotyvzgf1MNAXRjIfFq/0',
-				'https://mmocgame.qpic.cn/wechatgame/OiaWyWebic4whvRKG1ZkzhncGnQBgS4aqvuibepAhnQNeShQYEx7qqrTNlVwn0tHChm/0',
-				'https://mmocgame.qpic.cn/wechatgame/OiaWyWebic4whiaeddCqbUb3Qz5yUcKiaTte5OTvdiaCnjicLy2ZB0Akm74YibXQzStH4ey/0',
-			];
-			const imageUrlIds = [
-				'potGBePZS0SX6U5ebhmQqQ==',
-				'Hemmm1jzTQW2pSHMwLXJKg==',
-				'QcbKUi0eRGW5MHg7CUYMrg==',
-				'wFlejsEcT1uCJtJS6gG6Ww==',
-			];
-			const idx = randomRangeInt(0, 4);
-			const imageUrlId = imageUrlIds[idx];
-			const imageUrl = imageUrls[idx];
-			wx.shareAppMessage({
-				imageUrl,
-				imageUrlId,
-			});
+			if (WXMgr.instance.rewardAd != null) {
+				WXMgr.instance.rewardAd.show().catch((err) => {
+					console.log(`微信激励广告展示失败-> ${err}`);
+					// 失败重试
+					WXMgr.instance.rewardAd
+						.load()
+						.then(() => {
+							WXMgr.instance.rewardAd.show();
+						})
+						.catch((err) => {
+							console.log('广告重试失败原因: ', err);
+							this.rewardError();
+						});
+				});
 
-			const randomTime = randomRangeInt(3, 5);
+				return;
+			}
+			//分享功能
+			// if (sys.platform === sys.Platform.WECHAT_GAME) {
+			// 	const imageUrls = [
+			// 		'https://mmocgame.qpic.cn/wechatgame/OiaWyWebic4whhte7MdictnICvw2NdKrmQIwSTnHEpHjpb9WoHOT5KWZvVnbyiaT9YD7/0',
+			// 		'https://mmocgame.qpic.cn/wechatgame/OiaWyWebic4wjWXkXNK8UXVa9XrcJczDQicoxjpWPx7DK8DfKotyvzgf1MNAXRjIfFq/0',
+			// 		'https://mmocgame.qpic.cn/wechatgame/OiaWyWebic4whvRKG1ZkzhncGnQBgS4aqvuibepAhnQNeShQYEx7qqrTNlVwn0tHChm/0',
+			// 		'https://mmocgame.qpic.cn/wechatgame/OiaWyWebic4whiaeddCqbUb3Qz5yUcKiaTte5OTvdiaCnjicLy2ZB0Akm74YibXQzStH4ey/0',
+			// 	];
+			// 	const imageUrlIds = [
+			// 		'potGBePZS0SX6U5ebhmQqQ==',
+			// 		'Hemmm1jzTQW2pSHMwLXJKg==',
+			// 		'QcbKUi0eRGW5MHg7CUYMrg==',
+			// 		'wFlejsEcT1uCJtJS6gG6Ww==',
+			// 	];
+			// 	const idx = randomRangeInt(0, 4);
+			// 	const imageUrlId = imageUrlIds[idx];
+			// 	const imageUrl = imageUrls[idx];
+			// 	wx.shareAppMessage({
+			// 		imageUrl,
+			// 		imageUrlId,
+			// 	});
 
-			this.scheduleOnce(() => {
-				this._bInTip = true;
-				this.blockLayer.active = true;
-				audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+			// 	const randomTime = randomRangeInt(3, 5);
 
-				const moves = solve({ blocks: this._hrd.blocks });
-				if (moves) {
-					this._results = mergeSteps(moves);
-					this.autoMove();
-				} else {
-				}
-			}, randomTime);
-			return;
+			// 	this.scheduleOnce(() => {
+			// 		this._bInTip = true;
+			// 		this.blockLayer.active = true;
+			// 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+
+			// 		const moves = solve({ blocks: this._hrd.blocks });
+			// 		if (moves) {
+			// 			this._results = mergeSteps(moves);
+			// 			this.autoMove();
+			// 		} else {
+			// 		}
+			// 	}, randomTime);
+			// 	return;
+			// }
+
+			this._bInTip = true;
+			this.blockLayer.active = true;
+			audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+
+			const moves = solve({ blocks: this._hrd.blocks });
+			if (moves) {
+				this._results = mergeSteps(moves);
+				this.autoMove();
+			}
 		}
-
+	}
+	rewardError() {
 		this._bInTip = true;
 		this.blockLayer.active = true;
 		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
@@ -685,7 +718,18 @@ export class KlotskiView extends Component {
 		if (moves) {
 			this._results = mergeSteps(moves);
 			this.autoMove();
-		} else {
+		}
+	}
+
+	rewardSuccess() {
+		this._bInTip = true;
+		this.blockLayer.active = true;
+		audioMgr.playSound(SOUND_CLIPS.DEFAULT_CLICK);
+
+		const moves = solve({ blocks: this._hrd.blocks });
+		if (moves) {
+			this._results = mergeSteps(moves);
+			this.autoMove();
 		}
 	}
 
@@ -917,7 +961,7 @@ export class KlotskiView extends Component {
 	}
 
 	// private _createTopPlate() {
-	// 	const tmpPlateNode = instantiate(this.spPlate.node);
+	// 	const tmphttps://download-cn.cocos.com/CocosDashboard/image/2023-08-07/115/54f8153345cc41c7965ecb774e0cbfa5/54f8153345cc41c7965ecb774e0cbfa5.jpgPlateNode = instantiate(this.spPlate.node);
 	// 	this.deskTopPlatesNode.addChild(tmpPlateNode);
 	// }
 

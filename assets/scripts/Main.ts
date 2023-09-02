@@ -41,6 +41,8 @@ import { audioMgr, SOUND_CLIPS } from './AudioMgr';
 
 import { WIN_ID, getWinInfo, WIN_ZINDEX } from './common/mgrs/WinConfig';
 import WXAuthorize from './common/mgrs/WXAuthorize';
+import WXMgr from './WXMgr';
+import { KlotskiView } from './modules/klotskiModule/KlotskiView';
 
 const { ccclass, property } = _decorator;
 
@@ -180,11 +182,11 @@ export class Main extends Component {
 		// 预加载部分界面
 		resMgr.preloadPrefab(getWinInfo(WIN_ID.KLOTSKI).path);
 		resMgr.preloadPrefab(getWinInfo(WIN_ID.OVER).path);
-	}
 
-	onEnable() {
 		if (sys.platform === sys.Platform.WECHAT_GAME) {
 			console.log('on load auth');
+
+			//朋友圈分享
 			wx.showShareMenu({
 				withShareTicket: true,
 				menus: ['shareAppMessage', 'shareTimeline'],
@@ -229,8 +231,62 @@ export class Main extends Component {
 					console.log('res :>> ', res);
 				}
 			);
-		}
 
+			// 激励广告
+
+			try {
+				const { version } = wx.getSystemInfoSync();
+				console.log('version', version);
+				const m = version.match(/(\d+)\.(\d+)\.(\d+)/);
+				console.log('m', m);
+				if (m && m[1] && m[2] && m[3]) {
+					//version>= 2.0.4
+					const res = '2.0.4'
+						.split('.')
+						.map((v) => parseInt(v))
+						.reduce((pv, cv, cIndex, array) => {
+							console.log('array[cIndex]', array[cIndex]);
+							console.log('+m[cIndex + 1]', +m[cIndex + 1]);
+							if (array[cIndex] <= +m[cIndex + 1]) return cv + 0;
+							else return cv - 1;
+						}, 1);
+					console.log('res', res);
+					WXMgr.instance.canUseRewardAd = true;
+					if (WXMgr.instance.canUseRewardAd) {
+						WXMgr.instance.rewardAd = wx.createRewardedVideoAd({
+							adUnitId: 'adunit-4b552d2f15f93e7e',
+						});
+						WXMgr.instance.rewardAd.onLoad(() => {
+							console.log('微信广告拉取成功');
+						});
+						WXMgr.instance.rewardAd.onError((errMsg, errCode) => {
+							console.log(
+								`微信广告拉取失败-> errMsg: ${errMsg}, errCode: ${errCode}`
+							);
+							WXMgr.instance.rewardAd.load();
+						});
+						WXMgr.instance.rewardAd.onClose((res) => {
+							// 用户点击了【关闭广告】按钮
+							// 小于 2.1.0 的基础库版本，res 是一个 undefined
+							if ((res && res.isEnded) || res === undefined) {
+								// 正常播放结束，可以下发游戏奖励
+								console.log('正常播放结束，可以下发游戏奖励');
+								winMgr
+									.getKlotskiNode()
+									.getComponent(KlotskiView)
+									.rewardSuccess();
+							} else {
+								// 播放中途退出，不下发游戏奖励
+								console.log('播放中途退出，不下发游戏奖励');
+							}
+						});
+					}
+				}
+			} catch (error) {}
+		}
+	}
+
+	onEnable() {
 		this.dragonBook.addEventListener(
 			dragonBones.EventObject.COMPLETE,
 			this._dragonBookListener,

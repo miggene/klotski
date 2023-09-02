@@ -59,6 +59,10 @@ class WinMgr {
 		this._winLayer?.destroy();
 		this._winLayer = null;
 	}
+
+	public getKlotskiNode() {
+		return this._winLayer.getChildByName('KlotskiPrefab');
+	}
 }
 
 export const winMgr = WinMgr.instance;

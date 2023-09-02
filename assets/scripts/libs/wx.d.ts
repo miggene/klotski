@@ -68,4 +68,63 @@ declare module wx {
 		toCurrentGroup?: boolean;
 		path?: string;
 	}): void;
+
+	export function getSystemInfoSync(): {
+		brand: string;
+		model: string;
+		pixelRatio: number;
+		screenWidth: number;
+		screenHeight: number;
+		windowWidth: number;
+		windowHeight: number;
+		statusBarHeight: number;
+		language: string;
+		version: string;
+		system: string;
+		platform: string;
+		fontSizeSetting: number;
+		SDKVersion: string;
+		benchmarkLevel: number;
+		albumAuthorized: boolean;
+		cameraAuthorized: boolean;
+		locationAuthorized: boolean;
+		microphoneAuthorized: boolean;
+		notificationAuthorized: boolean;
+		notificationAlertAuthorized: boolean;
+		notificationBadgeAuthorized: boolean;
+		notificationSoundAuthorized: boolean;
+		phoneCalendarAuthorized: boolean;
+		bluetoothEnable: boolean;
+		locationEnabled: boolean;
+		wifiEnabled: boolean;
+		safeArea: {
+			left: number;
+			right: number;
+			top: number;
+			bottom: number;
+			width: number;
+			height: number;
+		};
+		locatonReducedAccuracy: boolean;
+		theme: string;
+		host: { appId: string };
+		enableDebug: boolean;
+		deviceOrientation: string;
+	};
+	function createRewardedVideoAd(param: {
+		adUnitId: string;
+		multiton?: boolean;
+	}): RewardedVideoAd;
+
+	export class RewardedVideoAd {
+		load(): Promise<void>;
+		show(): Promise<void>;
+		destroy(): void;
+		onLoad(listener: () => void): void;
+		offLoad(listener: () => void): void;
+		onError(listener: (errMsg: string, errCode: number) => void): void;
+		offError(listener: (errMsg: string, errCode: number) => void): void;
+		onClose(listener: (res?: { isEnded?: boolean }) => void): void;
+		offClose(listener: (res?: { isEnded?: boolean }) => void): void;
+	}
 }
